@@ -1,11 +1,48 @@
 /* General Styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Press Start 2P', cursive;
     margin: 0;
     padding: 0;
-    background-color: #111;
-    color: white;
+    background-color: black;
+    color: yellow;
     text-align: center;
+    overflow: hidden;
+}
+
+/* Pac-Man Background */
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/49/Pacman_background.png');
+    background-size: cover;
+    opacity: 0.2; /* Transparent effect */
+    z-index: -1;
+}
+
+/* Pac-Man Logo Animation */
+#pacman {
+    font-size: 40px;
+    font-weight: bold;
+    display: inline-block;
+    position: relative;
+    animation: eat 1.5s infinite;
+}
+
+/* Animation to simulate Pac-Man eating */
+@keyframes eat {
+    0% { content: "OkkOKI"; }
+    25% { content: "KkOKI"; }
+    50% { content: "OKI"; }
+    75% { content: "I"; }
+    100% { content: "OkkOKI"; }
+}
+
+/* Hero Section */
+#hero {
+    padding: 100px 20px;
+    font-size: 24px;
 }
 
 /* Navigation Bar */
@@ -19,12 +56,13 @@ body {
     width: 100%;
     top: 0;
     left: 0;
+    border-bottom: 2px solid yellow;
 }
 
 .logo {
     font-size: 24px;
     font-weight: bold;
-    color: #ffcc00;
+    color: yellow;
 }
 
 .nav-links {
@@ -35,7 +73,7 @@ body {
 
 .nav-links a {
     text-decoration: none;
-    color: white;
+    color: yellow;
     font-size: 16px;
     font-weight: bold;
     padding: 8px 12px;
@@ -44,24 +82,6 @@ body {
 }
 
 .nav-links a:hover {
-    background-color: #ffcc00;
+    background-color: yellow;
     color: black;
-}
-
-/* Hero Section */
-#hero {
-    padding: 100px 20px;
-    font-size: 24px;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        text-align: center;
-    }
-    .nav-links {
-        flex-direction: column;
-        padding-top: 10px;
-    }
 }
