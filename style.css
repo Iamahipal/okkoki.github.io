@@ -11,7 +11,7 @@ html, body {
     background-color: black;
     color: white;
     text-align: left;
-    height: 100vh; /* Forces full height */
+    min-height: 100vh; /* Ensures content takes full height */
     display: flex;
     flex-direction: column;
 }
@@ -38,10 +38,11 @@ html, body {
     max-width: 600px;
     width: 90%;
     margin: auto;
-    flex-grow: 1; /* Ensures content expands to push the footer down */
+    flex-grow: 1; /* Ensures content expands */
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding-bottom: 20px;
 }
 
 /* Sections */
@@ -74,17 +75,14 @@ html, body {
     margin: 0;
 }
 
-/* Sticky Footer (Always Visible) */
+/* Sticky Footer (Visible Without Scrolling) */
 footer {
     text-align: center;
     font-size: 14px;
     padding: 15px;
     border-top: 1px solid white;
     width: 100%;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    background: black;
+    margin-top: auto; /* Ensures it stays at the bottom */
 }
 
 /* Mobile Optimization */
