@@ -6,79 +6,68 @@ body {
     background-color: black;
     color: white;
     text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
-/* Main Container */
-.container {
-    width: 90%;
-    max-width: 400px;
+/* Navigation Bar */
+.navbar {
+    width: 100%;
+    padding: 15px 0;
+    background: black;
+    border-bottom: 2px solid white;
 }
 
-/* Logo */
 .logo {
     font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 40px;
 }
 
-/* Navigation */
-.nav-links {
-    list-style: none;
-    padding: 0;
+/* Main Container */
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 10px;
 }
 
-.nav-links li {
-    padding: 15px;
+/* Sections */
+.section {
     border-bottom: 1px solid white;
-    font-size: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    padding: 15px 0;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-.nav-links li:last-child {
-    border-bottom: none;
+.section h2 {
+    font-size: 22px;
+    margin: 0;
 }
 
-/* Hover Effect */
-.nav-links li:hover {
-    color: grey;
+/* Collapsible Content */
+.content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
 }
 
-/* Social Media */
-.socials {
-    margin-top: 40px;
-    font-size: 14px;
-}
-
-.socials a {
-    color: white;
-    text-decoration: none;
-    margin: 0 10px;
-}
-
-.socials a:hover {
-    color: grey;
+.content p {
+    font-size: 18px;
+    padding: 10px 0;
 }
 
 /* Footer */
-.footer {
-    margin-top: 20px;
-    font-size: 12px;
+footer {
+    margin-top: 50px;
+    font-size: 14px;
     opacity: 0.6;
 }
 
 /* Mobile Optimization */
 @media (max-width: 480px) {
     .container {
-        width: 95%;
+        width: 90%;
     }
-    .nav-links li {
+    .section h2 {
         font-size: 18px;
     }
 }
