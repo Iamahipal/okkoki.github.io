@@ -106,3 +106,26 @@ footer a:hover {
         font-size: 16px;
     }
 }
+
+/* Space-Themed Background */
+body {
+    background: black;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Creating Falling Stars Effect */
+@keyframes fallingStars {
+    from { transform: translateY(-10px); opacity: 0.8; }
+    to { transform: translateY(100vh); opacity: 0; }
+}
+
+.star {
+    position: absolute;
+    background: white;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: fallingStars linear infinite;
+}
