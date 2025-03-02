@@ -1,6 +1,9 @@
+/* Import Modern Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 /* General Styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: black;
@@ -19,7 +22,7 @@ body {
 
 .logo {
     font-size: 24px;
-    font-weight: bold;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -27,21 +30,22 @@ body {
 /* Main Container */
 .container {
     max-width: 600px;
-    margin: 50px auto;
+    margin: 40px auto;
     padding: 10px;
 }
 
 /* Sections */
 .section {
     border-bottom: 1px solid white;
-    padding: 15px 0;
+    padding: 12px 0; /* Adjusted spacing */
     cursor: pointer;
     transition: 0.3s;
 }
 
 /* Left-aligned headings */
 .section h2 {
-    font-size: 22px;
+    font-size: 20px;
+    font-weight: 600;
     margin: 0;
     padding-left: 10px;
 }
@@ -56,18 +60,18 @@ body {
 
 /* Adjust content alignment */
 .content p {
-    font-size: 18px;
-    padding: 10px 0;
+    font-size: 16px;
+    padding: 8px 0;
     margin: 0;
 }
 
 /* Footer with Contact Info */
 footer {
-    margin-top: 50px;
+    margin-top: 40px;
     font-size: 14px;
     text-align: center;
-    opacity: 0.6;
-    padding: 20px;
+    opacity: 0.8;
+    padding: 15px;
     border-top: 1px solid white;
 }
 
