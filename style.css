@@ -19,7 +19,7 @@ html, body {
 /* Navigation Bar */
 .navbar {
     width: 100%;
-    padding: 8px 0; /* Reduce top space */
+    padding: 10px 0;
     background: black;
     border-bottom: 2px solid white;
     text-align: center;
@@ -38,15 +38,15 @@ html, body {
     max-width: 600px;
     width: 90%;
     margin: auto;
-    flex-grow: 1; /* Ensures content expands properly */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Prevents extra spacing */
+    justify-content: flex-start;
 }
 
-/* Sections */
+/* Sections (Menu Items) */
 .section {
-    padding: 8px 0; /* Reduced section spacing */
+    padding: 12px 15px; /* Reduced padding for smaller gaps */
     cursor: pointer;
     transition: 0.3s;
     border-bottom: 1px solid white;
@@ -61,7 +61,6 @@ html, body {
 .section h2 {
     font-size: 18px;
     margin: 0;
-    padding-left: 10px;
 }
 
 /* Collapsible Content */
@@ -69,14 +68,13 @@ html, body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease-in-out;
-    padding-left: 15px;
 }
 
-/* Footer - Adjusted to Fit on Screen */
+/* Footer - Fixed Position Without Extra Space */
 footer {
     text-align: center;
     font-size: 14px;
-    padding: 10px 0;
+    padding: 12px 0;
     border-top: 1px solid white;
-    margin-top: auto; /* Pushes the footer up dynamically */
+    margin-top: 15px; /* Moves footer slightly up */
 }
