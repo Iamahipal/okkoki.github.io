@@ -1,18 +1,11 @@
 /* General Styles */
-* {
+body {
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    font-family: 'Arial', sans-serif;
     background-color: black;
     color: white;
     text-align: left;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Ensures content takes full height */
 }
 
 /* Navigation Bar */
@@ -24,7 +17,6 @@ html, body {
     text-align: center;
 }
 
-/* Logo */
 .logo {
     font-size: 24px;
     font-weight: bold;
@@ -35,9 +27,8 @@ html, body {
 /* Main Container */
 .container {
     max-width: 600px;
-    width: 90%;
-    margin: auto;
-    flex-grow: 1; /* Allows content to expand properly */
+    margin: 50px auto;
+    padding: 10px;
 }
 
 /* Sections */
@@ -50,7 +41,7 @@ html, body {
 
 /* Left-aligned headings */
 .section h2 {
-    font-size: 20px;
+    font-size: 22px;
     margin: 0;
     padding-left: 10px;
 }
@@ -65,15 +56,17 @@ html, body {
 
 /* Adjust content alignment */
 .content p {
-    font-size: 16px;
+    font-size: 18px;
     padding: 10px 0;
     margin: 0;
 }
 
-/* Footer */
+/* Footer with Contact Info */
 footer {
-    text-align: center;
+    margin-top: 50px;
     font-size: 14px;
+    text-align: center;
+    opacity: 0.6;
     padding: 20px;
     border-top: 1px solid white;
 }
@@ -81,7 +74,7 @@ footer {
 /* Mobile Optimization */
 @media (max-width: 480px) {
     .container {
-        width: 95%;
+        width: 90%;
     }
     .section h2 {
         font-size: 18px;
