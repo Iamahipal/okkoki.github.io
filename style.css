@@ -27,6 +27,15 @@ body {
     letter-spacing: 2px;
 }
 
+/* Logo Image Styling */
+.logo-img {
+    display: block;
+    margin: 0 auto;
+    width: 120px;  /* Adjust width as needed */
+    height: auto;
+    padding: 10px 0;
+}
+
 /* Main Container */
 .container {
     max-width: 600px;
