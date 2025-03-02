@@ -57,12 +57,13 @@ body {
     padding-left: 10px;
 }
 
-/* Collapsible Content */
+/* Faster Collapsible Content */
 .content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease-in-out;
+    transition: max-height 0.2s ease-out; /* Faster and smoother */
     padding-left: 15px;
+
 }
 
 /* Adjust content alignment */
