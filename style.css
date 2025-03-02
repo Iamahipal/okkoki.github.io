@@ -5,7 +5,7 @@ body {
     padding: 0;
     background-color: black;
     color: white;
-    text-align: center;
+    text-align: left;
 }
 
 /* Navigation Bar */
@@ -14,6 +14,7 @@ body {
     padding: 15px 0;
     background: black;
     border-bottom: 2px solid white;
+    text-align: center;
 }
 
 .logo {
@@ -38,9 +39,11 @@ body {
     transition: 0.3s;
 }
 
+/* Left-aligned headings */
 .section h2 {
     font-size: 22px;
     margin: 0;
+    padding-left: 10px;
 }
 
 /* Collapsible Content */
@@ -48,18 +51,24 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease-in-out;
+    padding-left: 15px;
 }
 
+/* Adjust content alignment */
 .content p {
     font-size: 18px;
     padding: 10px 0;
+    margin: 0;
 }
 
-/* Footer */
+/* Footer with Contact Info */
 footer {
     margin-top: 50px;
     font-size: 14px;
+    text-align: center;
     opacity: 0.6;
+    padding: 20px;
+    border-top: 1px solid white;
 }
 
 /* Mobile Optimization */
@@ -69,5 +78,8 @@ footer {
     }
     .section h2 {
         font-size: 18px;
+    }
+    .content p {
+        font-size: 16px;
     }
 }
