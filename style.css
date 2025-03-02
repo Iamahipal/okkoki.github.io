@@ -13,13 +13,13 @@ html, body {
     text-align: left;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100vh; /* Ensures content takes full height */
 }
 
 /* Navigation Bar */
 .navbar {
     width: 100%;
-    padding: 10px 0;
+    padding: 15px 0;
     background: black;
     border-bottom: 2px solid white;
     text-align: center;
@@ -38,18 +38,18 @@ html, body {
     max-width: 600px;
     width: 90%;
     margin: auto;
-    flex-grow: 1;
+    flex-grow: 1; /* Allows content to expand properly */
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center; /* Center content properly */
 }
 
-/* Sections (Menu Items) */
+/* Sections */
 .section {
-    padding: 12px 15px; /* Reduced padding for smaller gaps */
+    padding: 15px 0;
     cursor: pointer;
     transition: 0.3s;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid white; /* Adds line under each section */
 }
 
 /* Remove Line Below 'Research' */
@@ -59,8 +59,9 @@ html, body {
 
 /* Left-aligned headings */
 .section h2 {
-    font-size: 18px;
+    font-size: 20px;
     margin: 0;
+    padding-left: 10px;
 }
 
 /* Collapsible Content */
@@ -68,13 +69,22 @@ html, body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease-in-out;
+    padding-left: 15px;
 }
 
-/* Footer - Fixed Position Without Extra Space */
+/* Adjust content alignment */
+.content p {
+    font-size: 16px;
+    padding: 10px 0;
+    margin: 0;
+}
+
+/* Footer with Balanced Spacing */
 footer {
     text-align: center;
     font-size: 14px;
-    padding: 12px 0;
+    padding: 20px;
     border-top: 1px solid white;
-    margin-top: 15px; /* Moves footer slightly up */
+    margin-top: 40px; /* Moves the footer slightly up */
+    margin-bottom: 20px; /* Ensures equal bottom spacing */
 }
