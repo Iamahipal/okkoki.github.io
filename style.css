@@ -19,7 +19,7 @@ html, body {
 /* Navigation Bar */
 .navbar {
     width: 100%;
-    padding: 10px 0; /* Reduced padding */
+    padding: 8px 0; /* Further reduced padding */
     background: black;
     border-bottom: 2px solid white;
     text-align: center;
@@ -41,12 +41,13 @@ html, body {
     flex-grow: 1; /* Allows content to expand properly */
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center content properly */
+    justify-content: space-between; /* Pushes footer up */
+    min-height: 85vh; /* Ensures content fits the screen */
 }
 
 /* Sections */
 .section {
-    padding: 12px 0; /* Reduced spacing */
+    padding: 10px 0; /* Reduced spacing */
     cursor: pointer;
     transition: 0.3s;
     border-bottom: 1px solid white; /* Adds line under each section */
@@ -79,12 +80,11 @@ html, body {
     margin: 0;
 }
 
-/* Footer with Reduced Spacing */
+/* Footer - Pushed Up & Visible on First Load */
 footer {
     text-align: center;
     font-size: 14px;
-    padding: 15px 0; /* Reduced padding */
+    padding: 10px 0; /* Further reduced padding */
     border-top: 1px solid white;
-    margin-top: 20px; /* Moves the footer slightly up */
-    margin-bottom: 10px; /* Ensures equal bottom spacing */
+    margin-top: 10px; /* Brings footer even closer */
 }
