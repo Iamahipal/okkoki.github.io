@@ -3,35 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OkKOKI</title>
+    <title>OkKOKI - Devouring the Competition Digitally</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <!-- Logo -->
+    <!-- HEADER -->
+    <header class="navbar">
         <div class="logo">OkKOKI</div>
+    </header>
 
-        <!-- Navigation -->
-        <ul class="nav-links">
-            <li>Home</li>
-            <li>Portfolio</li>
-            <li>Services →</li>
-            <li>Team</li>
-            <li>Contact</li>
-        </ul>
-
-        <!-- Social Links -->
-        <div class="socials">
-            <a href="#">LinkedIn</a> | <a href="#">Instagram</a>
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- ABOUT US -->
+        <div class="section" onclick="toggleSection('about')">
+            <h2>About Us ⌄</h2>
+            <div class="content" id="about">
+                <p>We are a next-gen digital agency built for brands that want to dominate.</p>
+            </div>
         </div>
 
-        <!-- Footer -->
-        <div class="footer">
-            — Minimalist Collection —<br>
-            COPYRIGHT © 2024
+        <!-- PORTFOLIO -->
+        <div class="section" onclick="toggleSection('portfolio')">
+            <h2>Portfolio ⌄</h2>
+            <div class="content" id="portfolio">
+                <p>✔️ Brand A - Increased Engagement by 300%</p>
+                <p>✔️ Brand B - Built a Viral Marketing Strategy</p>
+                <p>✔️ Brand C - Launched a Trendsetting Campaign</p>
+            </div>
+        </div>
+
+        <!-- SERVICES -->
+        <div class="section" onclick="toggleSection('services')">
+            <h2>Services ⌄</h2>
+            <div class="content" id="services">
+                <p>✔️ Performance Marketing</p>
+                <p>✔️ SEO & Growth Hacking</p>
+                <p>✔️ Brand Strategy</p>
+                <p>✔️ Web Development</p>
+            </div>
+        </div>
+
+        <!-- RESEARCH (BLOG) -->
+        <div class="section" onclick="toggleSection('research')">
+            <h2>Research ⌄</h2>
+            <div class="content" id="research">
+                <p>✔️ 5 Digital Trends Brands Can’t Ignore in 2024</p>
+                <p>✔️ SEO in the AI Era – What’s Changing?</p>
+                <p>✔️ How to Make Your Brand Go Viral – A Blueprint</p>
+            </div>
+        </div>
+
+        <!-- CONTACT US -->
+        <div class="section" onclick="toggleSection('contact')">
+            <h2>Contact Us ⌄</h2>
+            <div class="content" id="contact">
+                <p>Email: hello@okkoki.com</p>
+                <p>LinkedIn | Instagram | Twitter</p>
+            </div>
         </div>
     </div>
 
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2024 OkKOKI. All Rights Reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
