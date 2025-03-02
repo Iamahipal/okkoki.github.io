@@ -46,10 +46,15 @@ html, body {
 
 /* Sections */
 .section {
-    border-bottom: 1px solid white;
     padding: 15px 0;
     cursor: pointer;
     transition: 0.3s;
+    border-bottom: 1px solid white; /* Adds line under each section */
+}
+
+/* Remove Line Below 'Research' */
+.section:last-of-type {
+    border-bottom: none;
 }
 
 /* Left-aligned headings */
