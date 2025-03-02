@@ -1,16 +1,17 @@
-/* General Styles */
+/* Reset Default Margin & Padding */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Set Full Screen Height */
 html, body {
     font-family: 'Arial', sans-serif;
     background-color: black;
     color: white;
     text-align: left;
-    min-height: 100vh; /* Ensure full height */
+    height: 100vh; /* Forces full height */
     display: flex;
     flex-direction: column;
 }
@@ -32,15 +33,15 @@ html, body {
     letter-spacing: 2px;
 }
 
-/* Main Container */
+/* Main Content Wrapper */
 .container {
     max-width: 600px;
     width: 90%;
     margin: auto;
-    flex-grow: 1; /* Allows content to expand fully */
+    flex-grow: 1; /* Ensures content expands to push the footer down */
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centers content vertically */
+    justify-content: center;
 }
 
 /* Sections */
@@ -73,13 +74,17 @@ html, body {
     margin: 0;
 }
 
-/* Footer with Contact Info */
+/* Sticky Footer (Always Visible) */
 footer {
     text-align: center;
     font-size: 14px;
     padding: 15px;
     border-top: 1px solid white;
-    margin-top: auto; /* Ensures footer stays at the bottom */
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: black;
 }
 
 /* Mobile Optimization */
