@@ -18,12 +18,13 @@ function toggleSection(id) {
 // Function to Create Floating Stars
 function createStars() {
     const numStars = 100; // Adjust number of stars
-    const container = document.body;
+    const container = document.querySelector(".stars-container");
 
     for (let i = 0; i < numStars; i++) {
         let star = document.createElement("div");
         star.classList.add("star");
         star.style.left = Math.random() * 100 + "vw";
+        star.style.top = Math.random() * 100 + "vh"; // Spread stars across the whole screen
         star.style.animationDuration = Math.random() * 5 + 3 + "s"; // Random speed
         star.style.animationDelay = Math.random() * 3 + "s"; // Random delay
         star.style.width = Math.random() * 2 + "px"; // Varying star sizes
