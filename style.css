@@ -1,11 +1,19 @@
-/* General Styles */
-body {
-    font-family: 'Arial', sans-serif;
+/* Reset Default Margin & Padding */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+/* Set Full Screen Height */
+html, body {
+    font-family: 'Arial', sans-serif;
     background-color: black;
     color: white;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensures content takes full height */
 }
 
 /* Navigation Bar */
@@ -17,6 +25,7 @@ body {
     text-align: center;
 }
 
+/* Logo */
 .logo {
     font-size: 24px;
     font-weight: bold;
@@ -24,11 +33,15 @@ body {
     letter-spacing: 2px;
 }
 
-/* Main Container */
+/* Main Content Wrapper */
 .container {
     max-width: 600px;
-    margin: 50px auto;
-    padding: 10px;
+    width: 90%;
+    margin: auto;
+    flex-grow: 1; /* Allows content to expand properly */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content properly */
 }
 
 /* Sections */
@@ -41,7 +54,7 @@ body {
 
 /* Left-aligned headings */
 .section h2 {
-    font-size: 22px;
+    font-size: 20px;
     margin: 0;
     padding-left: 10px;
 }
@@ -56,30 +69,17 @@ body {
 
 /* Adjust content alignment */
 .content p {
-    font-size: 18px;
+    font-size: 16px;
     padding: 10px 0;
     margin: 0;
 }
 
-/* Footer with Contact Info */
+/* Footer with Balanced Spacing */
 footer {
-    margin-top: 50px;
-    font-size: 14px;
     text-align: center;
-    opacity: 0.6;
+    font-size: 14px;
     padding: 20px;
     border-top: 1px solid white;
-}
-
-/* Mobile Optimization */
-@media (max-width: 480px) {
-    .container {
-        width: 90%;
-    }
-    .section h2 {
-        font-size: 18px;
-    }
-    .content p {
-        font-size: 16px;
-    }
+    margin-top: 40px; /* Moves the footer slightly up */
+    margin-bottom: 20px; /* Ensures equal bottom spacing */
 }
