@@ -6,11 +6,14 @@
     <title>OkKOKI - Homepage</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet"> <!-- Windows Phone font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
 </head>
 <body>
     <!-- HEADER -->
     <header class="navbar">
-        <h1 class="logo">OKKOKI</h1>
+        <a href="index.html">
+            <img src="OkKoki_Logo.png" alt="OkKOKI Logo" class="logo-img">
+        </a>
     </header>
 
     <!-- MAIN CONTENT (TILE GRID) -->
@@ -22,45 +25,26 @@
         </div>
 
         <!-- Medium Tiles (3x2 Grid) -->
-        <div class="tile medium yellow" onclick="tileClick('about')">
+        <div class="tile medium blue" onclick="tileClick('about')">
             <h3>About Us</h3>
-            <i class="icon">👤</i>
+            <i class="fas fa-users white-icon"></i>
         </div>
-        <div class="tile medium green" onclick="tileClick('services')">
+        <div class="tile medium blue" onclick="tileClick('services')">
             <h3>Our Services</h3>
-            <i class="icon">🎯</i>
+            <i class="fas fa-bullseye white-icon"></i>
         </div>
-        <div class="tile medium red" onclick="tileClick('portfolio')">
+        <div class="tile medium blue" onclick="tileClick('portfolio')">
             <h3>Portfolio</h3>
             <p>400% Growth Achieved!</p>
+            <i class="fas fa-chart-line white-icon"></i>
         </div>
-        <div class="tile medium purple" onclick="tileClick('research')">
+        <div class="tile medium blue" onclick="tileClick('research')">
             <h3>Blog/Research</h3>
-            <i class="icon">💡</i>
+            <i class="fas fa-lightbulb white-icon"></i>
         </div>
-        <div class="tile medium orange" onclick="tileClick('contact')">
+        <div class="tile medium blue" onclick="tileClick('contact')">
             <h3>Contact Us</h3>
-            <i class="icon">📞</i>
-        </div>
-        <div class="tile medium blue" onclick="openWhatsApp()">
-            <h3>WhatsApp</h3>
-            <i class="icon">💬</i>
-        </div>
-        <div class="tile medium green" onclick="openInstagram()">
-            <h3>Instagram</h3>
-            <i class="icon">📸</i>
-        </div>
-        <div class="tile medium red" onclick="openTwitter()">
-            <h3>X (Twitter)</h3>
-            <i class="icon">🐦</i>
-        </div>
-        <div class="tile medium purple" onclick="dialPhone()">
-            <h3>Phone</h3>
-            <i class="icon">📱</i>
-        </div>
-        <div class="tile medium yellow" onclick="openEmail()">
-            <h3>Email</h3>
-            <i class="icon">✉️</i>
+            <i class="fas fa-phone white-icon"></i>
         </div>
     </div>
 
