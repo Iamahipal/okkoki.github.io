@@ -3,80 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OkKOKI - Devouring the Competition Digitally</title>
+    <title>OkKOKI - Homepage</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet"> <!-- Windows Phone font -->
 </head>
 <body>
     <!-- HEADER -->
     <header class="navbar">
-        <a href="index.html">
-            <h1 class="logo">OKKOKI</h1>
-        </a>
+        <h1 class="logo">OKKOKI</h1>
     </header>
 
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <h1>We Grow Brands, No Fluff, Just Results</h1>
-        <p>Hey, I’m [Your Name], the growth nerd behind OkKOKI. Let’s make your business take off!</p>
-        <button class="cta-button" onclick="scrollToContact()">Get Your Free Growth Plan</button>
-    </section>
-
-    <!-- MAIN CONTENT -->
-    <div class="container">
-        <!-- ABOUT US -->
-        <div class="section" onclick="toggleSection('about')">
-            <h2>About Us</h2>
-            <div class="content" id="about">
-                <p>At OkKOKI, we cut through the noise with data-driven, high-impact strategies that fuel real growth. From powerful brand positioning to high-ROI marketing, we deliver results that matter. If you're ready to scale, dominate, and lead, let’s make it happen.</p>
-            </div>
+    <!-- MAIN CONTENT (TILE GRID) -->
+    <div class="tile-container">
+        <!-- Large Header Tile -->
+        <div class="tile large blue animate" id="header-tile">
+            <h2>OkKOKI – Devouring the Competition Digitally</h2>
+            <p>Boisar, Maharashtra – Fueling Small Business Growth</p>
         </div>
 
-        <!-- PORTFOLIO -->
-        <div class="section" onclick="toggleSection('portfolio')">
-            <h2>Portfolio</h2>
-            <div class="content" id="portfolio">
-                <p>✔️ ReelStar - Increased Followers by 400%</p>
-                <p>✔️ WorkIndia - Built a Viral Marketing Strategy</p>
-                <p>✔️ WeTrend – Built a Brand Strategy</p>
-            </div>
+        <!-- Medium Tiles (3x2 Grid) -->
+        <div class="tile medium yellow" onclick="tileClick('about')">
+            <h3>About Us</h3>
+            <i class="icon">👤</i>
         </div>
-
-        <!-- SERVICES -->
-        <div class="section" onclick="toggleSection('services')">
-            <h2>Services</h2>
-            <div class="content" id="services">
-                <p>✔️ Brand Strategy & Positioning</p>
-                <p>✔️ Performance Marketing</p>
-                <p>✔️ SEO & Growth Hacking</p>
-                <p>✔️ Social Media Growth</p>
-                <p>✔️ Creative & Content Marketing</p>
-                <p>✔️ Web Development</p>
-            </div>
+        <div class="tile medium green" onclick="tileClick('services')">
+            <h3>Our Services</h3>
+            <i class="icon">🎯</i>
         </div>
-
-        <!-- RESEARCH (BLOG) -->
-        <div class="section" onclick="toggleSection('research')">
-            <h2>Research</h2>
-            <div class="content" id="research">
-                <p>5 Digital Trends Brands Can’t Ignore in 2025</p>
-                <p>SEO in the AI Era – What’s Changing?</p>
-                <p>How to Make Your Brand Go Viral – A Blueprint</p>
-            </div>
+        <div class="tile medium red" onclick="tileClick('portfolio')">
+            <h3>Portfolio</h3>
+            <p>400% Growth Achieved!</p>
+        </div>
+        <div class="tile medium purple" onclick="tileClick('research')">
+            <h3>Blog/Research</h3>
+            <i class="icon">💡</i>
+        </div>
+        <div class="tile medium orange" onclick="tileClick('contact')">
+            <h3>Contact Us</h3>
+            <i class="icon">📞</i>
+        </div>
+        <div class="tile medium blue" onclick="openWhatsApp()">
+            <h3>WhatsApp</h3>
+            <i class="icon">💬</i>
+        </div>
+        <div class="tile medium green" onclick="openInstagram()">
+            <h3>Instagram</h3>
+            <i class="icon">📸</i>
+        </div>
+        <div class="tile medium red" onclick="openTwitter()">
+            <h3>X (Twitter)</h3>
+            <i class="icon">🐦</i>
+        </div>
+        <div class="tile medium purple" onclick="dialPhone()">
+            <h3>Phone</h3>
+            <i class="icon">📱</i>
+        </div>
+        <div class="tile medium yellow" onclick="openEmail()">
+            <h3>Email</h3>
+            <i class="icon">✉️</i>
         </div>
     </div>
 
-    <!-- FOOTER WITH CONTACT INFO -->
+    <!-- FOOTER -->
     <footer>
-        <p><strong>Contact Us:</strong></p>
-        <p>Email: <a href="mailto:shekhawatokkoki@gmail.com">shekhawatokkoki@gmail.com</a></p>
-        <p>Phone: <a href="tel:+917020340973">+91 7020340973</a></p>
-        <p>
-            <a href="https://wa.me/917020340973?text=Hi" target="_blank">WhatsApp</a> |
-            <a href="https://www.instagram.com/okkoki.in/" target="_blank">Instagram</a> |
-            <a href="https://x.com/OkKoki_in" target="_blank">X (Twitter)</a>
-        </p>
-        <p>© 2025 OkKOKI. All Rights Reserved.</p>
+        <p>© 2025 OkKOKI. All Rights Reserved. | Boisar, Maharashtra</p>
     </footer>
 
     <script src="script.js"></script>
