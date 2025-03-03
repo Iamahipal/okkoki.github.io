@@ -20,17 +20,14 @@ body {
     z-index: 1000;
 }
 
-.logo {
-    font-size: 2.5rem;
-    color: #FFFFFF;
-    text-transform: uppercase;
-    margin: 0;
-    letter-spacing: 2px;
-    transition: color 0.3s;
+.logo-img {
+    width: 120px; /* Adjust width as needed */
+    height: auto;
+    transition: opacity 0.3s;
 }
 
-.logo:hover {
-    color: #00BFFF;
+.logo-img:hover {
+    opacity: 0.8;
 }
 
 /* Tile Container */
@@ -52,6 +49,8 @@ body {
     transition: transform 0.3s, background 0.3s;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     overflow: hidden;
+    background-color: #0078D7; /* Blue like Windows Phone */
+    color: #FFFFFF;
 }
 
 .tile:hover {
@@ -69,12 +68,7 @@ body {
     font-size: 1.2rem;
 }
 
-.blue { background-color: #0078D7; }
-.yellow { background-color: #FFB900; }
-.green { background-color: #107C10; }
-.red { background-color: #E81123; }
-.purple { background-color: #5C2D91; }
-.orange { background-color: #F7630C; }
+.blue { background-color: #0078D7; } /* Already blue, no change needed */
 
 .tile h2, .tile h3 {
     margin: 0 0 10px;
@@ -86,24 +80,9 @@ body {
     font-size: 0.9rem;
 }
 
-.tile .icon {
+.white-icon {
+    color: #FFFFFF; /* Ensure icons are white */
     font-size: 1.5rem;
-}
-
-.cta-button {
-    background: #FFFFFF;
-    color: #000000;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.3s;
-}
-
-.cta-button:hover {
-    background: #00BFFF;
-    transform: scale(1.1);
 }
 
 /* Animation for Large Tile */
@@ -128,18 +107,6 @@ footer {
     border-top: 1px solid #A9A9A9;
 }
 
-footer a {
-    color: #00BFFF;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-footer a:hover {
-    color: #39FF14;
-    text-decoration: underline;
-}
-
 /* Mobile Optimization */
 @media (max-width: 768px) {
     .tile-container {
@@ -157,8 +124,8 @@ footer a:hover {
         font-size: 1rem;
     }
 
-    .logo {
-        font-size: 2rem;
+    .logo-img {
+        width: 100px; /* Smaller on mobile */
     }
 
     .navbar {
@@ -183,8 +150,8 @@ footer a:hover {
         font-size: 0.9rem;
     }
 
-    .logo {
-        font-size: 1.5rem;
+    .logo-img {
+        width: 80px; /* Even smaller on very small screens */
     }
 
     footer {
