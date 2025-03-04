@@ -3,49 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OkKOKI</title>
+    <title>OkKOKI - Fueling Small Business Growth</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    <!-- HEADER WITH LOGO -->
+    <!-- HEADER (LOGO) -->
     <header class="navbar">
-        <img src="OkKoki_Logo.png" alt="OkKOKI Logo" class="logo-img" onclick="window.location.reload();">
+        <img src="OkKoki_Logo.png" alt="OkKOKI Logo" class="logo-img">
     </header>
 
-    <!-- TILE CONTAINER -->
-    <div class="tile-container">
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <h1>OkKOKI</h1>
+        <h2>Fueling Small Business Growth</h2>
+    </div>
 
-        <!-- HERO SECTION -->
-        <div class="tile hero">
-            <h2>OKKOKI</h2>
-            <p>Fueling Small Business Growth</p>
+    <!-- MAIN CONTENT (TILE LAYOUT) -->
+    <div class="grid-container">
+        
+        <!-- Section 1: Services, Portfolio, Blog -->
+        <div class="tile services">Services</div>
+        <div class="tile portfolio">Portfolio</div>
+        <div class="tile blog">Blog</div>
+
+        <!-- Section 2: People, Mission, Hot Take -->
+        <div class="tile people">People</div>
+        <div class="tile mission">Mission</div>
+        <div class="tile hot-take">Hot Take!</div>
+
+        <!-- Section 3: Contact Section -->
+        <div class="tile contact-icons">
+            <div class="small-tile location"></div>
+            <div class="small-tile email"></div>
+            <div class="small-tile instagram"></div>
+            <div class="small-tile twitter"></div>
         </div>
-
-        <!-- NAVIGATION SECTION -->
-        <div class="tile square">Services</div>
-        <div class="tile square">Portfolio</div>
-        <div class="tile square">Blog</div>
-
-        <!-- COMPANY INFORMATION SECTION -->
-        <div class="tile square">People</div>
-        <div class="tile square">Mission</div>
-        <div class="tile square">Hot Take!</div>
-
-        <!-- CONTACT SECTION -->
-        <div class="tile small-icon"><i class="fas fa-map-marker-alt"></i></div>
-        <div class="tile small-icon"><i class="fas fa-envelope"></i></div>
-        <div class="tile small-icon"><i class="fab fa-instagram"></i></div>
-        <div class="tile small-icon"><i class="fab fa-twitter"></i></div>
-
-        <div class="tile square">WhatsApp</div>
-        <div class="tile square">Phone</div>
-
-        <!-- FOOTER SECTION -->
-        <div class="tile footer">Footer</div>
+        <div class="tile whatsapp">WhatsApp</div>
+        <div class="tile phone">Phone</div>
 
     </div>
 
+    <!-- FOOTER -->
+    <footer>
+        © 2025 OkKOKI. All Rights Reserved.
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
