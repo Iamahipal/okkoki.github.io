@@ -1,281 +1,75 @@
+/* Import Modern Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 /* General Styles */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
+    background-color: #003366; /* Dark Blue */
+    color: black;
     margin: 0;
     padding: 0;
-    background-color: #000000;
-    color: #FFFFFF;
-    text-align: center;
-    overflow-x: hidden;
-    min-height: 100vh;
-}
-
-/* Mobile-Only Class (Hide on Desktop) */
-.mobile-only {
-    display: block;
-}
-
-@media (min-width: 768px) { /* Desktop screens (tablets and up) */
-    .mobile-only {
-        display: none;
-    }
-}
-
-/* Desktop Warning (Show on Desktop, Hide on Mobile) */
-.desktop-warning {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    color: #FFFFFF;
-    text-align: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-@media (min-width: 768px) {
-    .desktop-warning {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
 }
 
 /* Navigation Bar */
 .navbar {
     width: 100%;
-    padding: 10px 0;
-    background: #000000;
+    padding: 15px 0;
+    background: black;
     text-align: center;
-    position: fixed;
-    top: 0;
-    z-index: 1000;
 }
 
 .logo-img {
-    width: 80px; /* Smaller for mobile */
+    width: 100px;
     height: auto;
-    transition: opacity 0.3s;
-}
-
-.logo-img:hover {
-    opacity: 0.8;
-}
-
-.logo-img-small {
-    width: 60px; /* Smaller logo in header tile */
-    height: auto;
-    margin-bottom: 10px;
-}
-
-/* Tile Container */
-.tile-container {
-    max-width: 100%;
-    margin: 60px auto 20px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Tile Row for Side-by-Side Layout */
-.tile-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    width: 100%;
-    gap: 10px;
-    margin: 0 auto;
-    max-width: 600px; /* Limit width for better mobile layout */
-}
-
-/* Tile Styles */
-.tile {
-    border-radius: 10px;
-    padding: 15px;
     cursor: pointer;
-    transition: transform 0.3s, background 0.3s;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    background-color: #0078D7; /* Blue like Windows Phone */
-    color: #FFFFFF;
-    width: 45%; /* Two tiles per row on wider mobiles */
-    max-width: 280px; /* Limit tile width for consistency */
 }
 
-.tile:hover {
-    transform: scale(1.05);
+/* Tile Grid Layout */
+.tile-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px;
+    margin: auto;
+    max-width: 100%;
 }
 
-.large {
-    height: 120px;
-    font-size: 1rem;
-    width: 90%;
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.medium {
-    height: 80px;
-    font-size: 0.9rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.small-tile {
-    height: 60px;
-    font-size: 0.8rem;
-    width: 45%; /* Two small tiles per row in contact-grid */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 5px;
-}
-
-.contact-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    padding: 5px;
-    width: 90%;
-    max-width: 300px;
-}
-
-.blue { background-color: #0078D7; } /* Already blue, no change needed */
-
-.tile h2 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-.tile p {
-    margin: 0;
-    font-size: 0.8rem;
-}
-
-.white-icon {
-    color: #FFFFFF; /* Ensure icons are white */
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-}
-
-.tile-label {
-    font-size: 0.7rem; /* Small text below icon */
-    margin-top: 5px;
-    text-transform: uppercase;
+/* Tile Styling */
+.tile {
+    background-color: #42A5F5; /* Windows Phone Tile Color */
+    color: black;
+    font-size: 18px;
     font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease;
 }
 
-/* Animation for Large Tile */
-.animate {
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
+/* Tile Size Variations */
+.large { grid-column: span 3; height: 100px; }
+.medium { grid-column: span 2; height: 80px; }
+.small { height: 70px; }
+.icon { height: 50px; font-size: 24px; }
 
 /* Footer */
-footer {
-    margin-top: 20px;
-    padding: 15px;
-    background: #0078D7;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
+.footer {
+    background-color: #0078D7;
+    color: white;
 }
 
-footer p {
-    font-size: 0.7rem;
-    margin: 5px 0;
+/* Hover Effect */
+.tile:hover {
+    background-color: #2196F3;
 }
 
 /* Mobile Optimization */
 @media (max-width: 480px) {
-    .tile-row {
-        flex-direction: column;
-        align-items: center;
+    .tile-container {
+        grid-template-columns: repeat(2, 1fr); /* Two columns for mobile */
     }
-
-    .tile {
-        width: 90%;
-        max-width: 300px;
-    }
-
-    .medium, .large {
-        height: auto;
-        padding: 15px;
-    }
-
-    .small-tile {
-        width: 90%;
-        max-width: 140px;
-    }
-
-    .contact-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .logo-img {
-        width: 60px;
-    }
-
-    footer {
-        width: 90%;
-        max-width: 300px;
-    }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-    .tile-row {
-        flex-direction: row;
-        justify-content: space-around;
-    }
-
-    .tile {
-        width: 45%;
-        max-width: 280px;
-    }
-
-    .medium, .large {
-        height: auto;
-        padding: 15px;
-    }
-
-    .small-tile {
-        width: 45%;
-        max-width: 140px;
-    }
-
-    .contact-grid {
-        flex-direction: row;
-        justify-content: space-around;
-    }
-
-    .logo-img {
-        width: 80px;
-    }
-
-    footer {
-        width: 90%;
-        max-width: 300px;
-    }
+    .large { grid-column: span 2; } /* Large tile takes full width */
 }
