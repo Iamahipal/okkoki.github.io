@@ -1,110 +1,28 @@
 /* General Styles */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #000000;
-    color: #FFFFFF;
-    text-align: center;
-    overflow-x: hidden;
-    min-height: 100vh;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-/* Mobile-Only Class (Hide on Desktop) */
-.mobile-only {
-    display: block;
-}
-
-@media (min-width: 768px) { /* Desktop screens (tablets and up) */
-    .mobile-only {
-        display: none;
-    }
-}
-
-/* Desktop Warning (Show on Desktop, Hide on Mobile) */
-.desktop-warning {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    color: #FFFFFF;
-    text-align: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-@media (min-width: 768px) {
-    .desktop-warning {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-}
-
-/* Tile Grid */
-.tile-grid {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 10px;
+/* Grid Layout */
+.grid-container {
     display: grid;
-    gap: 10px;
-    justify-items: center;
+    grid-template-columns: repeat(3, 100px); /* 3 columns */
+    grid-template-rows: repeat(4, 100px);  /* 4 rows */
+    gap: 5px; /* Space between tiles */
+    background-color: black;
 }
 
-/* Tile Styles */
+/* Tiles */
 .tile {
-    border-radius: 10px;
-    padding: 0;
-    background-color: #0078D7; /* Blue like Windows Phone */
-    width: 100px; /* Default square tile size */
-    height: 100px; /* Default square tile size */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s;
-}
-
-.tile:hover {
-    transform: scale(1.05);
-}
-
-.blue { background-color: #0078D7; } /* Already blue, no change needed */
-
-/* Mobile Optimization */
-@media (max-width: 320px) {
-    .tile-grid {
-        grid-template-columns: 1fr; /* 1 tile per row on very small screens */
-        gap: 5px;
-    }
-
-    .tile {
-        width: 80px; /* Smaller square tiles on very small screens */
-        height: 80px;
-    }
-}
-
-@media (min-width: 321px) and (max-width: 480px) {
-    .tile-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 tiles per row on small screens */
-        gap: 5px;
-    }
-
-    .tile {
-        width: 90px; /* Medium square tiles on small screens */
-        height: 90px;
-    }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-    .tile-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 tiles per row on typical mobiles */
-        gap: 10px;
-    }
-
-    .tile {
-        width: 100px; /* Default square tile size */
-        height: 100px;
-    }
+    width: 100px;
+    height: 100px;
+    background-color: #0047ab; /* Windows Phone Blue */
+    border: 2px solid black; /* Border between tiles */
+    box-sizing: border-box;
 }
