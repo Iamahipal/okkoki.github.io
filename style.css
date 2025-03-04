@@ -51,7 +51,7 @@ body {
     margin: 0 auto;
     padding: 10px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr); /* 3 tiles per row on mobile */
     gap: 10px;
     justify-items: center;
 }
@@ -59,10 +59,10 @@ body {
 /* Tile Styles */
 .tile {
     border-radius: 10px;
-    padding: 15px;
+    padding: 0;
     background-color: #0078D7; /* Blue like Windows Phone */
-    width: 100%;
-    height: 80px; /* Uniform tile height */
+    width: 100px; /* Square tile width */
+    height: 100px; /* Square tile height */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
 }
@@ -76,22 +76,24 @@ body {
 /* Mobile Optimization */
 @media (max-width: 480px) {
     .tile-grid {
-        grid-template-columns: repeat(2, 1fr); /* Stack on very small screens */
+        grid-template-columns: repeat(2, 1fr); /* 2 tiles per row on very small screens */
         gap: 5px;
     }
 
     .tile {
-        height: 60px; /* Smaller tiles on very small screens */
+        width: 80px; /* Smaller square tiles on very small screens */
+        height: 80px;
     }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
     .tile-grid {
-        grid-template-columns: repeat(4, 1fr); /* Maintain 4x5 grid on typical mobiles */
+        grid-template-columns: repeat(3, 1fr); /* Maintain 3 tiles per row on typical mobiles */
         gap: 10px;
     }
 
     .tile {
-        height: 80px; /* Default tile height */
+        width: 100px; /* Default square tile size */
+        height: 100px;
     }
 }
