@@ -1,54 +1,50 @@
-/* General Reset */
-* {
+/* General Styling */
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
+    background-color: black;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: black;
 }
 
+/* Grid Layout */
 .grid-container {
     display: grid;
-    width: 90vw;
-    height: 95vh;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    gap: 5px;
+    grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
+    grid-template-rows: repeat(6, 1fr); /* Ensuring 6 sections */
+    gap: 5px; /* Keeping proper spacing */
+    width: min(100vw, 90vh); /* Ensuring proper scaling */
+    max-width: 500px; /* Prevents excessive stretching */
 }
 
-/* Base Tile Styles */
+/* Standard Tile */
 .tile {
-    background-color: #0057b7;
-    border: 2px solid black;
+    background-color: #0057B7;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1; /* Keeps all tiles square */
 }
 
-/* Large Tiles */
+/* Large Tile (Spanning Full Width) */
 .large {
-    grid-column: span 3;
-    height: auto;
+    grid-column: span 3; /* Takes full width */
+    aspect-ratio: 3/1; /* Keeping consistent height */
 }
 
-/* Medium Tile */
+/* Medium Tile (Spanning Two Columns) */
 .medium {
-    grid-column: span 2;
-    height: auto;
+    grid-column: span 2; /* Spans two columns */
+    aspect-ratio: 2/1; /* Ensuring proper height */
 }
 
-/* Small Tiles in 4th Section */
-.large-grid {
+/* Fixing Small Tile Row Issue */
+.small {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* Ensuring 2x2 small tiles */
     grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
-}
-
-.small-tile {
-    background-color: #0057b7;
-    border: 2px solid black;
+    gap: 5px; /* Proper spacing */
 }
