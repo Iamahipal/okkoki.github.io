@@ -1,45 +1,51 @@
-// Wait for the document to load
-document.addEventListener("DOMContentLoaded", function () {
-    animateHeroSection();
-    addTileClickEffects();
-});
-
-// HERO SECTION ANIMATION (Windows Phone Style)
-function animateHeroSection() {
-    const hero = document.querySelector(".hero");
-    hero.style.opacity = 0;
-    hero.style.transform = "scale(0.9)";
-    
-    setTimeout(() => {
-        hero.style.transition = "opacity 0.8s ease-out, transform 0.8s ease-out";
-        hero.style.opacity = 1;
-        hero.style.transform = "scale(1)";
-    }, 300);
+// Tile click handler (for now, logs to console; we'll add page navigation later)
+function tileClick(tileId) {
+    console.log(`Clicked ${tileId} tile`);
+    alert(`You clicked the ${tileId} tile! We'll add navigation to the ${tileId} page later.`);
 }
 
-// ADDING CLICK EFFECTS TO TILES (Mimic Windows Phone Live Tiles)
-function addTileClickEffects() {
-    const tiles = document.querySelectorAll(".tile");
-    tiles.forEach(tile => {
-        tile.addEventListener("click", function () {
-            this.classList.add("tile-press-effect");
-
-            // Remove the effect after animation
-            setTimeout(() => {
-                this.classList.remove("tile-press-effect");
-            }, 200);
-        });
-    });
+// WhatsApp click handler (opens WhatsApp with "Hi" pre-filled)
+function openWhatsApp() {
+    const phone = '+917020340973';
+    const message = encodeURIComponent('Hi');
+    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
 }
 
-// OPTIONAL: Smooth Scroll to Sections when Clicked (if sections expand later)
-document.querySelectorAll(".tile").forEach(tile => {
-    tile.addEventListener("click", function () {
-        const targetId = this.getAttribute("data-target");
-        if (targetId) {
-            document.getElementById(targetId).scrollIntoView({
-                behavior: "smooth"
-            });
-        }
-    });
+// Instagram click handler (opens Instagram profile in a new tab)
+function openInstagram() {
+    window.open('https://www.instagram.com/okkoki.in/', '_blank');
+}
+
+// Twitter (X) click handler (opens X profile in a new tab)
+function openTwitter() {
+    window.open('https://x.com/OkKoki_in', '_blank');
+}
+
+// Phone click handler (dials the number using the device's dialer)
+function dialPhone() {
+    const phone = '+917020340973';
+    window.location.href = `tel:${phone}`;
+}
+
+// Email click handler (opens the default email client with pre-filled details)
+function openEmail() {
+    const email = 'shekhawatokkoki@gmail.com';
+    const subject = encodeURIComponent('Inquiry for OkKOKI Services');
+    const body = encodeURIComponent('Hi, I’d like to learn more about your digital marketing services.');
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
+// Check if the device is mobile and show/hide content
+document.addEventListener('DOMContentLoaded', function() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    const desktopWarning = document.getElementById('desktopWarning');
+    const mobileContent = document.querySelector('.mobile-only');
+
+    if (isMobile) {
+        mobileContent.style.display = 'block';
+        if (desktopWarning) desktopWarning.style.display = 'none';
+    } else {
+        mobileContent.style.display = 'none';
+        if (desktopWarning) desktopWarning.style.display = 'flex';
+    }
 });
