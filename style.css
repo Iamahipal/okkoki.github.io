@@ -12,36 +12,35 @@ body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
-    grid-template-rows: repeat(6, auto); /* Ensuring equal row height */
-    grid-gap: 4px; /* Keeping proper spacing */
-    width: 100vw; /* Fully fit screen width */
-    max-width: 500px; /* Prevent excessive stretching */
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 4px; /* Adjusted gap to prevent inconsistency */
+    width: min(100vw, 90vh);
+    max-width: 500px;
 }
 
 /* Standard Tile */
 .tile {
     background-color: #0057B7;
-    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    aspect-ratio: 1/1; /* Keeps all tiles square */
+    aspect-ratio: 1/1;
 }
 
-/* Large Tile (Hero Section) */
+/* Large Tile (Spanning Full Width) */
 .large {
-    grid-column: span 3; /* Takes full width */
-    aspect-ratio: 3/1; /* Maintaining proportion */
+    grid-column: span 3;
+    aspect-ratio: 3/1;
 }
 
-/* Medium Tile (Fixing Bottom Spacing Issue) */
+/* Medium Tile (Fixing Alignment Issue) */
 .medium {
     grid-column: span 2;
-    min-height: 0; /* Ensures it fully stretches */
+    min-height: 0; /* Prevents overflow causing spacing issues */
 }
 
-/* Small Tiles Section */
+/* Small Tiles */
 .small {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
