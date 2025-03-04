@@ -1,58 +1,55 @@
-* {
-    box-sizing: border-box;
+/* General Styling */
+body {
     margin: 0;
     padding: 0;
-}
-
-body, html {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: black;
-}
-
-.windows-phone-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    gap: 5px;
-    height: 100vh;
-    width: 100vw;
-    padding: 5px;
-    position: relative;
-}
-
-.tile {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #0057B7;
-    color: white;
-    text-align: center;
-    aspect-ratio: 1/1;
-    overflow: hidden;
-    position: relative;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.large-tile {
+/* Grid Layout */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(5, 1fr); /* Adjusted to 5 rows to accommodate layout */
+    gap: 10px; /* Increased gap for better visual separation */
+    width: min(100vw, 90vh);
+    max-width: 500px;
+    padding: 10px; /* Added padding to prevent tiles from touching screen edges */
+}
+
+/* Standard Tile */
+.tile {
+    background-color: #0057B7;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Large Tile (First Row Spanning Full Width) */
+.large {
     grid-column: span 3;
     aspect-ratio: 3/1;
 }
 
-.medium-tile {
+/* Medium Tile (Spanning Two Columns) */
+.medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
 }
 
-.small-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
-    aspect-ratio: 1/1;
+/* Hover and Active States for Tiles */
+.tile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.small-grid .tile {
-    background-color: #00A4EF;
+.tile:active {
+    transform: scale(0.95);
 }
