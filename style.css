@@ -13,11 +13,10 @@ body {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
-    grid-template-rows: auto; /* Auto-adjusts row height */
-    gap: 5px; /* Keeping proper spacing */
-    width: min(100vw, 90vh); /* Scaling properly */
-    max-width: 500px;
-    grid-auto-rows: 1fr; /* Ensures uniform row heights */
+    grid-template-rows: repeat(6, auto); /* Ensuring equal row height */
+    grid-gap: 4px; /* Keeping proper spacing */
+    width: 100vw; /* Fully fit screen width */
+    max-width: 500px; /* Prevent excessive stretching */
 }
 
 /* Standard Tile */
@@ -39,7 +38,7 @@ body {
 /* Medium Tile (Fixing Bottom Spacing Issue) */
 .medium {
     grid-column: span 2;
-    height: 100%; /* Ensures it fully stretches */
+    min-height: 0; /* Ensures it fully stretches */
 }
 
 /* Small Tiles Section */
@@ -47,5 +46,5 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
+    gap: 4px;
 }
