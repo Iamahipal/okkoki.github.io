@@ -12,8 +12,8 @@ body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
-    grid-template-rows: repeat(4, 1fr);  /* 4 equal rows */
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-rows: repeat(6, 1fr);  /* 6 rows instead of 4 */
     gap: 5px; /* Space between tiles */
     width: 90vw;  /* 90% of the viewport width */
     height: 90vh; /* 90% of the viewport height */
