@@ -26,72 +26,73 @@
     <div class="tile-container">
         <!-- Hero Section (Large Tile) -->
         <div class="tile large blue animate" id="header-tile">
-            <h2>OkKOKI – Fueling Small Business Growth</h2>
+            <img src="OkKoki_Logo.png" alt="OkKOKI Logo" class="logo-img-small" style="display: none;">
+            <h2>OKKOKI</h2>
+            <p>Fueling Small Business Growth</p>
         </div>
 
-        <!-- Navigation Section (Three Medium Tiles) -->
-        <div class="tile medium blue" onclick="tileClick('about')">
-            <i class="fas fa-users white-icon"></i>
-            <span class="tile-label">About</span>
-        </div>
-        <div class="tile medium blue" onclick="tileClick('services')">
-            <i class="fas fa-bullseye white-icon"></i>
-            <span class="tile-label">Services</span>
-        </div>
-        <div class="tile medium blue" onclick="tileClick('portfolio')">
-            <i class="fas fa-chart-line white-icon"></i>
-            <span class="tile-label">Portfolio</span>
+        <!-- Navigation Section (Three Medium Tiles, Side by Side) -->
+        <div class="tile-row">
+            <div class="tile medium blue" onclick="tileClick('about')">
+                <i class="fas fa-users white-icon"></i>
+                <span class="tile-label">About</span>
+            </div>
+            <div class="tile medium blue" onclick="tileClick('services')">
+                <i class="fas fa-bullseye white-icon"></i>
+                <span class="tile-label">Services</span>
+            </div>
+            <div class="tile medium blue" onclick="tileClick('portfolio')">
+                <i class="fas fa-chart-line white-icon"></i>
+                <span class="tile-label">Portfolio</span>
+            </div>
         </div>
 
-        <!-- Company Information Section (Three Medium Tiles) -->
-        <div class="tile medium blue" onclick="tileClick('people')">
-            <i class="fas fa-users white-icon"></i>
-            <span class="tile-label">People</span>
-        </div>
-        <div class="tile medium blue" onclick="tileClick('mission')">
-            <i class="fas fa-bullseye white-icon"></i>
-            <span class="tile-label">Mission</span>
-        </div>
-        <div class="tile medium blue" onclick="tileClick('hotTake')">
-            <i class="fas fa-bolt white-icon"></i>
-            <span class="tile-label">Hot Take!</span>
+        <!-- Company Information Section (Three Medium Tiles, Side by Side) -->
+        <div class="tile-row">
+            <div class="tile medium blue" onclick="tileClick('people')">
+                <i class="fas fa-users white-icon"></i>
+                <span class="tile-label">People</span>
+            </div>
+            <div class="tile medium blue" onclick="tileClick('mission')">
+                <i class="fas fa-bullseye white-icon"></i>
+                <span class="tile-label">Mission</span>
+            </div>
+            <div class="tile medium blue" onclick="tileClick('hotTake')">
+                <i class="fas fa-bolt white-icon"></i>
+                <span class="tile-label">Hot Take!</span>
+            </div>
         </div>
 
-        <!-- Contact Section (Mixed Tiles) -->
-        <div class="tile large blue contact-grid">
-            <div class="small-tile blue" onclick="tileClick('location')">
-                <i class="fas fa-map-marker white-icon"></i>
-                <span class="tile-label">Location</span>
+        <!-- Contact Section (Mixed Tiles, Side by Side) -->
+        <div class="tile-row">
+            <div class="tile large blue contact-grid">
+                <div class="small-tile blue" onclick="tileClick('location')">
+                    <i class="fas fa-map-marker white-icon"></i>
+                </div>
+                <div class="small-tile blue" onclick="openEmail()">
+                    <i class="fas fa-envelope white-icon"></i>
+                </div>
+                <div class="small-tile blue" onclick="openInstagram()">
+                    <i class="fab fa-instagram white-icon"></i>
+                </div>
+                <div class="small-tile blue" onclick="openTwitter()">
+                    <i class="fab fa-x-twitter white-icon"></i>
+                </div>
             </div>
-            <div class="small-tile blue" onclick="openEmail()">
-                <i class="fas fa-envelope white-icon"></i>
-                <span class="tile-label">Email</span>
+            <div class="tile medium blue" onclick="openWhatsApp()">
+                <i class="fab fa-whatsapp white-icon"></i>
+                <span class="tile-label">WhatsApp</span>
             </div>
-            <div class="small-tile blue" onclick="openInstagram()">
-                <i class="fab fa-instagram white-icon"></i>
-                <span class="tile-label">Instagram</span>
+            <div class="tile medium blue" onclick="dialPhone()">
+                <i class="fas fa-phone white-icon"></i>
+                <span class="tile-label">Phone</span>
             </div>
-            <div class="small-tile blue" onclick="openTwitter()">
-                <i class="fab fa-x-twitter white-icon"></i>
-                <span class="tile-label">X</span>
-            </div>
-        </div>
-        <div class="tile medium blue" onclick="openWhatsApp()">
-            <i class="fab fa-whatsapp white-icon"></i>
-            <span class="tile-label">WhatsApp</span>
-        </div>
-        <div class="tile medium blue" onclick="dialPhone()">
-            <i class="fas fa-phone white-icon"></i>
-            <span class="tile-label">Phone</span>
         </div>
     </div>
 
-    <!-- FOOTER (Snake Game Tile) -->
+    <!-- FOOTER -->
     <footer class="tile large blue">
-        <div id="snake-game" class="snake-game">
-            <canvas id="gameCanvas" width="300" height="200"></canvas>
-            <p>Play the Snake Game!</p>
-        </div>
+        <p>© 2025 OkKOKI. All Rights Reserved. | Boisar, Maharashtra</p>
     </footer>
 
     <script src="script.js"></script>
