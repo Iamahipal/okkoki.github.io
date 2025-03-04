@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OkKOKI - Fueling Small Business Growth</title>
+    <title>OkKOKI - Mobile</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet"> <!-- Windows Phone font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
 </head>
-<body>
+<body class="mobile-only">
+    <!-- Desktop Warning (Hidden on Mobile) -->
+    <div class="desktop-warning" id="desktopWarning">
+        <h1>Please view on mobile for the best experience.</h1>
+        <p>This website is optimized for mobile devices. Visit on your smartphone for full functionality.</p>
+    </div>
 
     <!-- HEADER (LOGO) -->
     <header class="navbar">
@@ -14,39 +21,69 @@
     </header>
 
     <!-- HERO SECTION -->
-    <div class="hero">
-        <h1>OkKOKI</h1>
+    <div class="tile large blue animate hero">
+        <h1>OKKOKI</h1>
         <h2>Fueling Small Business Growth</h2>
     </div>
 
     <!-- MAIN CONTENT (TILE LAYOUT) -->
     <div class="grid-container">
-        
         <!-- Section 1: Services, Portfolio, Blog -->
-        <div class="tile services">Services</div>
-        <div class="tile portfolio">Portfolio</div>
-        <div class="tile blog">Blog</div>
+        <div class="tile medium blue services" onclick="tileClick('services')">
+            <i class="fas fa-bullseye white-icon"></i>
+            <span class="tile-label">Services</span>
+        </div>
+        <div class="tile medium blue portfolio" onclick="tileClick('portfolio')">
+            <i class="fas fa-chart-line white-icon"></i>
+            <span class="tile-label">Portfolio</span>
+        </div>
+        <div class="tile medium blue blog" onclick="tileClick('blog')">
+            <i class="fas fa-lightbulb white-icon"></i>
+            <span class="tile-label">Blog</span>
+        </div>
 
         <!-- Section 2: People, Mission, Hot Take -->
-        <div class="tile people">People</div>
-        <div class="tile mission">Mission</div>
-        <div class="tile hot-take">Hot Take!</div>
+        <div class="tile medium blue people" onclick="tileClick('people')">
+            <i class="fas fa-users white-icon"></i>
+            <span class="tile-label">People</span>
+        </div>
+        <div class="tile medium blue mission" onclick="tileClick('mission')">
+            <i class="fas fa-bullseye white-icon"></i>
+            <span class="tile-label">Mission</span>
+        </div>
+        <div class="tile medium blue hot-take" onclick="tileClick('hotTake')">
+            <i class="fas fa-bolt white-icon"></i>
+            <span class="tile-label">Hot Take!</span>
+        </div>
 
         <!-- Section 3: Contact Section -->
-        <div class="tile contact-icons">
-            <div class="small-tile location"></div>
-            <div class="small-tile email"></div>
-            <div class="small-tile instagram"></div>
-            <div class="small-tile twitter"></div>
+        <div class="tile large blue contact-icons">
+            <div class="small-tile blue location" onclick="tileClick('location')">
+                <i class="fas fa-map-marker white-icon"></i>
+            </div>
+            <div class="small-tile blue email" onclick="openEmail()">
+                <i class="fas fa-envelope white-icon"></i>
+            </div>
+            <div class="small-tile blue instagram" onclick="openInstagram()">
+                <i class="fab fa-instagram white-icon"></i>
+            </div>
+            <div class="small-tile blue twitter" onclick="openTwitter()">
+                <i class="fab fa-x-twitter white-icon"></i>
+            </div>
         </div>
-        <div class="tile whatsapp">WhatsApp</div>
-        <div class="tile phone">Phone</div>
-
+        <div class="tile medium blue whatsapp" onclick="openWhatsApp()">
+            <i class="fab fa-whatsapp white-icon"></i>
+            <span class="tile-label">WhatsApp</span>
+        </div>
+        <div class="tile medium blue phone" onclick="dialPhone()">
+            <i class="fas fa-phone white-icon"></i>
+            <span class="tile-label">Phone</span>
+        </div>
     </div>
 
     <!-- FOOTER -->
-    <footer>
-        © 2025 OkKOKI. All Rights Reserved.
+    <footer class="tile large blue">
+        <p>© 2025 OkKOKI. All Rights Reserved. | Boisar, Maharashtra</p>
     </footer>
 
     <script src="script.js"></script>
