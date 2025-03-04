@@ -44,8 +44,78 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isMobile) {
         mobileContent.style.display = 'block';
         if (desktopWarning) desktopWarning.style.display = 'none';
+        initSnakeGame(); // Initialize snake game on mobile
     } else {
         mobileContent.style.display = 'none';
         if (desktopWarning) desktopWarning.style.display = 'flex';
     }
 });
+
+// Simple Snake Game
+function initSnakeGame() {
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let snake = [{x: 10, y: 10}];
+    let dx = 0, dy = 0;
+    let food = {x: 15, y: 15};
+    let score = 0;
+
+    function draw() {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw snake
+        ctx.fillStyle = '#FFFFFF';
+        snake.forEach(segment => {
+            ctx.fillRect(segment.x * 10, segment.y * 10, 10, 10);
+        });
+
+        // Draw food
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(food.x * 10, food.y * 10, 10, 10);
+
+        // Move snake
+        const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+        snake.unshift(head);
+
+        // Check food collision
+        if (head.x === food.x && head.y === food.y) {
+            score++;
+            food = {x: Math.floor(Math.random() * 30), y: Math.floor(Math.random() * 20)};
+        } else {
+            snake.pop();
+        }
+
+        // Check wall collision
+        if (head.x < 0 || head.x >= 30 || head.y < 0 || head.y >= 20) {
+            alert('Game Over! Score: ' + score);
+            snake = [{x: 10, y: 10}];
+            dx = dy = 0;
+            score = 0;
+        }
+
+        // Check self collision
+        for (let i = 1; i < snake.length; i++) {
+            if (head.x === snake[i].x && head.y === snake[i].y) {
+                alert('Game Over! Score: ' + score);
+                snake = [{x: 10, y: 10}];
+                dx = dy = 0;
+                score = 0;
+                break;
+            }
+        }
+
+        setTimeout(draw, 100);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        switch (e.key) {
+            case 'ArrowUp': if (dy === 0) { dx = 0; dy = -1; } break;
+            case 'ArrowDown': if (dy === 0) { dx = 0; dy = 1; } break;
+            case 'ArrowLeft': if (dx === 0) { dx = -1; dy = 0; } break;
+            case 'ArrowRight': if (dx === 0) { dx = 1; dy = 0; } break;
+        }
+    });
+
+    draw();
+}
