@@ -7,24 +7,22 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow-y: auto; /* Allows scrolling for extra tiles */
 }
 
-/* Grid Layout */
+/* Grid Container */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    grid-template-rows: repeat(6, 1fr);  /* 6 rows instead of 4 */
-    gap: 5px; /* Space between tiles */
-    width: 95vw;  /* 95% of the viewport width */
-    height: 95vh; /* 95% of the viewport height */
+    grid-template-columns: repeat(3, 1fr); /* 3 tiles per row */
+    gap: 5px; /* Small gap between tiles */
+    width: 100vw; /* Full width */
+    max-width: 100%; /* Prevents overflow */
+    padding: 5px;
 }
 
-/* Tiles */
+/* Grid Tiles */
 .tile {
-    background-color: #0047ab; /* Windows Phone Blue */
-    border: 2px solid black; /* Border between tiles */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
+    background-color: #004aad; /* Windows Phone Blue */
+    aspect-ratio: 1 / 1; /* Ensures perfect squares */
+    width: 100%; /* Auto adjusts based on screen */
 }
