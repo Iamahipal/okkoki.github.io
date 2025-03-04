@@ -30,7 +30,6 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 20px;
-    margin: auto;
     max-width: 100%;
 }
 
@@ -49,16 +48,33 @@ body {
     transition: 0.3s ease;
 }
 
-/* Tile Size Variations */
-.large { grid-column: span 3; height: 100px; }
-.medium { grid-column: span 2; height: 80px; }
-.small { height: 70px; }
-.icon { height: 50px; font-size: 24px; }
+/* Hero Section */
+.hero {
+    grid-column: span 3;
+    height: 100px;
+    font-size: 22px;
+    text-align: center;
+}
+
+/* Square Tiles */
+.square {
+    height: 100px;
+    width: 100px;
+}
+
+/* Small Icon Tiles */
+.small-icon {
+    height: 50px;
+    width: 50px;
+    font-size: 20px;
+}
 
 /* Footer */
 .footer {
     background-color: #0078D7;
     color: white;
+    grid-column: span 3;
+    height: 60px;
 }
 
 /* Hover Effect */
@@ -71,5 +87,5 @@ body {
     .tile-container {
         grid-template-columns: repeat(2, 1fr); /* Two columns for mobile */
     }
-    .large { grid-column: span 2; } /* Large tile takes full width */
+    .hero { grid-column: span 2; }
 }
