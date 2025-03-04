@@ -51,7 +51,6 @@ body {
     margin: 0 auto;
     padding: 10px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 tiles per row on mobile */
     gap: 10px;
     justify-items: center;
 }
@@ -61,8 +60,8 @@ body {
     border-radius: 10px;
     padding: 0;
     background-color: #0078D7; /* Blue like Windows Phone */
-    width: 100px; /* Square tile width */
-    height: 100px; /* Square tile height */
+    width: 100px; /* Default square tile size */
+    height: 100px; /* Default square tile size */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
 }
@@ -74,9 +73,9 @@ body {
 .blue { background-color: #0078D7; } /* Already blue, no change needed */
 
 /* Mobile Optimization */
-@media (max-width: 480px) {
+@media (max-width: 320px) {
     .tile-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 tiles per row on very small screens */
+        grid-template-columns: 1fr; /* 1 tile per row on very small screens */
         gap: 5px;
     }
 
@@ -86,9 +85,21 @@ body {
     }
 }
 
+@media (min-width: 321px) and (max-width: 480px) {
+    .tile-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 tiles per row on small screens */
+        gap: 5px;
+    }
+
+    .tile {
+        width: 90px; /* Medium square tiles on small screens */
+        height: 90px;
+    }
+}
+
 @media (min-width: 481px) and (max-width: 768px) {
     .tile-grid {
-        grid-template-columns: repeat(3, 1fr); /* Maintain 3 tiles per row on typical mobiles */
+        grid-template-columns: repeat(3, 1fr); /* 3 tiles per row on typical mobiles */
         gap: 10px;
     }
 
