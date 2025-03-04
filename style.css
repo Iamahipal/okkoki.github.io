@@ -1,4 +1,4 @@
-/* General Styling */
+/* General Styles */
 body {
     margin: 0;
     padding: 0;
@@ -6,57 +6,23 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto; /* Allows scrolling for extra tiles */
 }
 
-/* Grid Layout */
+/* Grid Container */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    width: 90vw;
-    max-width: 500px; /* Adjusting to fit most mobile screens */
+    grid-template-columns: repeat(3, 1fr); /* 3 tiles per row */
+    gap: 5px; /* Small gap between tiles */
+    width: 100vw; /* Full width */
+    max-width: 100%; /* Prevents overflow */
+    padding: 5px;
 }
 
-/* Standard Tile */
+/* Grid Tiles */
 .tile {
-    background-color: #0057B7;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    font-weight: bold;
-    aspect-ratio: 1/1;
-}
-
-/* Large Tile (Spanning 3 Tiles in Width) */
-.large {
-    grid-column: span 3;
-    aspect-ratio: 3/1;
-}
-
-/* Medium Tile (Spanning 2 Tiles) */
-.medium {
-    grid-column: span 2;
-}
-
-/* Small Tiles (Splitting One Tile into 4) */
-.small-tile {
-    background-color: #0057B7;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    aspect-ratio: 1/1;
-}
-
-/* Making Small Tiles Fit Properly */
-.small-tile:nth-child(9),
-.small-tile:nth-child(10),
-.small-tile:nth-child(11),
-.small-tile:nth-child(12) {
-    grid-column: span 1;
+    background-color: #004aad; /* Windows Phone Blue */
+    aspect-ratio: 1 / 1; /* Ensures perfect squares */
+    width: 100%; /* Auto adjusts based on screen */
 }
