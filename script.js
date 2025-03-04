@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Add subtle Windows Phone style animations (Pop-in effect)
     const tiles = document.querySelectorAll(".tile, .small-tile");
     tiles.forEach((tile, index) => {
         tile.style.opacity = "0";
