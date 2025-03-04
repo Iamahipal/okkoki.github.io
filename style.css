@@ -7,12 +7,48 @@ body {
     color: #FFFFFF;
     text-align: center;
     overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Mobile-Only Class (Hide on Desktop) */
+.mobile-only {
+    display: block;
+}
+
+@media (min-width: 768px) { /* Desktop screens (tablets and up) */
+    .mobile-only {
+        display: none;
+    }
+}
+
+/* Desktop Warning (Show on Desktop, Hide on Mobile) */
+.desktop-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    color: #FFFFFF;
+    text-align: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+@media (min-width: 768px) {
+    .desktop-warning {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 /* Navigation Bar */
 .navbar {
     width: 100%;
-    padding: 15px 0;
+    padding: 10px 0;
     background: #000000;
     text-align: center;
     position: fixed;
@@ -21,7 +57,7 @@ body {
 }
 
 .logo-img {
-    width: 120px; /* Adjust width as needed */
+    width: 80px; /* Smaller for mobile */
     height: auto;
     transition: opacity 0.3s;
 }
@@ -32,25 +68,28 @@ body {
 
 /* Tile Container */
 .tile-container {
-    max-width: 1200px;
-    margin: 80px auto 20px;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    max-width: 100%;
+    margin: 60px auto 20px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
-    justify-items: center;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Tile Styles */
 .tile {
     border-radius: 10px;
-    padding: 20px;
+    padding: 15px;
     cursor: pointer;
     transition: transform 0.3s, background 0.3s;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     background-color: #0078D7; /* Blue like Windows Phone */
     color: #FFFFFF;
+    width: 90%; /* Full width on mobile, with margin */
+    max-width: 300px; /* Limit tile width for consistency */
 }
 
 .tile:hover {
@@ -58,31 +97,52 @@ body {
 }
 
 .large {
-    grid-column: span 3;
-    height: 200px;
-    font-size: 1.5rem;
+    height: 120px;
+    font-size: 1rem;
+    width: 90%;
+    max-width: 300px;
 }
 
 .medium {
-    height: 150px;
-    font-size: 1.2rem;
+    height: 80px;
+    font-size: 0.9rem;
+    width: 90%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .blue { background-color: #0078D7; } /* Already blue, no change needed */
 
-.tile h2, .tile h3 {
-    margin: 0 0 10px;
+.tile h2 {
+    margin: 0;
     font-weight: 700;
+    font-size: 1.1rem;
 }
 
 .tile p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .white-icon {
     color: #FFFFFF; /* Ensure icons are white */
     font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.tile-label {
+    font-size: 0.7rem; /* Small text below icon */
+    margin-top: 5px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.sub-label {
+    font-size: 0.6rem; /* Smaller sub-label for Portfolio */
+    margin-top: 5px;
 }
 
 /* Animation for Large Tile */
@@ -98,64 +158,11 @@ body {
 
 /* Footer */
 footer {
-    margin-top: 40px;
-    font-size: 0.9rem;
+    margin-top: 20px;
+    font-size: 0.7rem;
     text-align: center;
     opacity: 0.8;
-    padding: 20px;
+    padding: 10px;
     background: #000000;
     border-top: 1px solid #A9A9A9;
-}
-
-/* Mobile Optimization */
-@media (max-width: 768px) {
-    .tile-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .large {
-        grid-column: span 2;
-        height: 150px;
-        font-size: 1.2rem;
-    }
-
-    .medium {
-        height: 120px;
-        font-size: 1rem;
-    }
-
-    .logo-img {
-        width: 100px; /* Smaller on mobile */
-    }
-
-    .navbar {
-        padding: 10px 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .tile-container {
-        grid-template-columns: 1fr;
-        gap: 5px;
-    }
-
-    .large {
-        grid-column: span 1;
-        height: 120px;
-        font-size: 1rem;
-    }
-
-    .medium {
-        height: 100px;
-        font-size: 0.9rem;
-    }
-
-    .logo-img {
-        width: 80px; /* Even smaller on very small screens */
-    }
-
-    footer {
-        font-size: 0.8rem;
-        padding: 15px;
-    }
 }
