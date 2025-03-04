@@ -1,4 +1,4 @@
-/* General Styles */
+/* General Styling */
 body {
     margin: 0;
     padding: 0;
@@ -6,23 +6,63 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    overflow-y: auto; /* Allows scrolling for extra tiles */
+    min-height: 100vh;
 }
 
-/* Grid Container */
+/* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 tiles per row */
-    gap: 5px; /* Small gap between tiles */
-    width: 100vw; /* Full width */
-    max-width: 100%; /* Prevents overflow */
-    padding: 5px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    width: 90vw;
+    max-width: 500px; /* Adjusting to fit most mobile screens */
 }
 
-/* Grid Tiles */
+/* Standard Tile */
 .tile {
-    background-color: #004aad; /* Windows Phone Blue */
-    aspect-ratio: 1 / 1; /* Ensures perfect squares */
-    width: 100%; /* Auto adjusts based on screen */
+    background-color: #0057B7;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    aspect-ratio: 1/1;
+}
+
+/* Large Tile (Merging 1,2,3) */
+.large {
+    grid-column: span 3;
+    aspect-ratio: 3/1;
+}
+
+/* Medium Tile (Merging 7,8) */
+.medium {
+    grid-column: span 2;
+}
+
+/* Small Tiles (Splitting 10 into 4) */
+.small-tile {
+    background-color: #0057B7;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    aspect-ratio: 1/1;
+}
+
+/* Making Small Tiles Fit Properly */
+.small-tile:nth-child(9) {
+    grid-column: span 1;
+}
+.small-tile:nth-child(10) {
+    grid-column: span 1;
+}
+.small-tile:nth-child(11) {
+    grid-column: span 1;
+}
+.small-tile:nth-child(12) {
+    grid-column: span 1;
 }
