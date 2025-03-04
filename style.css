@@ -114,6 +114,26 @@ body {
     align-items: center;
 }
 
+.small-tile {
+    height: 60px;
+    font-size: 0.8rem;
+    width: 45%; /* Two small tiles per row in contact-grid */
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+}
+
+.contact-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 5px;
+    width: 90%;
+    max-width: 300px;
+}
+
 .blue { background-color: #0078D7; } /* Already blue, no change needed */
 
 .tile h2 {
@@ -140,11 +160,6 @@ body {
     font-weight: 600;
 }
 
-.sub-label {
-    font-size: 0.6rem; /* Smaller sub-label for Portfolio */
-    margin-top: 5px;
-}
-
 /* Animation for Large Tile */
 .animate {
     animation: pulse 2s infinite;
@@ -156,13 +171,29 @@ body {
     100% { transform: scale(1); }
 }
 
-/* Footer */
+/* Footer (Snake Game) */
 footer {
     margin-top: 20px;
-    font-size: 0.7rem;
-    text-align: center;
-    opacity: 0.8;
     padding: 10px;
-    background: #000000;
-    border-top: 1px solid #A9A9A9;
+    background: #0078D7;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.snake-game {
+    position: relative;
+}
+
+#gameCanvas {
+    border: 1px solid #FFFFFF;
+    border-radius: 5px;
+}
+
+/* Footer Text */
+footer p {
+    font-size: 0.7rem;
+    margin: 5px 0;
 }
