@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OkKOKI - Homepage</title>
+    <title>OkKOKI - Mobile</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet"> <!-- Windows Phone font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
 </head>
-<body>
+<body class="mobile-only">
+    <!-- Desktop Warning (Hidden on Mobile) -->
+    <div class="desktop-warning" id="desktopWarning">
+        <h1>Please view on mobile for the best experience.</h1>
+        <p>This website is optimized for mobile devices. Visit on your smartphone for full functionality.</p>
+    </div>
+
     <!-- HEADER -->
     <header class="navbar">
         <a href="index.html">
@@ -24,27 +30,47 @@
             <p>Boisar, Maharashtra – Fueling Small Business Growth</p>
         </div>
 
-        <!-- Medium Tiles (3x2 Grid) -->
+        <!-- Medium Tiles (Vertical Stack on Mobile) -->
         <div class="tile medium blue" onclick="tileClick('about')">
-            <h3>About Us</h3>
             <i class="fas fa-users white-icon"></i>
+            <span class="tile-label">About Us</span>
         </div>
         <div class="tile medium blue" onclick="tileClick('services')">
-            <h3>Our Services</h3>
             <i class="fas fa-bullseye white-icon"></i>
+            <span class="tile-label">Our Services</span>
         </div>
         <div class="tile medium blue" onclick="tileClick('portfolio')">
-            <h3>Portfolio</h3>
-            <p>400% Growth Achieved!</p>
             <i class="fas fa-chart-line white-icon"></i>
+            <span class="tile-label">Portfolio</span>
+            <p class="sub-label">400% Growth Achieved!</p>
         </div>
         <div class="tile medium blue" onclick="tileClick('research')">
-            <h3>Blog/Research</h3>
             <i class="fas fa-lightbulb white-icon"></i>
+            <span class="tile-label">Blog/Research</span>
         </div>
         <div class="tile medium blue" onclick="tileClick('contact')">
-            <h3>Contact Us</h3>
             <i class="fas fa-phone white-icon"></i>
+            <span class="tile-label">Contact Us</span>
+        </div>
+        <div class="tile medium blue" onclick="openWhatsApp()">
+            <i class="fab fa-whatsapp white-icon"></i>
+            <span class="tile-label">WhatsApp</span>
+        </div>
+        <div class="tile medium blue" onclick="openInstagram()">
+            <i class="fab fa-instagram white-icon"></i>
+            <span class="tile-label">Instagram</span>
+        </div>
+        <div class="tile medium blue" onclick="openTwitter()">
+            <i class="fab fa-x-twitter white-icon"></i>
+            <span class="tile-label">X</span>
+        </div>
+        <div class="tile medium blue" onclick="dialPhone()">
+            <i class="fas fa-phone white-icon"></i>
+            <span class="tile-label">Phone</span>
+        </div>
+        <div class="tile medium blue" onclick="openEmail()">
+            <i class="fas fa-envelope white-icon"></i>
+            <span class="tile-label">Email</span>
         </div>
     </div>
 
@@ -52,7 +78,7 @@
     <footer>
         <p>© 2025 OkKOKI. All Rights Reserved. | Boisar, Maharashtra</p>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
     <script src="script.js"></script>
 </body>
 </html>
