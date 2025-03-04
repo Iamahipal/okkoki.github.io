@@ -66,6 +66,12 @@ body {
     opacity: 0.8;
 }
 
+.logo-img-small {
+    width: 60px; /* Smaller logo in header tile */
+    height: auto;
+    margin-bottom: 10px;
+}
+
 /* Tile Container */
 .tile-container {
     max-width: 100%;
@@ -78,6 +84,17 @@ body {
     align-items: center;
 }
 
+/* Tile Row for Side-by-Side Layout */
+.tile-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+    gap: 10px;
+    margin: 0 auto;
+    max-width: 600px; /* Limit width for better mobile layout */
+}
+
 /* Tile Styles */
 .tile {
     border-radius: 10px;
@@ -88,8 +105,8 @@ body {
     overflow: hidden;
     background-color: #0078D7; /* Blue like Windows Phone */
     color: #FFFFFF;
-    width: 90%; /* Full width on mobile, with margin */
-    max-width: 300px; /* Limit tile width for consistency */
+    width: 45%; /* Two tiles per row on wider mobiles */
+    max-width: 280px; /* Limit tile width for consistency */
 }
 
 .tile:hover {
@@ -101,13 +118,15 @@ body {
     font-size: 1rem;
     width: 90%;
     max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .medium {
     height: 80px;
     font-size: 0.9rem;
-    width: 90%;
-    max-width: 300px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -118,11 +137,11 @@ body {
     height: 60px;
     font-size: 0.8rem;
     width: 45%; /* Two small tiles per row in contact-grid */
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 2px;
+    margin: 5px;
 }
 
 .contact-grid {
@@ -171,10 +190,10 @@ body {
     100% { transform: scale(1); }
 }
 
-/* Footer (Snake Game) */
+/* Footer */
 footer {
     margin-top: 20px;
-    padding: 10px;
+    padding: 15px;
     background: #0078D7;
     border-radius: 10px;
     width: 90%;
@@ -183,17 +202,80 @@ footer {
     margin-right: auto;
 }
 
-.snake-game {
-    position: relative;
-}
-
-#gameCanvas {
-    border: 1px solid #FFFFFF;
-    border-radius: 5px;
-}
-
-/* Footer Text */
 footer p {
     font-size: 0.7rem;
     margin: 5px 0;
+}
+
+/* Mobile Optimization */
+@media (max-width: 480px) {
+    .tile-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tile {
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .medium, .large {
+        height: auto;
+        padding: 15px;
+    }
+
+    .small-tile {
+        width: 90%;
+        max-width: 140px;
+    }
+
+    .contact-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logo-img {
+        width: 60px;
+    }
+
+    footer {
+        width: 90%;
+        max-width: 300px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .tile-row {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .tile {
+        width: 45%;
+        max-width: 280px;
+    }
+
+    .medium, .large {
+        height: auto;
+        padding: 15px;
+    }
+
+    .small-tile {
+        width: 45%;
+        max-width: 140px;
+    }
+
+    .contact-grid {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .logo-img {
+        width: 80px;
+    }
+
+    footer {
+        width: 90%;
+        max-width: 300px;
+    }
 }
