@@ -13,7 +13,7 @@ body {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
-    gap: 5px;
+    gap: 4px; /* Reduced from 5px to 4px to fix spacing issue */
     width: min(100vw, 90vh); /* Ensuring the grid scales while maintaining proportions */
     max-width: 500px; /* Prevents it from stretching too much on larger devices */
 }
