@@ -13,8 +13,8 @@ body {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
-    grid-template-rows: repeat(6, 1fr); /* Ensuring 6 sections */
-    gap: 5px; /* Keeping proper spacing */
+    grid-template-rows: repeat(6, minmax(0, 1fr)); /* Maintain equal height */
+    gap: 4px; /* Slight reduction to align spacing */
     width: min(100vw, 90vh); /* Ensuring proper scaling */
     max-width: 500px; /* Prevents excessive stretching */
 }
@@ -39,6 +39,7 @@ body {
 .medium {
     grid-column: span 2; /* Spans two columns */
     aspect-ratio: 2/1; /* Ensuring proper height */
+    width: calc(200% + 4px); /* Dynamically adjusts size */
 }
 
 /* Fixing Small Tile Row Issue */
@@ -46,5 +47,5 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Ensuring 2x2 small tiles */
     grid-template-rows: repeat(2, 1fr);
-    gap: 5px; /* Proper spacing */
+    gap: 4px; /* Proper spacing */
 }
