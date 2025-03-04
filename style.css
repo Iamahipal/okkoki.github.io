@@ -12,17 +12,19 @@ body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 100px); /* 3 columns */
-    grid-template-rows: repeat(4, 100px);  /* 4 rows */
+    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+    grid-template-rows: repeat(4, 1fr);  /* 4 equal rows */
     gap: 5px; /* Space between tiles */
-    background-color: black;
+    width: 90vw;  /* 90% of the viewport width */
+    height: 90vh; /* 90% of the viewport height */
 }
 
 /* Tiles */
 .tile {
-    width: 100px;
-    height: 100px;
     background-color: #0047ab; /* Windows Phone Blue */
     border: 2px solid black; /* Border between tiles */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     box-sizing: border-box;
 }
