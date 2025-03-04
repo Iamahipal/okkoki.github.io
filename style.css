@@ -14,7 +14,7 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
     grid-template-rows: repeat(6, 1fr); /* Ensuring 6 sections */
-    gap: 7px; /* Keeping proper spacing */
+    gap: 5px; /* Keeping proper spacing */
     width: min(100vw, 90vh); /* Ensuring proper scaling */
     max-width: 500px; /* Prevents excessive stretching */
 }
@@ -46,5 +46,5 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Ensuring 2x2 small tiles */
     grid-template-rows: repeat(2, 1fr);
-    gap: 7px; /* Proper spacing */
+    gap: 5px; /* Proper spacing */
 }
