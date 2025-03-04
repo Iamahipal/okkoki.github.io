@@ -6,19 +6,19 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden; /* Prevent horizontal scrolling */
+    overflow: hidden;
 }
 
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 5px; /* Minimal spacing */
-    width: 100vw; /* Full width */
-    height: 100vh; /* Full height */
-    max-width: 100%; /* Ensure it doesn't exceed screen width */
+    gap: 5px;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
     padding: 0;
-    overflow: auto; /* Allow vertical scrolling if needed */
+    overflow: auto;
 }
 
 .tile {
@@ -29,6 +29,8 @@ body {
     align-items: center;
     aspect-ratio: 1/1;
     overflow: hidden;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .large {
@@ -41,9 +43,14 @@ body {
     aspect-ratio: 2/1;
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    .grid-container {
-        gap: 3px; /* Slightly smaller gap on smaller screens */
-    }
+.small-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px;
+    grid-column: span 1;
+}
+
+.small-grid .tile {
+    background-color: #00A4EF;  /* Slightly different blue for distinction */
 }
