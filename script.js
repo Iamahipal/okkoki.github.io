@@ -1,14 +1,13 @@
-// Check if the device is mobile and show/hide content
-document.addEventListener('DOMContentLoaded', function() {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    const desktopWarning = document.getElementById('desktopWarning');
-    const mobileContent = document.querySelector('.mobile-only');
-
-    if (isMobile) {
-        mobileContent.style.display = 'block';
-        if (desktopWarning) desktopWarning.style.display = 'none';
-    } else {
-        mobileContent.style.display = 'none';
-        if (desktopWarning) desktopWarning.style.display = 'flex';
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    // Add subtle Windows Phone style animations (Pop-in effect)
+    const tiles = document.querySelectorAll(".tile, .small-tile");
+    tiles.forEach((tile, index) => {
+        tile.style.opacity = "0";
+        tile.style.transform = "scale(0.8)";
+        setTimeout(() => {
+            tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+            tile.style.opacity = "1";
+            tile.style.transform = "scale(1)";
+        }, index * 100);
+    });
 });
