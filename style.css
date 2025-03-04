@@ -1,91 +1,95 @@
-/* Import Modern Font */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-/* General Styles */
+/* General Styling */
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #003366; /* Dark Blue */
-    color: black;
     margin: 0;
     padding: 0;
+    background-color: #002147; /* Dark Blue Background */
+    color: white;
+    text-align: center;
 }
 
-/* Navigation Bar */
+/* HEADER (LOGO) */
 .navbar {
     width: 100%;
     padding: 15px 0;
-    background: black;
+    background: #001a33; /* Slightly darker shade */
     text-align: center;
 }
 
 .logo-img {
     width: 100px;
     height: auto;
-    cursor: pointer;
 }
 
-/* Tile Grid Layout */
-.tile-container {
+/* HERO SECTION */
+.hero {
+    background-color: #007bff; /* Light Blue */
+    padding: 40px 10px;
+    font-size: 22px;
+    font-weight: bold;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* HERO ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* TILE GRID */
+.grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 20px;
-    max-width: 100%;
 }
 
-/* Tile Styling */
+/* Standard Tile */
 .tile {
-    background-color: #42A5F5; /* Windows Phone Tile Color */
-    color: black;
-    font-size: 18px;
-    font-weight: 600;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s ease;
-}
-
-/* Hero Section */
-.hero {
-    grid-column: span 3;
-    height: 100px;
-    font-size: 22px;
-    text-align: center;
-}
-
-/* Square Tiles */
-.square {
-    height: 100px;
-    width: 100px;
-}
-
-/* Small Icon Tiles */
-.small-icon {
-    height: 50px;
-    width: 50px;
-    font-size: 20px;
-}
-
-/* Footer */
-.footer {
-    background-color: #0078D7;
-    color: white;
-    grid-column: span 3;
-    height: 60px;
-}
-
-/* Hover Effect */
-.tile:hover {
     background-color: #2196F3;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
 }
 
-/* Mobile Optimization */
+.tile:hover {
+    transform: scale(1.05);
+}
+
+/* Contact Section */
+.contact-icons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.small-tile {
+    background-color: #005bb5;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* FOOTER */
+footer {
+    margin-top: 20px;
+    font-size: 14px;
+    text-align: center;
+    opacity: 0.8;
+    padding: 15px;
+    background: #001a33;
+}
+
+/* MOBILE RESPONSIVENESS */
 @media (max-width: 480px) {
-    .tile-container {
-        grid-template-columns: repeat(2, 1fr); /* Two columns for mobile */
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
     }
-    .hero { grid-column: span 2; }
 }
