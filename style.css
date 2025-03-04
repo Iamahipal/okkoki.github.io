@@ -33,3 +33,9 @@ body {
     grid-column: span 3; /* Spans across the full row */
     aspect-ratio: 3/1; /* Keeps height same as square tiles */
 }
+
+/* Medium Tile (Spanning Two Columns) */
+.medium {
+    grid-column: span 2; /* Spans 2 columns */
+    aspect-ratio: 2/1; /* Keeps proportional height */
+}
