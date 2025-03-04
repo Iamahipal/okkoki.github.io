@@ -5,10 +5,9 @@ body {
     background-color: black;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start; /* Aligns grid to the very top */
     height: 100vh;
     overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Grid Layout */
@@ -20,7 +19,7 @@ body {
     width: 100vw;
     height: 100vh;
     max-width: 100%;
-    padding: 5px;
+    padding: 0; /* Removes extra padding */
     box-sizing: border-box;
 }
 
@@ -47,6 +46,12 @@ body {
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
+}
+
+/* Ensuring Medium Tile Spacing is Consistent */
+.medium {
+    grid-column: span 2;
+    height: calc(200% + 5px); /* Adjust for spacing */
 }
 
 /* Ensure responsiveness */
