@@ -13,10 +13,11 @@ body {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
-    grid-template-rows: repeat(6, 1fr); /* Ensuring 6 sections */
-    gap: 5px; /* Keeping proper spacing */
-    width: min(100vw, 90vh); /* Ensuring proper scaling */
-    max-width: 500px; /* Prevents excessive stretching */
+    grid-template-rows: auto; /* Auto-adjusts row height */
+    gap: 5px; /* Proper spacing */
+    width: min(100vw, 90vh); /* Scaling properly */
+    max-width: 500px;
+    grid-auto-rows: 1fr; /* Ensures uniform row heights */
 }
 
 /* Standard Tile */
@@ -29,22 +30,22 @@ body {
     aspect-ratio: 1/1; /* Keeps all tiles square */
 }
 
-/* Large Tile (Spanning Full Width) */
+/* Large Tile (Hero Section) */
 .large {
     grid-column: span 3; /* Takes full width */
-    aspect-ratio: 3/1; /* Keeping consistent height */
+    aspect-ratio: 3/1; /* Maintaining proportion */
 }
 
-/* Medium Tile (Spanning Two Columns) */
+/* Medium Tile (Fixing Bottom Spacing Issue) */
 .medium {
-    grid-column: span 2; /* Spans two columns */
-    aspect-ratio: 2/1; /* Ensuring proper height */
+    grid-column: span 2;
+    height: 100%; /* Ensures it fully stretches */
 }
 
-/* Fixing Small Tile Row Issue */
+/* Small Tiles Section */
 .small {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Ensuring 2x2 small tiles */
+    grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 5px; /* Proper spacing */
+    gap: 5px;
 }
