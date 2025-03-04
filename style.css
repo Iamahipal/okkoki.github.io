@@ -16,11 +16,11 @@ body {
 /* Grid Container */
 .grid-container {
     display: grid;
-    width: 90vw; /* Ensures it fits screen width */
-    height: 95vh; /* Adjust to fit screen height */
+    width: 90vw;
+    height: 95vh;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    gap: 4px; /* Adjusting spacing to remove misalignment */
+    grid-template-rows: auto;
+    gap: 4px;
 }
 
 /* Base Tile Styles */
@@ -32,13 +32,19 @@ body {
 /* Large Tile (Hero & Footer) */
 .large {
     grid-column: span 3;
-    height: auto;
 }
 
-/* Medium Tile */
+/* Medium Tile (Fixing Bottom Spacing Issue) */
 .medium {
     grid-column: span 2;
-    height: auto;
+    height: 100%; /* Ensures it fills row height properly */
+    display: flex;
+    align-items: stretch; /* Makes sure it fully stretches */
+}
+
+/* Regular Tile */
+.regular {
+    height: 100%;
 }
 
 /* Small Tiles in 4th Section */
@@ -46,7 +52,7 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 4px; /* Fixing misalignment */
+    gap: 4px;
 }
 
 .small-tile {
