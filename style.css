@@ -15,8 +15,8 @@ body {
     grid-template-columns: repeat(3, 1fr); /* 3 columns */
     grid-template-rows: repeat(6, 1fr);  /* 6 rows instead of 4 */
     gap: 5px; /* Space between tiles */
-    width: 90vw;  /* 90% of the viewport width */
-    height: 90vh; /* 90% of the viewport height */
+    width: 95vw;  /* 95% of the viewport width */
+    height: 95vh; /* 95% of the viewport height */
 }
 
 /* Tiles */
