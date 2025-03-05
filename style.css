@@ -17,10 +17,10 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 5px; /* Keeping spacing consistent */
+    gap: 7px; /* Keeping spacing consistent */
     width: min(100vw, 90vh); /* Ensuring proper scaling */
     max-width: 500px; /* Prevents excessive stretching */
-    padding: 5px;
+    padding: 0px;
     box-sizing: border-box;
 }
 
@@ -54,12 +54,12 @@ html, body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
+    gap: 7px;
 }
 
 /* Responsiveness */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 3px; /* Slightly reduce gap for small screens */
+        gap: 5px; /* Slightly reduce gap for small screens */
     }
 }
