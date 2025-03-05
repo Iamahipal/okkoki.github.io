@@ -1,52 +1,65 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const tiles = document.querySelectorAll(".tile, .small-tile");
-    const gridContainer = document.querySelector('.grid-container');
-    
-    // Animate tiles
-    tiles.forEach((tile, index) => {
-        tile.style.opacity = "0";
-        tile.style.transform = "scale(0.8)";
-        setTimeout(() => {
-            tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
-            tile.style.opacity = "1";
-            tile.style.transform = "scale(1)";
-        }, index * 100);
+document.addEventListener('DOMContentLoaded', () => {
+    const tiles = document.querySelectorAll('.tile');
+    const navButtons = document.querySelectorAll('.nav-btn');
+
+    // Tile Animation Functions
+    function animateTile(tile) {
+        // Random animation type for each tile
+        const animationType = Math.floor(Math.random() * 3); // 0: Scale, 1: Rotate, 2: Flip
+
+        switch (animationType) {
+            case 0: // Scale Animation
+                tile.style.transition = 'transform 0.5s ease';
+                tile.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    tile.style.transform = 'scale(1)';
+                }, 500);
+                break;
+            case 1: // Rotate Animation
+                tile.style.transition = 'transform 0.5s ease';
+                tile.style.transform = 'rotate(10deg)';
+                setTimeout(() => {
+                    tile.style.transform = 'rotate(0deg)';
+                }, 500);
+                break;
+            case 2: // Flip Animation (3D flip)
+                tile.style.transition = 'transform 0.5s ease';
+                tile.style.transform = 'rotateY(180deg)';
+                setTimeout(() => {
+                    tile.style.transform = 'rotateY(0deg)';
+                }, 500);
+                break;
+        }
+    }
+
+    // Add hover animation to tiles
+    tiles.forEach(tile => {
+        tile.addEventListener('mouseover', () => {
+            animateTile(tile);
+        });
+
+        // Optional: Add click animation for interactivity
+        tile.addEventListener('click', () => {
+            animateTile(tile);
+        });
     });
 
-    // Improved touch handling
-    let startY = 0;
-    let isScrolling = false;
+    // Initial load animation for tiles (staggered effect)
+    let delay = 0;
+    tiles.forEach(tile => {
+        setTimeout(() => {
+            animateTile(tile);
+        }, delay);
+        delay += 200; // Stagger by 200ms for each tile
+    });
 
-    gridContainer.addEventListener('touchstart', (e) => {
-        startY = e.touches[0].clientY;
-        isScrolling = false;
-    }, { passive: true });
-
-    gridContainer.addEventListener('touchmove', (e) => {
-        const currentY = e.touches[0].clientY;
-        const deltaY = currentY - startY;
-
-        // Determine if scrolling
-        if (Math.abs(deltaY) > 10) {
-            isScrolling = true;
-        }
-
-        // Allow default scrolling behavior
-        if (gridContainer.scrollTop === 0 && deltaY > 0) {
-            e.preventDefault();
-        } else if ((gridContainer.scrollTop + gridContainer.clientHeight) >= gridContainer.scrollHeight && deltaY < 0) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    gridContainer.addEventListener('touchend', () => {
-        isScrolling = false;
-    }, { passive: true });
-
-    // Prevent pull-to-refresh on the entire document
-    document.addEventListener('touchmove', (e) => {
-        if (e.touches.length > 1) {
-            e.preventDefault();
-        }
-    }, { passive: false });
+    // Nav Button Animation (slight scale on hover)
+    navButtons.forEach(btn => {
+        btn.addEventListener('mouseover', () => {
+            btn.style.transform = 'scale(1.1)';
+        });
+        btn.addEventListener('mouseout', () => {
+            btn.style.transform = 'scale(1)';
+        });
+    });
 });
