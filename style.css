@@ -6,7 +6,7 @@ html, body {
     overscroll-behavior-y: auto;
     touch-action: auto;
     overflow-y: auto;
-    height: 100%;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,7 +20,7 @@ html, body {
     gap: 7px;
     width: min(100vw, 90vh);
     max-width: 500px;
-    padding: 5px;
+    padding: 7px;
     box-sizing: border-box;
 }
 
@@ -31,7 +31,6 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
     aspect-ratio: 1/1;
     overflow: hidden;
 }
@@ -48,19 +47,21 @@ html, body {
     aspect-ratio: 2/1;
 }
 
-/* Small Tile Container */
-.small-tile-container {
+/* Small Tile Group */
+.small-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 7px;
-    width: 100%;
+}
+
+.small {
     aspect-ratio: 1/1;
 }
 
-/* Small Tiles */
-.small {
-    width: 100%;
-    height: 100%;
-    background-color: #0057B7;
+/* Responsive Fix */
+@media screen and (max-width: 600px) {
+    .grid-container {
+        gap: 5px;
+    }
 }
