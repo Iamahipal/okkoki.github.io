@@ -5,7 +5,7 @@ body {
     background-color: black;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     height: 100vh;
     overflow: hidden;
 }
@@ -14,9 +14,11 @@ body {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px; /* Keeps consistent spacing */
+    grid-template-rows: repeat(6, 1fr);
+    gap: 4px; /* Consistent spacing */
     width: 100vw;
     height: 100vh;
+    max-width: 100%;
     padding: 0;
     box-sizing: border-box;
 }
@@ -24,8 +26,14 @@ body {
 /* Standard Tile */
 .tile {
     background-color: #0057B7;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
-    aspect-ratio: 1/1; /* Ensures perfect square */
+    height: 100%;
+    aspect-ratio: 1/1;
+    overflow: hidden;
 }
 
 /* Large Tile (Spanning Full Width) */
@@ -40,7 +48,7 @@ body {
     aspect-ratio: 2/1;
 }
 
-/* Small Tiles (4 in 1 Regular) */
+/* Small Tiles – Ensuring Perfect Alignment */
 .small-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -48,15 +56,12 @@ body {
     gap: 4px;
 }
 
-.small-tile {
+.small {
     background-color: #0057B7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
+    height: 100%;
     aspect-ratio: 1/1;
-}
-
-/* Responsive Fixes */
-@media screen and (max-width: 600px) {
-    .grid-container {
-        gap: 3px;
-    }
 }
