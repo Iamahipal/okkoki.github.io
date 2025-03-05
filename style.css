@@ -13,13 +13,13 @@ body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(7, 1fr); /* Added an extra row for more tiles */
-    gap: 4px;
+    grid-template-columns: repeat(3, 1fr); /* Three equal columns */
+    grid-template-rows: repeat(8, 1fr); /* Increased to 8 rows to add bottom tiles */
+    gap: 5px;
     width: 100vw;
     height: 100vh;
     max-width: 100%;
-    padding: 0;
+    padding: 5px;
     box-sizing: border-box;
 }
 
@@ -31,30 +31,28 @@ body {
     align-items: center;
     width: 100%;
     height: 0;
-    padding-bottom: 100%; /* Ensures perfect square tiles */
+    padding-bottom: calc(100% / 3 - 5px); /* Ensures perfect squares */
     overflow: hidden;
 }
 
 /* Large Tile (Spanning Full Width) */
 .large {
     grid-column: span 3;
-    height: 0;
-    padding-bottom: calc(3 * (100% / 3)); /* Large tile remains square */
+    padding-bottom: calc(3 * (100% / 3) - 5px); /* Ensuring square shape */
 }
 
 /* Medium Tile (Spanning Two Columns) */
 .medium {
     grid-column: span 2;
-    height: 0;
-    padding-bottom: calc(2 * (100% / 3)); /* Medium tile remains square */
+    padding-bottom: calc(2 * (100% / 3) - 5px); /* Keeping square */
 }
 
-/* Small Tiles – Adding 4 Small Tiles in Empty Space */
+/* Small Tiles - Placing Four Small Tiles in a Grid */
 .small-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 4px;
+    gap: 5px;
     width: 100%;
     height: 100%;
 }
@@ -66,5 +64,5 @@ body {
     align-items: center;
     width: 100%;
     height: 0;
-    padding-bottom: 50%; /* Ensuring they are perfect squares */
+    padding-bottom: calc(50% - 5px); /* Making sure they are perfect squares */
 }
