@@ -1,14 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const tiles = document.querySelectorAll(".tile, .small-tile");
-
-    // Allow touch scrolling (Removed preventDefault)
-    document.body.addEventListener('touchmove', (e) => {
-        // Only prevent default if not scrolling
-        if (!e.target.closest('.grid-container')) {
-            e.preventDefault();
-        }
-    }, { passive: true });
-
+    const tiles = document.querySelectorAll(".tile, .small-tile-container .small");
     tiles.forEach((tile, index) => {
         tile.style.opacity = "0";
         tile.style.transform = "scale(0.8)";
