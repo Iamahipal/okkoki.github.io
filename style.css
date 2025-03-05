@@ -41,6 +41,7 @@ html, body {
 
 /* Large Tile (Spanning Full Width) */
 .large {
+    margin-top: 5px;
     grid-column: span 3; /* Takes full width */
     aspect-ratio: 3/1;
 }
