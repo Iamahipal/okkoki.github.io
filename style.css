@@ -47,15 +47,15 @@ html, body {
     aspect-ratio: 2/1;
 }
 
-/* Fix Small Grid Tile Proportions */
+/* Fix Small Grid Tile Alignment */
 .small-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 7px; /* Maintain same spacing */
-    width: 100%; /* Ensure it takes the full space of a regular tile */
-    height: 100%; /* Force it to behave like a regular tile */
-    box-sizing: border-box; /* Prevents extra space calculation */
+    width: calc(100% - 7px); /* Ensures it does not exceed a regular tile size */
+    height: calc(100% - 7px); /* Keeps height in sync */
+    box-sizing: border-box; /* Prevents unexpected sizing issues */
 }
 
 .small {
