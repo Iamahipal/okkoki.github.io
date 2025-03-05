@@ -1,68 +1,54 @@
 /* General Styling */
-body {
+html, body {
     margin: 0;
     padding: 0;
     background-color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
+    overscroll-behavior-y: contain; /* Prevent pull-to-refresh */
+    touch-action: pan-y; /* Allow vertical scrolling */
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100%;
 }
 
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Three equal columns */
-    grid-template-rows: repeat(8, 1fr); /* Increased to 8 rows to add bottom tiles */
-    gap: 5px;
-    width: 100vw;
-    height: 100vh;
-    max-width: 100%;
-    padding: 5px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 10px; /* Increased gap for better spacing */
+    width: 100%;
+    min-height: 100vh;
+    padding: 10px;
     box-sizing: border-box;
 }
 
 /* Standard Tile */
 .tile {
     background-color: #0057B7;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 0;
-    padding-bottom: calc(100% / 3 - 5px); /* Ensures perfect squares */
+    height: 100%;
+    aspect-ratio: 1/1;
     overflow: hidden;
 }
 
 /* Large Tile (Spanning Full Width) */
 .large {
     grid-column: span 3;
-    padding-bottom: calc(3 * (100% / 3) - 5px); /* Ensuring square shape */
+    aspect-ratio: 3/1;
 }
 
 /* Medium Tile (Spanning Two Columns) */
 .medium {
     grid-column: span 2;
-    padding-bottom: calc(2 * (100% / 3) - 5px); /* Keeping square */
+    aspect-ratio: 2/1;
 }
 
-/* Small Tiles - Placing Four Small Tiles in a Grid */
-.small-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
-    width: 100%;
-    height: 100%;
-}
-
-.small {
-    background-color: #0057B7;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 0;
-    padding-bottom: calc(50% - 5px); /* Making sure they are perfect squares */
+/* Ensure responsiveness */
+@media screen and (max-width: 600px) {
+    .grid-container {
+        gap: 5px;
+    }
 }
