@@ -2,9 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows Phone UI</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            height: 100%;
+            overflow: auto;
+            overscroll-behavior-y: auto;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 10px;
+            width: 100%;
+            min-height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .tile {
+            background-color: #0057B7;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+        }
+
+        .large {
+            grid-column: span 3;
+            aspect-ratio: 3/1;
+        }
+
+        .medium {
+            grid-column: span 2;
+            aspect-ratio: 2/1;
+        }
+
+        @media screen and (max-width: 600px) {
+            .grid-container {
+                gap: 5px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="grid-container">
@@ -31,6 +79,38 @@
         <div class="tile"></div>
         <div class="tile"></div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tiles = document.querySelectorAll(".tile");
+            const gridContainer = document.querySelector('.grid-container');
+
+            // Create additional content to enable scrolling
+            for (let i = 0; i < 10; i++) {
+                const extraTile = document.createElement('div');
+                extraTile.classList.add('tile');
+                extraTile.textContent = `Extra Tile ${i + 1}`;
+                gridContainer.appendChild(extraTile);
+            }
+
+            // Tile animation
+            tiles.forEach((tile, index) => {
+                tile.style.opacity = "0";
+                tile.style.transform = "scale(0.8)";
+                setTimeout(() => {
+                    tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+                    tile.style.opacity = "1";
+                    tile.style.transform = "scale(1)";
+                }, index * 100);
+            });
+
+            // Enable smooth scrolling and prevent overscroll
+            document.body.style.touchAction = 'pan-y';
+            document.body.addEventListener('touchmove', (e) => {
+                // Allow vertical scrolling
+                e.preventDefault();
+            }, { passive: false });
+        });
+    </script>
 </body>
 </html>
