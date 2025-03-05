@@ -6,7 +6,7 @@ html, body {
     overscroll-behavior-y: auto; /* Allow smooth scrolling */
     touch-action: auto; /* Enable touch interactions */
     overflow-y: auto; /* Enable vertical scrolling */
-    height: 95vh;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start; /* Align grid from top */
