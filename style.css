@@ -40,10 +40,11 @@ html, body {
     aspect-ratio: 3/1;
 }
 
-/* Medium Tile */
+/* Medium Tile Fix */
 .medium {
-    grid-column: span 2;
-    aspect-ratio: 2/1;
+    grid-column: span 2; /* Takes two columns */
+    aspect-ratio: 2/1; /* Maintain proper aspect ratio */
+    width: calc(200% + 7px); /* Ensure it exactly spans 2 tiles, including gap */
 }
 
 /* Small Tile Group */
