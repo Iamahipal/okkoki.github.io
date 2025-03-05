@@ -17,7 +17,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    gap: 7px;
+    gap: 10px;
     width: min(100vw, 90vh);
     max-width: 500px;
     padding: 7px;
