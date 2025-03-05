@@ -2,29 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Windows Phone UI</title>
     <style>
-        html, body {
+        * {
             margin: 0;
             padding: 0;
-            background-color: black;
-            height: 100%;
-            overflow: auto;
-            overscroll-behavior-y: auto;
+            box-sizing: border-box;
         }
-
+        html, body {
+            height: 100%;
+            background-color: black;
+            overscroll-behavior-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .container {
+            max-width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
         .grid-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(6, 1fr);
+            grid-template-rows: auto;
             gap: 10px;
             width: 100%;
-            min-height: 100vh;
             padding: 10px;
-            box-sizing: border-box;
         }
-
         .tile {
             background-color: #0057B7;
             color: white;
@@ -32,66 +37,66 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            height: 100%;
             aspect-ratio: 1/1;
             overflow: hidden;
         }
-
         .large {
             grid-column: span 3;
             aspect-ratio: 3/1;
         }
-
         .medium {
             grid-column: span 2;
             aspect-ratio: 2/1;
         }
-
-        @media screen and (max-width: 600px) {
-            .grid-container {
-                gap: 5px;
-            }
+        .extra-tile {
+            background-color: #004C99;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            margin: 10px 0;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="grid-container">
-        <!-- Large Hero Tile -->
-        <div class="tile large"></div>
+    <div class="container">
+        <div class="grid-container">
+            <!-- Large Hero Tile -->
+            <div class="tile large"></div>
 
-        <!-- Three Regular Tiles -->
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
+            <!-- Three Regular Tiles -->
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
 
-        <!-- Medium Tile and Regular Tile -->
-        <div class="tile medium"></div>
-        <div class="tile"></div>
+            <!-- Medium Tile and Regular Tile -->
+            <div class="tile medium"></div>
+            <div class="tile"></div>
 
-        <!-- Remaining Tiles -->
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
+            <!-- Remaining Tiles -->
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+        </div>
+
+        <!-- Extra Tiles for Scrolling -->
+        <div class="extra-tile">Scroll Content 1</div>
+        <div class="extra-tile">Scroll Content 2</div>
+        <div class="extra-tile">Scroll Content 3</div>
+        <div class="extra-tile">Scroll Content 4</div>
+        <div class="extra-tile">Scroll Content 5</div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const tiles = document.querySelectorAll(".tile");
-            const gridContainer = document.querySelector('.grid-container');
-
-            // Create additional content to enable scrolling
-            for (let i = 0; i < 10; i++) {
-                const extraTile = document.createElement('div');
-                extraTile.classList.add('tile');
-                extraTile.textContent = `Extra Tile ${i + 1}`;
-                gridContainer.appendChild(extraTile);
-            }
 
             // Tile animation
             tiles.forEach((tile, index) => {
@@ -104,12 +109,10 @@
                 }, index * 100);
             });
 
-            // Enable smooth scrolling and prevent overscroll
-            document.body.style.touchAction = 'pan-y';
+            // Ensure scrolling works on mobile
             document.body.addEventListener('touchmove', (e) => {
-                // Allow vertical scrolling
-                e.preventDefault();
-            }, { passive: false });
+                // Allow default scrolling behavior
+            }, { passive: true });
         });
     </script>
 </body>
