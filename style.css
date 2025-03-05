@@ -17,7 +17,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    gap: 7px; /* Consistent spacing */
+    gap: 8px; /* Consistent spacing */
     width: 100vw; /* Ensure it takes full width */
     max-width: 500px;
     padding: 7px;
@@ -51,7 +51,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 6px;
+    gap: 5px;
     width: 100%; /* Ensure correct spacing */
     height: 100%;
 }
@@ -63,6 +63,6 @@ html, body {
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 5px;
+        gap: 6px;
     }
 }
