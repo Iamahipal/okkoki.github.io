@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tiles = document.querySelectorAll(".tile, .small");
-    
     tiles.forEach((tile, index) => {
         tile.style.opacity = "0";
         tile.style.transform = "scale(0.8)";
