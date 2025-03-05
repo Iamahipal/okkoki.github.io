@@ -1,20 +1,20 @@
 /* General Styling */
 html, body {
-    padding-top: 5px; /* Moves everything inside the body down */
     margin: 0;
     padding: 0;
     background-color: black;
     overscroll-behavior-y: auto; /* Allow pull-to-refresh */
     touch-action: auto; /* Allow all touch interactions */
     overflow-y: auto; /* Enable vertical scrolling */
-    height: 100%;
+    min-height: 100vh; /* Ensures full height usage */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align grid at the top instead of centering */
 }
 
 /* Grid Layout */
 .grid-container {
+    margin-top: 10px; /* Move the entire grid down */
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(6, 1fr);
