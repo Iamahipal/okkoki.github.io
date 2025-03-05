@@ -26,6 +26,11 @@ html, body {
 
 /* Standard Tile */
 .tile {
+    background-color: #0057B7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
     width: 100%;
     height: auto; /* Ensure uniform height */
     aspect-ratio: 1/1; /* Forces perfect square shape */
