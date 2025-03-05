@@ -3,8 +3,8 @@ html, body {
     margin: 0;
     padding: 0;
     background-color: black;
-    overscroll-behavior-y: none; /* Allow natural scrolling */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    overscroll-behavior-y: contain; /* Prevent pull-to-refresh */
+    touch-action: pan-y; /* Allow vertical scrolling */
     overflow-y: auto; /* Enable vertical scrolling */
     height: 100%;
 }
@@ -14,16 +14,13 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 10px;
+    gap: 10px; /* Increased gap for better spacing */
     width: 100%;
     min-height: 100vh;
     padding: 10px;
     box-sizing: border-box;
-    overflow-y: auto; /* Allow scrolling within the grid */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
-/* Rest of the CSS remains the same */
 /* Standard Tile */
 .tile {
     background-color: #0057B7;
