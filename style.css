@@ -47,19 +47,19 @@ html, body {
     aspect-ratio: 2/1;
 }
 
-/* Fix Small Grid Tile Alignment */
+/* Fix Small Grid Tile Alignment using Flexbox */
 .small-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 7px; /* Maintain same spacing */
-    width: calc(100% - 7px); /* Ensures it does not exceed a regular tile size */
-    height: calc(100% - 7px); /* Keeps height in sync */
+    display: flex;
+    flex-wrap: wrap; /* Ensures small tiles wrap inside */
+    gap: 7px; /* Keeps spacing consistent */
+    width: 100%;
+    height: 100%;
     box-sizing: border-box; /* Prevents unexpected sizing issues */
 }
 
 .small {
-    aspect-ratio: 1/1;
+    width: calc(50% - 3.5px); /* Each small tile takes half width, adjusting for gap */
+    height: calc(50% - 3.5px); /* Each small tile takes half height, adjusting for gap */
 }
 
 /* Responsive Fix */
