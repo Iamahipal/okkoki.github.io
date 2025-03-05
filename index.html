@@ -2,45 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows Phone UI Grid Layout</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Windows Phone UI - OkKOKI</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="phone-screen">
-        <div class="tile-grid">
-            <!-- Large Tile (3 columns wide) -->
-            <div class="tile large"></div>
 
-            <!-- Medium Tile (2 columns wide) -->
-            <div class="tile medium"></div>
+    <div class="grid-container">
+        <!-- 1st Section - Large Hero Tile -->
+        <div class="tile large"></div>
 
-            <!-- Small Tile Grid (4 equal tiles, 1 column each) -->
-            <div class="tile small"></div>
-            <div class="tile small"></div>
-            <div class="tile small"></div>
-            <div class="tile small"></div>
+        <!-- 2nd Section - Three Regular Tiles -->
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
 
-            <!-- Regular Tiles (1 column each) -->
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
+        <!-- 3rd Section - One Medium Tile + One Regular Tile -->
+        <div class="tile medium"></div>
+        <div class="tile"></div>
+
+        <!-- 4th Section - Small Tile Grid + Two Regular Tiles -->
+        <div class="small-tile-container">
+            <div class="small-tile"></div>
+            <div class="small-tile"></div>
+            <div class="small-tile"></div>
+            <div class="small-tile"></div>
         </div>
+        <div class="tile"></div>
+        <div class="tile"></div>
 
-        <!-- Navigation Buttons at the Bottom -->
-        <div class="nav-buttons">
-            <button class="nav-btn">Back</button>
-            <button class="nav-btn">Windows</button>
-            <button class="nav-btn">Search</button>
-        </div>
+        <!-- 5th Section - Three Regular Tiles -->
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+
+        <!-- 6th Section - Large Tile Again -->
+        <div class="tile large"></div>
     </div>
 
-    <script src="script.js"></script>
 </body>
 </html>
