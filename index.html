@@ -2,118 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Windows Phone UI</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            height: 100%;
-            background-color: black;
-            overscroll-behavior-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .container {
-            max-width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-            -webkit-overflow-scrolling: touch;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: auto;
-            gap: 10px;
-            width: 100%;
-            padding: 10px;
-        }
-        .tile {
-            background-color: #0057B7;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            aspect-ratio: 1/1;
-            overflow: hidden;
-        }
-        .large {
-            grid-column: span 3;
-            aspect-ratio: 3/1;
-        }
-        .medium {
-            grid-column: span 2;
-            aspect-ratio: 2/1;
-        }
-        .extra-tile {
-            background-color: #004C99;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-            margin: 10px 0;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="grid-container">
-            <!-- Large Hero Tile -->
-            <div class="tile large"></div>
+    <div class="grid-container">
+        <!-- Large Hero Tile -->
+        <div class="tile large"></div>
 
-            <!-- Three Regular Tiles -->
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
+        <!-- Three Regular Tiles -->
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
 
-            <!-- Medium Tile and Regular Tile -->
-            <div class="tile medium"></div>
-            <div class="tile"></div>
+        <!-- Medium Tile and Regular Tile -->
+        <div class="tile medium"></div>
+        <div class="tile"></div>
 
-            <!-- Remaining Tiles -->
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-        </div>
-
-        <!-- Extra Tiles for Scrolling -->
-        <div class="extra-tile">Scroll Content 1</div>
-        <div class="extra-tile">Scroll Content 2</div>
-        <div class="extra-tile">Scroll Content 3</div>
-        <div class="extra-tile">Scroll Content 4</div>
-        <div class="extra-tile">Scroll Content 5</div>
+        <!-- Remaining Tiles -->
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
     </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const tiles = document.querySelectorAll(".tile");
-
-            // Tile animation
-            tiles.forEach((tile, index) => {
-                tile.style.opacity = "0";
-                tile.style.transform = "scale(0.8)";
-                setTimeout(() => {
-                    tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
-                    tile.style.opacity = "1";
-                    tile.style.transform = "scale(1)";
-                }, index * 100);
-            });
-
-            // Ensure scrolling works on mobile
-            document.body.addEventListener('touchmove', (e) => {
-                // Allow default scrolling behavior
-            }, { passive: true });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
