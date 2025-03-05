@@ -1,6 +1,5 @@
 /* General Styling */
 html, body {
-    padding-top: 10px;
     margin: 0;
     padding: 0;
     background-color: black;
@@ -15,7 +14,7 @@ html, body {
 
 /* Grid Layout */
 .grid-container {
-    margin-top: 10px; /* Moves the whole grid 5px lower */
+    margin-top: 5px; /* Moves the whole grid 5px lower */
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(6, 1fr);
@@ -41,7 +40,6 @@ html, body {
 
 /* Large Tile (Spanning Full Width) */
 .large {
-    margin-top: 10px;
     grid-column: span 3; /* Takes full width */
     aspect-ratio: 3/1;
 }
