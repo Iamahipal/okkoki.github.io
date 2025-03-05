@@ -1,29 +1,28 @@
 /* General Styling */
-html, body {
+body {
     margin: 0;
     padding: 0;
     background-color: black;
-    overscroll-behavior-y: none; /* Allow natural scrolling */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    overflow-y: auto; /* Enable vertical scrolling */
-    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    gap: 10px;
-    width: 100%;
-    min-height: 100vh;
-    padding: 10px;
+    grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
+    grid-template-rows: repeat(6, 1fr); /* Ensuring 6 sections */
+    gap: 4px; /* Keeping proper and consistent spacing */
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    padding: 0; /* Removed padding to fit screen */
     box-sizing: border-box;
-    overflow-y: auto; /* Allow scrolling within the grid */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
-
-/* Rest of the CSS remains the same */
 
 /* Standard Tile */
 .tile {
@@ -41,18 +40,20 @@ html, body {
 /* Large Tile (Spanning Full Width) */
 .large {
     grid-column: span 3;
-    aspect-ratio: 3/1;
+    aspect-ratio: auto; /* Fixed ratio to maintain proper fit */
+    height: calc(2 * ((100vh - 5 * 4px) / 6)); /* Dynamic height */
 }
 
 /* Medium Tile (Spanning Two Columns) */
 .medium {
     grid-column: span 2;
-    aspect-ratio: 2/1;
+    aspect-ratio: auto;
+    height: calc((100vh - 5 * 4px) / 6);
 }
 
-/* Ensure responsiveness */
+/* Ensuring Equal Tile Spacing */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 5px;
+        gap: 3px;
     }
 }
