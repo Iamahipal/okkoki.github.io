@@ -52,7 +52,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 4px;
+    gap: 6px;
     width: 100%; /* Ensure correct spacing */
     height: 100%;
 }
