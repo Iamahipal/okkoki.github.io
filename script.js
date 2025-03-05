@@ -1,65 +1,26 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const tiles = document.querySelectorAll('.tile');
-    const navButtons = document.querySelectorAll('.nav-btn');
+document.addEventListener("DOMContentLoaded", () => {
+    const tiles = document.querySelectorAll(".tile, .small-tile");
 
-    // Tile Animation Functions
-    function animateTile(tile) {
-        // Random animation type for each tile
-        const animationType = Math.floor(Math.random() * 3); // 0: Scale, 1: Rotate, 2: Flip
-
-        switch (animationType) {
-            case 0: // Scale Animation
-                tile.style.transition = 'transform 0.5s ease';
-                tile.style.transform = 'scale(1.1)';
-                setTimeout(() => {
-                    tile.style.transform = 'scale(1)';
-                }, 500);
-                break;
-            case 1: // Rotate Animation
-                tile.style.transition = 'transform 0.5s ease';
-                tile.style.transform = 'rotate(10deg)';
-                setTimeout(() => {
-                    tile.style.transform = 'rotate(0deg)';
-                }, 500);
-                break;
-            case 2: // Flip Animation (3D flip)
-                tile.style.transition = 'transform 0.5s ease';
-                tile.style.transform = 'rotateY(180deg)';
-                setTimeout(() => {
-                    tile.style.transform = 'rotateY(0deg)';
-                }, 500);
-                break;
-        }
-    }
-
-    // Add hover animation to tiles
-    tiles.forEach(tile => {
-        tile.addEventListener('mouseover', () => {
-            animateTile(tile);
-        });
-
-        // Optional: Add click animation for interactivity
-        tile.addEventListener('click', () => {
-            animateTile(tile);
-        });
-    });
-
-    // Initial load animation for tiles (staggered effect)
-    let delay = 0;
-    tiles.forEach(tile => {
+    tiles.forEach((tile, index) => {
+        tile.style.opacity = "0";
+        tile.style.transform = "scale(0.8)";
+        
         setTimeout(() => {
-            animateTile(tile);
-        }, delay);
-        delay += 200; // Stagger by 200ms for each tile
+            tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+            tile.style.opacity = "1";
+            tile.style.transform = "scale(1)";
+        }, index * 100);
     });
 
-    // Nav Button Animation (slight scale on hover)
-    navButtons.forEach(btn => {
-        btn.addEventListener('mouseover', () => {
-            btn.style.transform = 'scale(1.1)';
+    // Simulate Windows Live Tile Animations
+    setInterval(() => {
+        tiles.forEach((tile) => {
+            if (Math.random() > 0.7) { // Random chance for animation
+                tile.style.transform = "scale(1.05)";
+                setTimeout(() => {
+                    tile.style.transform = "scale(1)";
+                }, 300);
+            }
         });
-        btn.addEventListener('mouseout', () => {
-            btn.style.transform = 'scale(1)';
-        });
-    });
+    }, 3000);
 });
