@@ -1,14 +1,12 @@
 /* General Styling */
-body {
+html, body {
     margin: 0;
     padding: 0;
     background-color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overscroll-behavior-y: contain; /* Prevent pull-to-refresh */
+    touch-action: pan-y; /* Allow vertical scrolling */
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100%;
 }
 
 /* Grid Layout */
@@ -16,11 +14,10 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 5px;
-    width: 100vw;
-    height: 100vh;
-    max-width: 100%;
-    padding: 5px;
+    gap: 10px; /* Increased gap for better spacing */
+    width: 100%;
+    min-height: 100vh;
+    padding: 10px;
     box-sizing: border-box;
 }
 
@@ -52,6 +49,6 @@ body {
 /* Ensure responsiveness */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 3px;
+        gap: 5px;
     }
 }
