@@ -31,7 +31,9 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    aspect-ratio: 1/1;
+    width: 100%;
+    height: 0; /* Reset height */
+    padding-bottom: 100%; /* Maintain square shape */
     overflow: hidden;
 }
 
@@ -49,14 +51,16 @@ html, body {
 
 /* Fix Small Grid Tile Alignment using Flexbox */
 .small-grid {
-    display: flex;
-    flex-wrap: wrap; /* Ensures small tiles wrap inside */
-    gap: 7px; /* Keeps spacing consistent */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 7px;
     width: 100%;
     height: 100%;
     box-sizing: border-box; /* Prevents unexpected sizing issues */
 }
 
+/* Small Tile Fix */
 .small {
     width: calc(50% - 3.5px); /* Each small tile takes half width, adjusting for gap */
     height: calc(50% - 3.5px); /* Each small tile takes half height, adjusting for gap */
