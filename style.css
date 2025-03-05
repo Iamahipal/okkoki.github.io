@@ -26,12 +26,9 @@ html, body {
 
 /* Standard Tile */
 .tile {
-    background-color: #0057B7;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    aspect-ratio: 1/1; /* Ensuring all tiles remain square */
-    overflow: hidden;
+    width: 100%;
+    height: auto; /* Ensure uniform height */
+    aspect-ratio: 1/1; /* Forces perfect square shape */
 }
 
 /* Large Tile */
@@ -40,13 +37,12 @@ html, body {
     aspect-ratio: 3/1;
 }
 
-/* Medium Tile Fix */
 .medium {
-    grid-column: span 2; /* Spans exactly 2 columns */
+    grid-column: span 2;
     aspect-ratio: 2/1;
-    width: calc(200% + 8px); /* Adjust width to match two columns + spacing */
+    width: 100%; /* Remove width hacks */
+    height: auto; /* Allow height to be naturally controlled */
 }
-
 
 /* Small Tile Group */
 .small-grid {
