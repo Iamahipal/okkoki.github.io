@@ -54,19 +54,19 @@ html, body {
 /* Small Grid Section */
 .small-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* Ensuring exactly 2x2 small tiles */
     grid-template-rows: repeat(2, 1fr);
     gap: 7px; /* Keeping spacing consistent */
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box; /* Ensuring perfect layout */
+    width: 100%; /* Ensures full width */
+    height: 100%; /* Ensures full height */
+    box-sizing: border-box;
 }
 
 /* Small Tile Fix */
 .small {
-    width: 100%;
-    height: 0;
-    padding-bottom: 50%; /* Ensuring small tiles remain squares */
+    width: 100%; /* Each small tile takes full width */
+    height: 100%; /* Each small tile takes full height */
+    aspect-ratio: 1/1; /* Ensures square shape */
 }
 
 /* Responsive Fix */
