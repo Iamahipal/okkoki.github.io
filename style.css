@@ -20,7 +20,7 @@ html, body {
     gap: 7px; /* Keeping spacing consistent */
     width: min(100vw, 90vh); /* Ensuring proper scaling */
     max-width: 500px; /* Prevents excessive stretching */
-    padding: 0px;
+    padding: 5px;
     box-sizing: border-box;
 }
 
