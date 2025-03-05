@@ -17,10 +17,10 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    gap: 8px;
+    gap: 10px;
     width: min(100vw, 90vh);
     max-width: 500px;
-    padding: 8px;
+    padding: 10px;
     box-sizing: border-box;
 }
 
@@ -52,7 +52,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .small {
@@ -62,6 +62,6 @@ html, body {
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 8px;
+        gap: 10px;
     }
 }
