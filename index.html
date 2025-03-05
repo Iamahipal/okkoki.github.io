@@ -26,9 +26,9 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: auto;
-            gap: 10px;
+            gap: 2px; /* Minimal spacing to match screenshot */
             width: 100%;
-            padding: 10px;
+            padding: 2px;
         }
         .tile {
             background-color: #0057B7;
@@ -47,15 +47,6 @@
         .medium {
             grid-column: span 2;
             aspect-ratio: 2/1;
-        }
-        .extra-tile {
-            background-color: #004C99;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-            margin: 10px 0;
-            color: white;
         }
     </style>
 </head>
@@ -85,13 +76,6 @@
             <div class="tile"></div>
             <div class="tile"></div>
         </div>
-
-        <!-- Extra Tiles for Scrolling -->
-        <div class="extra-tile">Scroll Content 1</div>
-        <div class="extra-tile">Scroll Content 2</div>
-        <div class="extra-tile">Scroll Content 3</div>
-        <div class="extra-tile">Scroll Content 4</div>
-        <div class="extra-tile">Scroll Content 5</div>
     </div>
 
     <script>
