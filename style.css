@@ -42,9 +42,9 @@ html, body {
 
 /* Medium Tile Fix */
 .medium {
-    grid-column: span 2; /* Takes two columns */
-    aspect-ratio: 2/1; /* Maintain proper aspect ratio */
-    width: calc(200% + 7px); /* Ensure it exactly spans 2 tiles, including gap */
+    grid-column: span 2; /* Takes exactly 2 columns */
+    aspect-ratio: 2/1;
+    width: 100%; /* Ensure it fits perfectly inside its columns */
 }
 
 /* Small Tile Group */
