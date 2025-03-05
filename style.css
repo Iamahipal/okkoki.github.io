@@ -1,5 +1,6 @@
 /* General Styling */
 html, body {
+    padding-top: 5px; /* Moves everything inside the body down */
     margin: 0;
     padding: 0;
     background-color: black;
