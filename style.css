@@ -4,12 +4,12 @@ html, body {
     padding: 0;
     background-color: black;
     overscroll-behavior-y: auto; /* Allow smooth scrolling */
-    touch-action: auto; /* Enable all touch interactions */
+    touch-action: auto; /* Enable touch interactions */
     overflow-y: auto; /* Enable vertical scrolling */
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align grid from top */
 }
 
 /* Grid Layout */
@@ -17,8 +17,8 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    gap: 7px; /* Consistent spacing throughout */
-    width: min(100vw, 90vh); /* Ensuring proper scaling */
+    gap: 7px; /* Consistent spacing */
+    width: 100vw; /* Ensure it takes full width */
     max-width: 500px;
     padding: 7px;
     box-sizing: border-box;
@@ -27,7 +27,6 @@ html, body {
 /* Standard Tile */
 .tile {
     background-color: #0057B7;
-    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,35 +34,35 @@ html, body {
     overflow: hidden;
 }
 
-/* Large Tile (Spanning Full Width) */
+/* Large Tile */
 .large {
     grid-column: span 3;
     aspect-ratio: 3/1;
 }
 
-/* Medium Tile (Spanning Two Columns) */
+/* Medium Tile */
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
 }
 
-/* Small Tiles (Inside a Wrapper for Proper Alignment) */
+/* Small Tile Group */
 .small-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 7px;
-    width: 100%; /* Ensure it occupies the correct space */
+    width: 100%; /* Ensure correct spacing */
     height: 100%;
 }
 
 .small {
-    aspect-ratio: 1/1; /* Ensure they are perfectly square */
+    aspect-ratio: 1/1;
 }
 
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 5px; /* Reduce spacing slightly for smaller screens */
+        gap: 5px;
     }
 }
