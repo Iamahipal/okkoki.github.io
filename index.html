@@ -2,70 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Windows Phone UI</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            height: 100%;
-            background-color: black;
-            overscroll-behavior-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .container {
-            max-width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-            -webkit-overflow-scrolling: touch;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: 1fr;
-            gap: 7px; /* Increased spacing */
-            width: 100%;
-            padding: 7px;
-        }
-        .tile {
-            background-color: #0057B7;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            aspect-ratio: 1/1;
-            overflow: hidden;
-        }
-        .large {
-            grid-column: span 3;
-            aspect-ratio: 3/1;
-        }
-        .medium {
-            grid-column: span 2;
-            aspect-ratio: 2/1;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Phone UI Grid Layout</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="grid-container">
-            <!-- Large Hero Tile -->
+    <div class="phone-screen">
+        <div class="tile-grid">
+            <!-- Large Tile (3 columns wide) -->
             <div class="tile large"></div>
 
-            <!-- Three Regular Tiles -->
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-
-            <!-- Medium Tile and Regular Tile -->
+            <!-- Medium Tile (2 columns wide) -->
             <div class="tile medium"></div>
-            <div class="tile"></div>
 
-            <!-- Remaining Tiles -->
+            <!-- Small Tile Grid (4 equal tiles, 1 column each) -->
+            <div class="tile small"></div>
+            <div class="tile small"></div>
+            <div class="tile small"></div>
+            <div class="tile small"></div>
+
+            <!-- Regular Tiles (1 column each) -->
             <div class="tile"></div>
             <div class="tile"></div>
             <div class="tile"></div>
@@ -76,28 +32,13 @@
             <div class="tile"></div>
             <div class="tile"></div>
         </div>
+
+        <!-- Navigation Buttons at the Bottom -->
+        <div class="nav-buttons">
+            <button class="nav-btn">Back</button>
+            <button class="nav-btn">Windows</button>
+            <button class="nav-btn">Search</button>
+        </div>
     </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const tiles = document.querySelectorAll(".tile");
-
-            // Tile animation
-            tiles.forEach((tile, index) => {
-                tile.style.opacity = "0";
-                tile.style.transform = "scale(0.8)";
-                setTimeout(() => {
-                    tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
-                    tile.style.opacity = "1";
-                    tile.style.transform = "scale(1)";
-                }, index * 100);
-            });
-
-            // Ensure scrolling works on mobile
-            document.body.addEventListener('touchmove', (e) => {
-                // Allow default scrolling behavior
-            }, { passive: true });
-        });
-    </script>
 </body>
 </html>
