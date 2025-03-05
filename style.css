@@ -3,9 +3,9 @@ html, body {
     margin: 0;
     padding: 0;
     background-color: black;
-    overscroll-behavior-y: auto;
-    touch-action: auto;
-    overflow-y: auto;
+    overscroll-behavior-y: auto; /* Allow smooth scrolling */
+    touch-action: auto; /* Enable all touch interactions */
+    overflow-y: auto; /* Enable vertical scrolling */
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -17,8 +17,8 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    gap: 7px;
-    width: min(100vw, 90vh);
+    gap: 7px; /* Consistent spacing throughout */
+    width: min(100vw, 90vh); /* Ensuring proper scaling */
     max-width: 500px;
     padding: 7px;
     box-sizing: border-box;
@@ -31,37 +31,39 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    aspect-ratio: 1/1;
+    aspect-ratio: 1/1; /* Ensuring all tiles remain square */
     overflow: hidden;
 }
 
-/* Large Tile */
+/* Large Tile (Spanning Full Width) */
 .large {
     grid-column: span 3;
     aspect-ratio: 3/1;
 }
 
-/* Medium Tile */
+/* Medium Tile (Spanning Two Columns) */
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
 }
 
-/* Small Tile Group */
+/* Small Tiles (Inside a Wrapper for Proper Alignment) */
 .small-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 7px;
+    width: 100%; /* Ensure it occupies the correct space */
+    height: 100%;
 }
 
 .small {
-    aspect-ratio: 1/1;
+    aspect-ratio: 1/1; /* Ensure they are perfectly square */
 }
 
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 5px;
+        gap: 5px; /* Reduce spacing slightly for smaller screens */
     }
 }
