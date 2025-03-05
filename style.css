@@ -1,101 +1,67 @@
-* {
+/* General Styling */
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #000;
+    background-color: black;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.phone-screen {
-    width: 360px; /* Typical phone width */
-    height: 640px; /* Typical phone height */
-    background-color: #000;
-    border: 2px solid #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.tile-grid {
+/* Grid Layout */
+.grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns of equal width */
-    gap: 5px; /* Consistent spacing between tiles */
-    padding: 5px; /* Padding around the grid */
-    height: calc(100% - 60px); /* Adjust for nav buttons */
-    background: linear-gradient(to bottom, #1f4e79, #1f4e79); /* Blue gradient background */
+    grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
+    grid-template-rows: repeat(6, auto); /* Six rows with dynamic height */
+    gap: 5px; /* Uniform spacing between tiles */
+    width: min(95vw, 90vh); /* Ensures it fits properly on all screens */
+    padding: 5px;
+    box-sizing: border-box;
 }
 
-/* Tile Styles */
+/* Standard Tile */
 .tile {
-    background-color: #1f4e79; /* Default blue tile color */
-    border: 1px solid #fff;
-    aspect-ratio: 1 / 1; /* Ensures square tiles */
-    border-radius: 5px;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.tile:hover {
-    transform: scale(1.05);
-    background-color: #2c6eb5; /* Slightly lighter blue on hover */
-}
-
-/* Large Tile (3 columns wide) */
-.large {
-    grid-column: span 3; /* Spans 3 columns */
-    background-color: #1f4e79; /* Default blue */
-}
-
-/* Medium Tile (2 columns wide) */
-.medium {
-    grid-column: span 2; /* Spans 2 columns */
-    background-color: #1f4e79; /* Default blue */
-}
-
-/* Small Tile (1 column wide, part of a 2x2 grid) */
-.small {
-    grid-column: span 1; /* Single column */
-    background-color: #1f4e79; /* Default blue */
-}
-
-/* Navigation Buttons */
-.nav-buttons {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
+    background-color: #0057B7;
+    color: white;
     display: flex;
-    justify-content: space-around;
-    padding: 0 10px;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1; /* Ensures square tiles */
 }
 
-.nav-btn {
-    background-color: #1f4e79;
-    border: 1px solid #fff;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+/* Large Tile (Spanning Full Width) */
+.large {
+    grid-column: span 3; /* Takes full width */
+    aspect-ratio: 3/1; /* Maintaining proportion */
 }
 
-.nav-btn:hover {
-    background-color: #2c6eb5;
-    transform: scale(1.05);
+/* Medium Tile (Spanning Two Columns) */
+.medium {
+    grid-column: span 2; /* Spans two columns */
+    aspect-ratio: 2/1; /* Keeping correct proportions */
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .phone-screen {
-        width: 90%;
-        height: 80vh;
+/* Small Tile Grid (4 Small Tiles in One Regular Tile Space) */
+.small-tile-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px; /* Spacing between small tiles */
+}
+
+.small-tile {
+    background-color: #0057B7;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ensure proper spacing and fitting */
+@media screen and (max-width: 600px) {
+    .grid-container {
+        gap: 4px; /* Adjust spacing for smaller screens */
     }
 }
