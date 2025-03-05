@@ -5,63 +5,64 @@ body {
     background-color: black;
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    align-items: flex-start;
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Always maintain 3 columns */
-    grid-template-rows: repeat(6, auto); /* Six rows with dynamic height */
-    gap: 5px; /* Uniform spacing between tiles */
-    width: min(95vw, 90vh); /* Ensures it fits properly on all screens */
-    padding: 5px;
+    grid-template-columns: repeat(3, 1fr); /* Always 3 columns */
+    grid-template-rows: repeat(6, 1fr); /* Ensuring 6 sections */
+    gap: 4px; /* Keep equal spacing */
+    width: 100vw; /* Ensures full width */
+    height: 100vh; /* Ensures full height */
+    max-width: 100%;
+    padding: 0; /* Remove extra spacing */
     box-sizing: border-box;
 }
 
 /* Standard Tile */
 .tile {
     background-color: #0057B7;
-    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    aspect-ratio: 1/1; /* Ensures square tiles */
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1/1;
 }
 
 /* Large Tile (Spanning Full Width) */
 .large {
-    grid-column: span 3; /* Takes full width */
-    aspect-ratio: 3/1; /* Maintaining proportion */
+    grid-column: span 3;
+    aspect-ratio: 3/1;
 }
 
 /* Medium Tile (Spanning Two Columns) */
 .medium {
-    grid-column: span 2; /* Spans two columns */
-    aspect-ratio: 2/1; /* Keeping correct proportions */
+    grid-column: span 2;
+    aspect-ratio: 2/1;
 }
 
-/* Small Tile Grid (4 Small Tiles in One Regular Tile Space) */
-.small-tile-container {
+/* Small Tile (2x2 inside one tile) */
+.small-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 5px; /* Spacing between small tiles */
+    gap: 4px;
 }
 
 .small-tile {
     background-color: #0057B7;
-    aspect-ratio: 1/1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    height: 100%;
 }
 
-/* Ensure proper spacing and fitting */
+/* Ensure responsiveness */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 4px; /* Adjust spacing for smaller screens */
+        gap: 3px;
     }
 }
