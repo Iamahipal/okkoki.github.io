@@ -44,7 +44,7 @@ html, body {
 .medium {
     grid-column: span 2; /* Takes exactly 2 columns */
     aspect-ratio: 2/1;
-    width: calc(97% + 7px); /* Adjust width to compensate for the grid gap */
+    width: calc(97.5% + 7px); /* Adjust width to compensate for the grid gap */
 }
 
 /* Small Tile Group */
