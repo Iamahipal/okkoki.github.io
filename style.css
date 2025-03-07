@@ -79,11 +79,11 @@ html, body {
 .tile i {
     font-size: 30px;
     color: white;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .small i {
-    font-size: 20px;
+    font-size: 30px;
     margin-bottom: 0;
 }
 
@@ -101,17 +101,17 @@ html, body {
 
 /* Dotted text style for OHHOHI */
 .dotted-text {
-    font-size: 36px;
+    font-size: 40px;
     font-weight: bold;
     color: white;
-    letter-spacing: 2px;
+    letter-spacing: 4px;
     margin: 0;
     padding: 0;
 }
 
 /* Style for the tagline */
 .tagline {
-    font-size: 16px;
+    font-size: 20px;
     color: white;
     margin-top: 5px;
 }
@@ -150,16 +150,16 @@ html, body {
         gap: 7px;
     }
     .tile i {
-        font-size: 24px;
-    }
-    .small i {
-        font-size: 18px;
-    }
-    .dotted-text {
         font-size: 30px;
     }
+    .small i {
+        font-size: 30px;
+    }
+    .dotted-text {
+        font-size: 40px;
+    }
     .tagline {
-        font-size: 14px;
+        font-size: 20px;
     }
 }
 
