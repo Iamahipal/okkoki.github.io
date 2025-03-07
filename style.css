@@ -16,9 +16,9 @@ html, body {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: auto;
+    grid-template-rows: auto;
     gap: 5px; /* Consistent spacing */
-    width: 100%; /* Ensure it takes full width */
+    width: 100vw; /* Ensure it takes full width */
     max-width: 500px;
     padding: 5px;
     box-sizing: border-box;
@@ -32,6 +32,7 @@ html, body {
     align-items: center;
     overflow: hidden;
     width: 100%;
+    height: auto; /* Ensure uniform height */
     aspect-ratio: 1/1; /* Forces perfect square shape */
 }
 
@@ -44,6 +45,8 @@ html, body {
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
+    width: 100%; /* Remove width hacks */
+    height: auto; /* Allow height to be naturally controlled */
 }
 
 /* Small Tile Group */
@@ -52,11 +55,11 @@ html, body {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 5px;
-    grid-column: span 1; /* Ensure it spans exactly one column */
+    width: 100%; /* Ensure correct spacing */
+    height: 100%;
 }
 
 .small {
-    background-color: #0057B7;
     aspect-ratio: 1/1;
 }
 
@@ -64,5 +67,6 @@ html, body {
 @media screen and (max-width: 600px) {
     .grid-container {
         gap: 5px;
+        width: 100%; /* Changed from 100vw to 100% */
     }
 }
