@@ -3,6 +3,10 @@ html, body {
     margin: 0;
     padding: 0;
     background-color: black;
+    background-image: url('windows10-background.jpg'); /* Add the background image */
+    background-size: cover; /* Make sure it covers the entire viewport */
+    background-position: center; /* Center the background */
+    background-repeat: no-repeat; /* Prevent repeating */
     overscroll-behavior-y: auto; /* Allow smooth scrolling */
     touch-action: auto; /* Enable touch interactions */
     overflow-y: auto; /* Enable vertical scrolling */
@@ -15,7 +19,7 @@ html, body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* other properties remain the same */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: auto;
     gap: 7px; /* Consistent spacing */
     width: 100vw; /* Ensure it takes full width */
@@ -27,14 +31,22 @@ html, body {
 
 /* Standard Tile */
 .tile {
-    background-color: #0057B7;
+    background-color: rgba(0, 87, 183, 0.85); /* Make tiles semi-transparent */
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     width: 100%;
-    height: auto; /* Ensure uniform height */
-    aspect-ratio: 1/1; /* Forces perfect square shape */
+    height: auto;
+    aspect-ratio: 1/1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: adds subtle shadow */
+    backdrop-filter: blur(1px); /* Optional: slight blur effect under tiles */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effects */
+}
+
+/* Hover effect */
+.tile:hover {
+    background-color: rgba(0, 87, 183, 0.95); /* Less transparent on hover */
 }
 
 /* Large Tile */
@@ -46,7 +58,7 @@ html, body {
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
-    width: 100%; /* Remove width hacks */
+    width: 100%;
     height: 0; /* Force height calculation from aspect ratio */
     padding-bottom: calc(50% - 3.5px); /* Half of width minus half of the gap */
 }
@@ -57,7 +69,7 @@ html, body {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 7px;
-    width: 100%; /* Ensure correct spacing */
+    width: 100%;
     height: 100%;
 }
 
