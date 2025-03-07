@@ -22,6 +22,7 @@ html, body {
     max-width: 500px;
     padding: 5px;
     box-sizing: border-box;
+    margin-top: 0; /* Fix the top overflow issue */
 }
 
 /* Standard Tile */
@@ -46,7 +47,8 @@ html, body {
     grid-column: span 2;
     aspect-ratio: 2/1;
     width: 100%; /* Remove width hacks */
-    height: auto; /* Allow height to be naturally controlled */
+    height: 0; /* Force height calculation from aspect ratio */
+    padding-bottom: calc(50% - 3.5px); /* Half of width minus half of the gap */
 }
 
 /* Small Tile Group */
@@ -55,7 +57,7 @@ html, body {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 7px;
-    width: 99%; /* Ensure correct spacing */
+    width: 100%; /* Ensure correct spacing */
     height: 100%;
 }
 
