@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create dotted text effect for the title
     const dottedText = document.querySelector('.dotted-text');
     if (dottedText) {
-        const text = dottedText.textContent;
+        const text = dottedText.textContent; // "OKKOKI"
         let dottedHTML = '';
         
         for (let char of text) {
@@ -54,7 +54,7 @@ function initSnakeGame() {
     canvas.style.left = '0';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
-    canvas.style.zIndex = '1';
+    canvas.style.zIndex = '0'; // Below the text
     
     // Insert canvas before the tile content
     largeTile.insertBefore(canvas, largeTile.firstChild);
@@ -71,24 +71,30 @@ function initSnakeGame() {
     let letterIndex = 0;
     const pixelSize = 5;
     
-    // Initialize food positions based on letter positions
+    // Initialize food positions based on "OKKOKI" letters only
     function initFoodPositions() {
         letterElements = document.querySelectorAll('.letter');
+        const targetText = "OKKOKI"; // Only allow these letters
+        foodPositions = [];
+        
         letterElements.forEach((letter, index) => {
-            const rect = letter.getBoundingClientRect();
-            const tileRect = largeTile.getBoundingClientRect();
-            
-            // Calculate position relative to canvas
-            const x = Math.floor((rect.left - tileRect.left) / pixelSize) * pixelSize;
-            const y = Math.floor((rect.top - tileRect.top) / pixelSize) * pixelSize;
-            
-            // Add food at letter position
-            foodPositions.push({
-                x: x,
-                y: y,
-                letter: letter.getAttribute('data-char'),
-                eaten: false
-            });
+            const char = letter.getAttribute('data-char');
+            if (targetText.includes(char)) { // Only include "O", "K", "I" from "OKKOKI"
+                const rect = letter.getBoundingClientRect();
+                const tileRect = largeTile.getBoundingClientRect();
+                
+                // Calculate position relative to canvas
+                const x = Math.floor((rect.left - tileRect.left) / pixelSize) * pixelSize;
+                const y = Math.floor((rect.top - tileRect.top) / pixelSize) * pixelSize;
+                
+                // Add food at letter position
+                foodPositions.push({
+                    x: x,
+                    y: y,
+                    letter: char,
+                    eaten: false
+                });
+            }
         });
     }
     
@@ -105,7 +111,6 @@ function initSnakeGame() {
         ctx.fillStyle = '#33ff33'; // 8-bit green
         foodPositions.forEach(food => {
             if (!food.eaten) {
-                // Draw 8-bit style letter representation
                 ctx.fillRect(food.x, food.y, pixelSize, pixelSize);
             }
         });
@@ -140,7 +145,7 @@ function initSnakeGame() {
         // Add new head
         snake.unshift(head);
         
-        // Check for food collision
+        // Check for food collision (only "OKKOKI" letters)
         let ateFood = false;
         for (let i = 0; i < foodPositions.length; i++) {
             if (!foodPositions[i].eaten && 
@@ -170,12 +175,15 @@ function initSnakeGame() {
             snake.pop();
         }
 
-        // Check if all food is eaten
+        // Check if all "OKKOKI" food is eaten
         if (foodPositions.every(food => food.eaten)) {
             // Reset the letters
             letterElements.forEach(letter => {
-                letter.style.opacity = '1';
-                letter.style.transition = 'opacity 0.5s';
+                const char = letter.getAttribute('data-char');
+                if (targetText.includes(char)) {
+                    letter.style.opacity = '1';
+                    letter.style.transition = 'opacity 0.5s';
+                }
             });
             
             // Reset food
