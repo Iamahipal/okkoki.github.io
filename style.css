@@ -1,19 +1,27 @@
 /* General Styling */
+@font-face {
+    font-family: 'Segoe UI';
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/segoe-ui-fontface/4.0.0/segoe-ui.min.css') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
 html, body {
     margin: 0;
     padding: 0;
     background-color: black;
-    background-image: url('windows10-background.jpg'); /* Add the background image */
-    background-size: cover; /* Make sure it covers the entire viewport */
-    background-position: center; /* Center the background */
-    background-repeat: no-repeat; /* Prevent repeating */
-    overscroll-behavior-y: auto; /* Allow smooth scrolling */
-    touch-action: auto; /* Enable touch interactions */
-    overflow-y: auto; /* Enable vertical scrolling */
+    background-image: url('windows10-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overscroll-behavior-y: auto;
+    touch-action: auto;
+    overflow-y: auto;
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align grid from top */
+    align-items: flex-start;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
 }
 
 /* Grid Layout */
@@ -21,17 +29,17 @@ html, body {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: auto;
-    gap: 7px; /* Consistent spacing */
-    width: 100vw; /* Ensure it takes full width */
+    gap: 7px;
+    width: 100vw;
     max-width: 500px;
     padding: 5px;
     box-sizing: border-box;
-    margin-top: 0; /* Fix the top overflow issue */
+    margin-top: 0;
 }
 
 /* Standard Tile */
 .tile {
-    background-color: rgba(0, 87, 183, 0.85); /* Make tiles semi-transparent */
+    background-color: rgba(0, 87, 183, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,14 +47,44 @@ html, body {
     width: 100%;
     height: auto;
     aspect-ratio: 1/1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: adds subtle shadow */
-    backdrop-filter: blur(1px); /* Optional: slight blur effect under tiles */
-    transition: background-color 0.3s ease; /* Smooth transition for hover effects */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
-/* Hover effect */
-.tile:hover {
-    background-color: rgba(0, 87, 183, 0.95); /* Less transparent on hover */
+/* Tile Content Positioning */
+.tile-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Text inside tiles */
+.tile span {
+    color: white;
+    font-size: 14px;
+    font-weight: 400;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    text-transform: capitalize;
+}
+
+/* Icons styling */
+.tile i {
+    font-size: 28px;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.small i {
+    font-size: 20px;
+    margin-bottom: 0;
 }
 
 /* Large Tile */
@@ -55,12 +93,41 @@ html, body {
     aspect-ratio: 3/1;
 }
 
+.large .tile-content {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Dotted text style for OHHOHI */
+.dotted-text {
+    font-size: 36px;
+    font-weight: bold;
+    color: white;
+    letter-spacing: 2px;
+    margin: 0;
+    padding: 0;
+}
+
+/* Style for the tagline */
+.tagline {
+    font-size: 16px;
+    color: white;
+    margin-top: 5px;
+}
+
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
     width: 100%;
-    height: 0; /* Force height calculation from aspect ratio */
-    padding-bottom: calc(50% - 3.5px); /* Half of width minus half of the gap */
+    height: 0;
+    padding-bottom: calc(50% - 3.5px);
+}
+
+.medium .tile-content {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 /* Small Tile Group */
@@ -82,4 +149,29 @@ html, body {
     .grid-container {
         gap: 7px;
     }
+    .tile i {
+        font-size: 24px;
+    }
+    .small i {
+        font-size: 18px;
+    }
+    .dotted-text {
+        font-size: 30px;
+    }
+    .tagline {
+        font-size: 14px;
+    }
+}
+
+/* Create dotted text effect for OHHOHI */
+.dotted-text {
+    display: inline-block;
+    font-family: monospace;
+    position: relative;
+}
+
+/* Pixel-style effect for 8-bit heart */
+.fa-heart {
+    transform: scale(1.2);
+    image-rendering: pixelated;
 }
