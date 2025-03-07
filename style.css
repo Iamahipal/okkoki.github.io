@@ -15,7 +15,7 @@ html, body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* other properties remain the same */
     grid-template-rows: auto;
     gap: 5px; /* Consistent spacing */
     width: 100vw; /* Ensure it takes full width */
