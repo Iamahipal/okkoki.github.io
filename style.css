@@ -77,9 +77,9 @@ html, body {
 
 /* Icons styling */
 .tile i {
-    font-size: 28px;
+    font-size: 30px;
     color: white;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .small i {
