@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         dottedText.innerHTML = dottedHTML;
+        console.log("Dotted text initialized: ", dottedText.innerHTML); // Debug log
     }
 });
 
@@ -54,7 +55,7 @@ function initSnakeGame() {
     canvas.style.left = '0';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
-    canvas.style.zIndex = '0'; // Below the text
+    canvas.style.zIndex = '0'; // Ensure canvas is behind text
     
     // Insert canvas before the tile content
     largeTile.insertBefore(canvas, largeTile.firstChild);
@@ -74,12 +75,12 @@ function initSnakeGame() {
     // Initialize food positions based on "OKKOKI" letters only
     function initFoodPositions() {
         letterElements = document.querySelectorAll('.letter');
-        const targetText = "OKKOKI"; // Only allow these letters
+        const targetText = "OKKOKI";
         foodPositions = [];
         
         letterElements.forEach((letter, index) => {
             const char = letter.getAttribute('data-char');
-            if (targetText.includes(char)) { // Only include "O", "K", "I" from "OKKOKI"
+            if (targetText.includes(char)) {
                 const rect = letter.getBoundingClientRect();
                 const tileRect = largeTile.getBoundingClientRect();
                 
@@ -94,8 +95,10 @@ function initSnakeGame() {
                     letter: char,
                     eaten: false
                 });
+                console.log(`Added food at (${x}, ${y}) for letter ${char}`); // Debug log
             }
         });
+        console.log("Food positions initialized: ", foodPositions); // Debug log
     }
     
     // Draw 8-bit style snake
@@ -120,32 +123,20 @@ function initSnakeGame() {
     function updateSnake() {
         const head = { ...snake[0] };
         
-        // Move based on direction
         switch (direction) {
-            case 'up':
-                head.y -= pixelSize;
-                break;
-            case 'down':
-                head.y += pixelSize;
-                break;
-            case 'left':
-                head.x -= pixelSize;
-                break;
-            case 'right':
-                head.x += pixelSize;
-                break;
+            case 'up': head.y -= pixelSize; break;
+            case 'down': head.y += pixelSize; break;
+            case 'left': head.x -= pixelSize; break;
+            case 'right': head.x += pixelSize; break;
         }
         
-        // Check boundaries and wrap around
         if (head.x < 0) head.x = canvas.width - pixelSize;
         if (head.x >= canvas.width) head.x = 0;
         if (head.y < 0) head.y = canvas.height - pixelSize;
         if (head.y >= canvas.height) head.y = 0;
         
-        // Add new head
         snake.unshift(head);
         
-        // Check for food collision (only "OKKOKI" letters)
         let ateFood = false;
         for (let i = 0; i < foodPositions.length; i++) {
             if (!foodPositions[i].eaten && 
@@ -154,30 +145,23 @@ function initSnakeGame() {
                 foodPositions[i].eaten = true;
                 ateFood = true;
                 
-                // Hide the actual letter element
                 if (letterElements[i]) {
                     letterElements[i].style.opacity = '0';
                     letterElements[i].style.transition = 'opacity 0.5s';
                 }
                 
-                // Grow the snake
                 for (let j = 0; j < 3; j++) {
                     snake.push({ ...snake[snake.length - 1] });
                 }
-                
-                // Break after eating one letter
                 break;
             }
         }
         
-        // Remove tail if didn't eat food
         if (!ateFood) {
             snake.pop();
         }
 
-        // Check if all "OKKOKI" food is eaten
         if (foodPositions.every(food => food.eaten)) {
-            // Reset the letters
             letterElements.forEach(letter => {
                 const char = letter.getAttribute('data-char');
                 if (targetText.includes(char)) {
@@ -185,66 +169,44 @@ function initSnakeGame() {
                     letter.style.transition = 'opacity 0.5s';
                 }
             });
-            
-            // Reset food
-            foodPositions.forEach(food => {
-                food.eaten = false;
-            });
+            foodPositions.forEach(food => food.eaten = false);
         }
     }
     
     // Game loop
     function gameLoop(currentTime) {
         if (gameOver) return;
-        
         window.requestAnimationFrame(gameLoop);
-        
         const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
         if (secondsSinceLastRender < gameSpeed / 1000) return;
         
         lastRenderTime = currentTime;
-        
-        // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Update and draw
         updateSnake();
         drawFood();
         drawSnake();
     }
     
-    // Change direction based on random movement
     function changeDirection() {
         const directions = ['up', 'down', 'left', 'right'];
         const currentDirIndex = directions.indexOf(direction);
-        
-        // Don't allow complete reversal
         const possibleDirs = directions.filter((dir, index) => {
-            if (currentDirIndex === 0 && index === 1) return false; // up → down
-            if (currentDirIndex === 1 && index === 0) return false; // down → up
-            if (currentDirIndex === 2 && index === 3) return false; // left → right
-            if (currentDirIndex === 3 && index === 2) return false; // right → left
+            if (currentDirIndex === 0 && index === 1) return false;
+            if (currentDirIndex === 1 && index === 0) return false;
+            if (currentDirIndex === 2 && index === 3) return false;
+            if (currentDirIndex === 3 && index === 2) return false;
             return true;
         });
-        
-        // Choose random valid direction
-        const newDir = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
-        direction = newDir;
+        direction = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
     }
     
-    // Set random direction changes
     setInterval(changeDirection, 2000);
     
-    // Adjust to title container after slight delay to ensure elements are positioned
     setTimeout(() => {
         const tileContentRect = largeTile.querySelector('.tile-content').getBoundingClientRect();
         canvas.width = tileContentRect.width;
         canvas.height = tileContentRect.height;
-        
-        // Initialize food positions after elements are properly rendered
         initFoodPositions();
-        
-        // Start the game
         requestAnimationFrame(gameLoop);
     }, 500);
 }
