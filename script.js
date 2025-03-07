@@ -11,29 +11,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }, index * 100);
     });
 
-    // Create dotted text effect for the title
-    const dottedText = document.querySelector('.dotted-text');
-    if (dottedText) {
-        const text = dottedText.textContent;
-        let dottedHTML = '';
-        
-        for (let char of text) {
-            if (char === ' ') {
-                dottedHTML += ' ';
-            } else {
-                // Create a series of dots to form each letter
-                const letterHTML = createDottedLetter(char);
-                dottedHTML += letterHTML;
-            }
-        }
-        
-        dottedText.innerHTML = dottedHTML;
-    }
+    // No need for dotted text effect - using 8-bit font directly
 });
-
-// Function to create dotted letters (simplified version)
-function createDottedLetter(char) {
-    // This is a simplified representation - in a real implementation
-    // you would have patterns for each letter
-    return `<span class="letter">${char}</span>`;
-}
