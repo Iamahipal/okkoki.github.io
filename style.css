@@ -108,6 +108,7 @@ html, body {
     text-align: center;
     z-index: 2; /* Ensure text is above canvas */
     position: relative;
+    overflow: visible; /* Ensure content isn’t clipped */
 }
 
 /* Snake game canvas */
@@ -119,6 +120,7 @@ html, body {
     width: 100%;
     height: 100%;
     z-index: 1; /* Below the text */
+    background: transparent; /* Ensure canvas doesn’t obscure text */
 }
 
 /* Dotted text style for OKKOKI */
@@ -129,9 +131,10 @@ html, body {
     letter-spacing: 4px;
     margin: 0;
     padding: 0;
-    font-family: 'PressStart2P', monospace;
+    font-family: 'PressStart2P', monospace, sans-serif; /* Fallback font */
     position: relative;
     z-index: 2; /* Ensure text is above canvas */
+    text-shadow: 1px 1px 2px black; /* Improve visibility */
 }
 
 /* Individual letters for 8-bit effect */
@@ -139,6 +142,7 @@ html, body {
     display: inline-block;
     position: relative;
     transition: opacity 0.5s;
+    opacity: 1; /* Ensure letters start visible */
 }
 
 /* Style for the tagline */
