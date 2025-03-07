@@ -3,24 +3,21 @@ html, body {
     margin: 0;
     padding: 0;
     background-color: black;
-    overscroll-behavior-y: auto; /* Allow smooth scrolling */
-    touch-action: auto; /* Enable touch interactions */
-    overflow-y: auto; /* Enable vertical scrolling */
+    overscroll-behavior-y: auto;
+    touch-action: auto;
+    overflow-y: auto;
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align grid from top */
+    align-items: flex-start;
 }
 
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr; /* Make sure the width is set properly */
-    width: calc(100% - 10px); /* Account for padding */
-    max-width: 500px; /* Other properties remain the same */
-    grid-template-rows: auto;
-    gap: 5px; /* Consistent spacing */
-    width: 100vw; /* Ensure it takes full width */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    width: 100%;
     max-width: 500px;
     padding: 5px;
     box-sizing: border-box;
@@ -33,9 +30,8 @@ html, body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    aspect-ratio: 1/1;
     width: 100%;
-    height: auto; /* Ensure uniform height */
-    aspect-ratio: 1/1; /* Forces perfect square shape */
 }
 
 /* Large Tile */
@@ -44,30 +40,37 @@ html, body {
     aspect-ratio: 3/1;
 }
 
+/* Medium Tile */
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
-    width: 100%; /* Remove width hacks */
-    height: auto; /* Allow height to be naturally controlled */
 }
 
 /* Small Tile Group */
 .small-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     gap: 5px;
-    width: 100%; /* Ensure correct spacing */
-    height: 100%;
+    grid-column: span 1;
 }
 
 .small {
+    background-color: #0057B7;
     aspect-ratio: 1/1;
+    width: 100%;
+    height: auto;
 }
 
-/* Responsive Fix */
+/* Remove any potential margins or paddings that could cause misalignment */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* Responsive adjustments */
 @media screen and (max-width: 600px) {
     .grid-container {
-        gap: 5px;
+        width: calc(100% - 10px); /* Account for the container padding */
     }
 }
