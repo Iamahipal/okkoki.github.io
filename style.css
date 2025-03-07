@@ -106,33 +106,6 @@ html, body {
     overflow: visible; /* Ensure content isn't clipped */
 }
 
-/* Snake game canvas */
-.snake-game {
-    image-rendering: pixelated;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; /* Below the text */
-    background: transparent; /* Ensure canvas doesn't obscure text */
-}
-
-/* 8-bit style text for OKKOKI */
-.retro-text {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 32px;
-    font-weight: bold;
-    color: white;
-    letter-spacing: 2px;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    z-index: 2; /* Ensure text is above canvas */
-    text-shadow: 1px 1px 2px black; /* Improve visibility */
-    text-transform: uppercase;
-}
-
 /* Style for the tagline */
 .tagline {
     font-size: 20px;
@@ -191,4 +164,102 @@ html, body {
 .fa-heart {
     transform: scale(1.2);
     image-rendering: pixelated;
+}
+
+/* Pac-Man Game Container */
+.game-container {
+    position: relative;
+    width: 100%;
+    height: 60px;
+    margin-bottom: 10px;
+    overflow: visible;
+}
+
+/* Text Container for OKKOKI Letters */
+.text-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Individual Letters */
+.letter {
+    display: inline-block;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 32px;
+    color: white;
+    margin: 0 3px;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Pac-Man Styling */
+.pacman {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: #FFFF00;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    overflow: hidden;
+}
+
+/* Pac-Man Mouth */
+.pacman-mouth {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 87, 183, 0.95);
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform-origin: right center;
+    clip-path: polygon(100% 0, 100% 100%, 50% 50%);
+}
+
+/* Pac-Man Animation */
+.pacman-right {
+    transform: translateY(-50%) rotate(0deg);
+}
+
+/* Mouth Open/Close Animation */
+.pacman.mouth-open .pacman-mouth {
+    clip-path: polygon(100% 25%, 100% 75%, 50% 50%);
+}
+
+/* Glitch Effect for Text Reset */
+.text-container.glitch {
+    animation: glitch 0.5s linear;
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+        filter: brightness(1);
+    }
+    20% {
+        transform: translate(-5px, 5px);
+        filter: brightness(1.5) contrast(1.5);
+    }
+    40% {
+        transform: translate(5px, -5px);
+        filter: brightness(0.8) contrast(2);
+    }
+    60% {
+        transform: translate(-5px, -5px);
+        filter: brightness(1.2) contrast(0.8);
+    }
+    80% {
+        transform: translate(5px, 5px);
+        filter: brightness(1.5) contrast(1.2);
+    }
+    100% {
+        transform: translate(0);
+        filter: brightness(1);
+    }
 }
