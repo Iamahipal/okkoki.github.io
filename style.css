@@ -67,6 +67,5 @@ html, body {
 @media screen and (max-width: 600px) {
     .grid-container {
         gap: 5px;
-        width: 100%; /* Changed from 100vw to 100% */
     }
 }
