@@ -6,6 +6,11 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'PressStart2P';
+    src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -75,16 +80,20 @@ html, body {
     text-transform: capitalize;
 }
 
-/* Icons styling */
+/* Icons styling - standardized size for all tiles */
 .tile i {
     font-size: 30px;
     color: white;
-    margin-bottom: 15px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-.small i {
-    font-size: 30px;
-    margin-bottom: 0;
+/* Adjusted position for tiles with text */
+.tile:not(.small) .tile-content:has(span) i {
+    transform: translate(-50%, -70%);
 }
 
 /* Large Tile */
@@ -97,9 +106,21 @@ html, body {
     justify-content: center;
     align-items: center;
     text-align: center;
+    z-index: 2;
+    position: relative;
 }
 
-/* Dotted text style for OHHOHI */
+/* Snake game canvas */
+.snake-game {
+    image-rendering: pixelated;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Dotted text style for OKKOKI */
 .dotted-text {
     font-size: 40px;
     font-weight: bold;
@@ -107,6 +128,16 @@ html, body {
     letter-spacing: 4px;
     margin: 0;
     padding: 0;
+    font-family: 'PressStart2P', monospace;
+    position: relative;
+    z-index: 2;
+}
+
+/* Individual letters for 8-bit effect */
+.letter {
+    display: inline-block;
+    position: relative;
+    transition: opacity 0.5s;
 }
 
 /* Style for the tagline */
@@ -114,6 +145,8 @@ html, body {
     font-size: 20px;
     color: white;
     margin-top: 5px;
+    position: relative;
+    z-index: 2;
 }
 
 .medium {
@@ -152,22 +185,12 @@ html, body {
     .tile i {
         font-size: 30px;
     }
-    .small i {
-        font-size: 30px;
-    }
     .dotted-text {
         font-size: 40px;
     }
     .tagline {
         font-size: 20px;
     }
-}
-
-/* Create dotted text effect for OKKOKI */
-.dotted-text {
-    display: inline-block;
-    font-family: monospace;
-    position: relative;
 }
 
 /* Pixel-style effect for 8-bit heart */
