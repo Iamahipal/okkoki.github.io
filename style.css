@@ -206,14 +206,18 @@ html, body {
     padding: 5px 0;
 }
 
+/* UPDATED: Changed letter header to show only the letter without background bar */
 .letter-header {
-    background-color: rgba(0, 87, 183, 0.95); /* Same blue as your tiles */
-    color: white;
-    padding: 5px 10px;
-    font-size: 24px;
+    color: rgba(0, 87, 183, 0.95); /* Blue color */
+    padding: 8px;
+    font-size: 22px;
     font-weight: bold;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 8px 10px;
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    min-width: 30px;
+    text-align: center;
 }
 
 .app-item {
@@ -239,47 +243,9 @@ html, body {
     color: white;
 }
 
-.jump-list {
-    position: fixed;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    z-index: 10;
-}
+/* REMOVED: Jump list - as requested */
 
-.jump-list a {
-    color: rgba(0, 87, 183, 0.95);
-    text-decoration: none;
-    font-size: 14px;
-    margin: 2px 0;
-    font-weight: bold;
-}
-
-.toggle-view {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 200;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 20px;
-    padding: 5px 15px;
-}
-
-.toggle-view button {
-    background: none;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.toggle-view button.active {
-    color: rgba(0, 87, 183, 0.95);
-}
+/* REMOVED: Toggle view buttons - as requested */
 
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
