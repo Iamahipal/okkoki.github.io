@@ -157,6 +157,130 @@ html, body {
     aspect-ratio: 1/1;
 }
 
+/* App List View Styles */
+.app-list-container {
+    display: none;
+    width: 100vw;
+    max-width: 500px;
+    height: 100vh;
+    background-color: black;
+    color: white;
+    position: relative;
+    overflow-y: auto;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.app-list-container.active {
+    display: block;
+}
+
+.search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: black;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.search-bar .search-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.search-bar input {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    flex-grow: 1;
+    outline: none;
+    padding: 5px 0;
+}
+
+.letter-header {
+    background-color: rgba(0, 87, 183, 0.95); /* Same blue as your tiles */
+    color: white;
+    padding: 5px 10px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.app-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-icon {
+    width: 48px;
+    height: 48px;
+    margin-right: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 87, 183, 0.95);
+    color: white;
+}
+
+.app-name {
+    font-size: 18px;
+    color: white;
+}
+
+.jump-list {
+    position: fixed;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.jump-list a {
+    color: rgba(0, 87, 183, 0.95);
+    text-decoration: none;
+    font-size: 14px;
+    margin: 2px 0;
+    font-weight: bold;
+}
+
+.toggle-view {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+
+.toggle-view button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.toggle-view button.active {
+    color: rgba(0, 87, 183, 0.95);
+}
+
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
     .grid-container {
