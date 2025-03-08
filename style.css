@@ -129,8 +129,10 @@ html, body {
 /* Medium Tile */
 .medium {
     grid-column: span 2;
+    aspect-ratio: 2/1;
     width: 100%;
-    height: calc(2 * (100% / 3) + 7px); /* 2x the small tile height + gap */
+    height: 0; /* Force height calculation from aspect ratio */
+    padding-bottom: calc(50% - 3.5px); /* Half of width minus half of the gap */
 }
 
 /* Small Tile Group */
