@@ -13,62 +13,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Get the large tile
     const largeTile = document.querySelector('.large');
+    
+    // Set up 3D container on the large tile
+    largeTile.style.perspective = "1000px";
+    
+    // Get the tile content
     const tileContent = largeTile.querySelector('.tile-content');
     
-    // Make sure OKKOKI and subheadline are using 8-bit font
-    const titleElement = document.querySelector('.retro-text');
-    const taglineElement = document.querySelector('.tagline');
+    // Store original content
+    const originalContent = tileContent.innerHTML;
     
-    // Ensure the title is using the 8-bit font
-    titleElement.style.fontFamily = "'Press Start 2P', cursive";
+    // Prepare front and back elements
+    const frontSide = document.createElement('div');
+    frontSide.className = 'tile-front';
+    frontSide.innerHTML = originalContent;
     
-    // Simple fade-in for the large tile with a slight delay
-    largeTile.style.opacity = "0";
-    setTimeout(() => {
-        largeTile.style.transition = "opacity 0.8s ease-out, transform 0.8s ease-out";
-        largeTile.style.opacity = "1";
-    }, 500);
+    const backSide = document.createElement('div');
+    backSide.className = 'tile-back';
+    backSide.innerHTML = `
+        <div class="back-message">Let's Build Something Cool!</div>
+    `;
     
-    // Simple tile flip animation (just once, not continuously)
-    setTimeout(() => {
-        tileContent.style.transition = "transform 0.8s ease-in-out";
-        tileContent.style.transform = "rotateY(180deg)";
+    // Add styles for 3D flip and properly centered text
+    const style = document.createElement('style');
+    style.textContent = `
+        .large .tile-content {
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            position: relative;
+        }
         
-        // Create back side with message
-        const backSide = document.createElement('div');
-        backSide.className = 'tile-back';
-        backSide.innerHTML = `
-            <div style="
-                font-family: 'Press Start 2P', cursive; 
-                color: white; 
-                text-align: center; 
-                font-size: 16px;
-                padding: 0 15px;
-            ">Let's Build Something Cool!</div>
-        `;
-        backSide.style.position = "absolute";
-        backSide.style.top = "0";
-        backSide.style.left = "0";
-        backSide.style.width = "100%";
-        backSide.style.height = "100%";
-        backSide.style.display = "flex";
-        backSide.style.justifyContent = "center";
-        backSide.style.alignItems = "center";
-        backSide.style.backfaceVisibility = "hidden";
-        backSide.style.transform = "rotateY(180deg)";
-        backSide.style.backgroundColor = "rgba(0, 87, 183, 0.95)";
+        .tile-front, .tile-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 87, 183, 0.95);
+        }
         
-        tileContent.appendChild(backSide);
+        .tile-back {
+            transform: rotateY(180deg);
+        }
+        
+        .retro-text, .tagline {
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .retro-text {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+        }
+        
+        .back-message {
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            padding: 0 15px;
+        }
+        
+        @media screen and (max-width: 600px) {
+            .retro-text {
+                font-size: 24px;
+            }
+            
+            .tagline {
+                font-size: 12px;
+            }
+            
+            .back-message {
+                font-size: 14px;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Clear and rebuild the content with front and back sides
+    tileContent.innerHTML = '';
+    tileContent.appendChild(frontSide);
+    tileContent.appendChild(backSide);
+    
+    // Flip the tile after a delay
+    setTimeout(() => {
+        tileContent.style.transform = 'rotateY(180deg)';
         
         // Flip back after 5 seconds
         setTimeout(() => {
-            tileContent.style.transform = "rotateY(0deg)";
-            // Remove back side after animation completes
-            setTimeout(() => {
-                if (backSide.parentNode === tileContent) {
-                    tileContent.removeChild(backSide);
-                }
-            }, 800);
+            tileContent.style.transform = 'rotateY(0deg)';
         }, 5000);
     }, 3000);
 });
