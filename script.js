@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 text-align: center; 
                 font-size: 16px;
                 padding: 0 15px;
-            ">📟 "Let's Build Something Cool!"</div>
+            ">Let's Build Something Cool!</div>
         `;
         backSide.style.position = "absolute";
         backSide.style.top = "0";
