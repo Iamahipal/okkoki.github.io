@@ -14,14 +14,12 @@ html, body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    overscroll-behavior-y: auto;
-    touch-action: auto;
-    overflow-y: auto;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     font-family: 'Segoe UI', 'Roboto', sans-serif;
+    overflow-y: auto;
 }
 
 /* Grid Layout */
@@ -49,6 +47,7 @@ html, body {
     aspect-ratio: 1/1;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
 /* Tile Content Positioning */
@@ -75,7 +74,7 @@ html, body {
     text-transform: capitalize;
 }
 
-/* Icons styling - standardized size for all tiles */
+/* Icons styling */
 .tile i {
     font-size: 30px;
     color: white;
@@ -101,12 +100,10 @@ html, body {
     justify-content: center;
     align-items: center;
     text-align: center;
-    z-index: 2; /* Ensure text is above canvas */
     position: relative;
-    overflow: visible; /* Ensure content isn't clipped */
 }
 
-/* Ensure 8-bit styling for the OKKOKI header */
+/* OKKOKI header styling */
 .retro-text {
     font-family: 'Press Start 2P', cursive !important;
     font-size: 32px;
@@ -115,47 +112,25 @@ html, body {
     letter-spacing: 2px;
     margin: 0;
     padding: 0;
-    position: relative;
     text-shadow: 1px 1px 2px black;
     text-transform: uppercase;
+    margin-bottom: 20px;
 }
 
-/* Style for the tagline to match */
+/* Style for the tagline */
 .tagline {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 16px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
     color: white;
     margin-top: 15px;
-    position: relative;
+    text-align: center;
 }
 
-/* Basic 3D flip setup for the large tile */
-.tile.large {
-    perspective: 1000px;
-}
-
-.tile.large .tile-content {
-    transform-style: preserve-3d;
-    transition: transform 0.8s;
-}
-
-/* Ensure proper Windows-style tile animation */
-.tile, .small {
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
 /* Medium Tile */
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
     width: 100%;
-    height: 0;
-    padding-bottom: calc(50% - 3.5px);
-}
-
-.medium .tile-content {
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 /* Small Tile Group */
@@ -181,75 +156,9 @@ html, body {
         font-size: 30px;
     }
     .retro-text {
-        font-size: 26px;
+        font-size: 24px;
     }
     .tagline {
-        font-size: 18px;
+        font-size: 12px;
     }
-}
-
-/* Pixel-style effect for 8-bit heart */
-.fa-heart {
-    transform: scale(1.2);
-    image-rendering: pixelated;
-}
-/* Additional styles to add to style.css */
-
-/* 3D Flip Animation Styles */
-.tile.large {
-    perspective: 1000px;
-    transition: none;
-}
-
-.tile-content {
-    transform-style: preserve-3d;
-    transition: transform 0.8s;
-    width: 100%;
-    height: 100%;
-}
-
-.tile-front, .tile-back {
-    backface-visibility: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    -webkit-backface-visibility: hidden; /* Safari support */
-    backface-visibility: hidden;
-}
-
-.tile-back {
-    transform: rotateY(180deg);
-}
-
-/* DOS terminal cursor animation */
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-
-.cursor {
-    font-weight: bold;
-    animation: blink 0.7s infinite;
-    display: inline-block;
-}
-
-/* Style for the surprise message on the back */
-.surprise-message {
-    font-family: 'Press Start 2P', cursive;
-    color: white;
-    text-align: center;
-    font-size: 16px;
-    padding: 0 15px;
-    letter-spacing: 1px;
-}
-
-/* When tile is flipped */
-.flipped .tile-content {
-    transform: rotateY(180deg);
 }
