@@ -1,25 +1,15 @@
 /* General Styling */
-@font-face {
-    font-family: 'Segoe UI';
-    src: url('https://cdnjs.cloudflare.com/ajax/libs/segoe-ui-fontface/4.0.0/segoe-ui.min.css') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
-
 html, body {
     margin: 0;
     padding: 0;
     background-color: black;
-    background-image: url('windows10-background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    overscroll-behavior-y: auto;
+    touch-action: auto;
+    overflow-y: auto;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    font-family: 'Segoe UI', 'Roboto', sans-serif;
-    overflow-y: auto;
 }
 
 /* Grid Layout */
@@ -33,28 +23,21 @@ html, body {
     padding: 5px;
     box-sizing: border-box;
     margin-top: 0;
+    /* Remove any extra margins that might cause spacing */
+    margin-bottom: 0;
 }
 
 /* Standard Tile */
 .tile {
-    background-color: rgba(0, 87, 183, 0.95);
+    background-color: #0057B7;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     width: 100%;
-    height: auto;
     aspect-ratio: 1/1;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
-
-/* Standard Tile */
-.tile {
-    /* Your existing properties */
-    height: 0;
-    padding-bottom: 100%; /* Ensures square aspect ratio */
 }
 
 /* Tile Content Positioning */
@@ -92,59 +75,34 @@ html, body {
     transform: translate(-50%, -50%);
 }
 
-/* Adjusted position for tiles with text */
-.tile:not(.small) .tile-content:has(span) i {
-    transform: translate(-50%, -70%);
-}
-
 /* Large Tile */
 .large {
     grid-column: span 3;
     aspect-ratio: 3/1;
 }
 
-.large .tile-content {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    position: relative;
-}
-
-/* OKKOKI header styling */
-.retro-text {
-    font-family: 'Press Start 2P', cursive !important;
-    font-size: 32px;
-    font-weight: normal;
-    color: white;
-    letter-spacing: 2px;
-    margin: 0;
-    padding: 0;
-    text-shadow: 1px 1px 2px black;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
-
-/* Style for the tagline */
-.tagline {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 14px;
-    color: white;
-    margin-top: 15px;
-    text-align: center;
-}
-
 /* Medium Tile */
 .medium {
     grid-column: span 2;
     aspect-ratio: 2/1;
-    width: 100%;
-    height: auto;
 }
 
-/* Medium Tile override */
-.medium {
-    grid-column: span 2;
-    padding-bottom: 50%; /* Half the height of a square tile */
+/* Fix for medium tile icon and text alignment */
+.medium .tile-content {
+    position: relative;
+}
+
+.medium i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.medium span {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
 }
 
 /* Small Tile Group */
@@ -161,18 +119,17 @@ html, body {
     aspect-ratio: 1/1;
 }
 
+/* Fix for the bottom gap */
+body::after {
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+}
+
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
     .grid-container {
         gap: 7px;
-    }
-    .tile i {
-        font-size: 30px;
-    }
-    .retro-text {
-        font-size: 24px;
-    }
-    .tagline {
-        font-size: 12px;
     }
 }
