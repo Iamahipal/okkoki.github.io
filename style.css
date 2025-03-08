@@ -106,8 +106,6 @@ html, body {
     overflow: visible; /* Ensure content isn't clipped */
 }
 
-/* Add these styles to your style.css file to ensure 8-bit styling */
-
 /* Ensure 8-bit styling for the OKKOKI header */
 .retro-text {
     font-family: 'Press Start 2P', cursive !important;
