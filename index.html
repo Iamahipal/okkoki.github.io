@@ -7,8 +7,231 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* App List View Styles */
+        .app-list-container {
+            display: none;
+            width: 100vw;
+            max-width: 500px;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            position: relative;
+            overflow-y: auto;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        .app-list-container.active {
+            display: block;
+        }
+
+        .search-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: black;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar .search-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .letter-header {
+            background-color: rgba(0, 87, 183, 0.95); /* Same blue as your tiles */
+            color: white;
+            padding: 5px 10px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .app-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 87, 183, 0.95);
+            color: white;
+        }
+
+        .app-name {
+            font-size: 18px;
+            color: white;
+        }
+
+        .jump-list {
+            position: fixed;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .jump-list a {
+            color: rgba(0, 87, 183, 0.95);
+            text-decoration: none;
+            font-size: 14px;
+            margin: 2px 0;
+            font-weight: bold;
+        }
+
+        .toggle-view {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 5px 15px;
+        }
+
+        .toggle-view button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .toggle-view button.active {
+            color: rgba(0, 87, 183, 0.95);
+        }
+
+        /* Hide grid when app list is shown */
+        .app-list-container.active + .grid-container {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <!-- App List View Container -->
+    <div class="app-list-container" id="appListView">
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <div class="search-icon">
+                <i class="fa-solid fa-search"></i>
+            </div>
+            <input type="text" id="searchApps" placeholder="Search apps..." style="display: none;">
+        </div>
+
+        <!-- 'A' Section -->
+        <div class="letter-header">a</div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <div class="app-name">Adobe Reader</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <div class="app-name">AE Bubble</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="app-name">Alarms</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-brands fa-amazon"></i>
+            </div>
+            <div class="app-name">Amazon Mobile</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-folder"></i>
+            </div>
+            <div class="app-name">App Folder</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-share-nodes"></i>
+            </div>
+            <div class="app-name">App Social</div>
+        </div>
+
+        <!-- 'B' Section -->
+        <div class="letter-header">b</div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-battery-half"></i>
+            </div>
+            <div class="app-name">Battery Saver</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+            <div class="app-name">Blink</div>
+        </div>
+
+        <!-- 'C' Section -->
+        <div class="letter-header">c</div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-calculator"></i>
+            </div>
+            <div class="app-name">Calculator</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-calendar"></i>
+            </div>
+            <div class="app-name">Calendar</div>
+        </div>
+        <div class="app-item">
+            <div class="app-icon">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+            <div class="app-name">Camera</div>
+        </div>
+
+        <!-- More sections would be added here for the rest of the alphabet -->
+
+        <!-- Quick Navigation Jump List -->
+        <div class="jump-list">
+            <a href="#section-a">a</a>
+            <a href="#section-b">b</a>
+            <a href="#section-c">c</a>
+            <!-- More letters would go here -->
+            <a href="#section-z">z</a>
+        </div>
+
+        <!-- Toggle View Button -->
+        <div class="toggle-view">
+            <button id="showTiles"><i class="fa-solid fa-th-large"></i></button>
+            <button id="showList" class="active"><i class="fa-solid fa-list"></i></button>
+        </div>
+    </div>
+
+    <!-- Your Existing Tile Grid -->
     <div class="grid-container">
         <!-- Large Tile - Header -->
         <div class="tile large">
@@ -146,5 +369,77 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Add toggle functionality between tile view and app list view
+        document.addEventListener("DOMContentLoaded", () => {
+            // Get elements
+            const appListView = document.getElementById('appListView');
+            const showTilesBtn = document.getElementById('showTiles');
+            const showListBtn = document.getElementById('showList');
+            
+            // Toggle between views
+            showTilesBtn.addEventListener('click', () => {
+                appListView.classList.remove('active');
+                showListBtn.classList.remove('active');
+                showTilesBtn.classList.add('active');
+                
+                // Re-trigger the tile animations
+                const tiles = document.querySelectorAll(".tile, .small");
+                tiles.forEach((tile, index) => {
+                    tile.style.opacity = "0";
+                    tile.style.transform = "scale(0.8)";
+                    setTimeout(() => {
+                        tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+                        tile.style.opacity = "1";
+                        tile.style.transform = "scale(1)";
+                    }, index * 100);
+                });
+            });
+            
+            showListBtn.addEventListener('click', () => {
+                appListView.classList.add('active');
+                showTilesBtn.classList.remove('active');
+                showListBtn.classList.add('active');
+            });
+            
+            // For demo purposes, make the tile view active initially
+            appListView.classList.remove('active');
+            showListBtn.classList.remove('active');
+            showTilesBtn.classList.add('active');
+            
+            // Add search functionality
+            const searchInput = document.getElementById('searchApps');
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const appItems = document.querySelectorAll('.app-item');
+                
+                appItems.forEach(item => {
+                    const appName = item.querySelector('.app-name').textContent.toLowerCase();
+                    if (appName.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Search icon click behavior
+            const searchIcon = document.querySelector('.search-icon');
+            searchIcon.addEventListener('click', () => {
+                if (searchInput.style.display === 'none') {
+                    searchInput.style.display = 'block';
+                    searchInput.focus();
+                } else {
+                    searchInput.style.display = 'none';
+                    searchInput.value = '';
+                    // Reset search results
+                    const appItems = document.querySelectorAll('.app-item');
+                    appItems.forEach(item => {
+                        item.style.display = 'flex';
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
