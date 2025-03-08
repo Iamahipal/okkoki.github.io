@@ -25,8 +25,8 @@ html, body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto;
+    grid-template-columns: repeat(3, 1fr); /* Ensures all columns are equal */
+    grid-auto-rows: 1fr; /* Ensures all rows have equal height */
     gap: 7px;
     width: 100vw;
     max-width: 500px;
@@ -43,8 +43,7 @@ html, body {
     align-items: center;
     overflow: hidden;
     width: 100%;
-    height: auto;
-    aspect-ratio: 1/1;
+    aspect-ratio: 1/1; /* Ensures perfect square */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
@@ -79,10 +78,8 @@ html, body {
     font-size: 30px;
     color: white;
     margin: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative; /* Changed from absolute to relative */
+    transform: none; /* Removes previous transformation issues */
 }
 
 /* Large Tile */
@@ -121,12 +118,11 @@ html, body {
     text-align: center;
 }
 
-/* 🔥 FIXED Medium Tile */
+/* 🔥 FIXED Medium Tile (Perfect Height & Alignment) */
 .medium {
     grid-column: span 2;
     width: 100%;
-    height: auto; /* Allow it to adjust properly */
-    aspect-ratio: 2/1; /* Ensures proper height */
+    aspect-ratio: 2/1; /* Perfect width-to-height ratio */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -134,11 +130,11 @@ html, body {
     overflow: hidden; /* Prevents unwanted gaps */
 }
 
-/* 🔥 FIXED Medium Tile Icon */
+/* 🔥 FIXED Medium Tile Icon (Now Properly Centered) */
 .medium .tile-content i {
     font-size: 40px;
-    position: relative;
-    transform: none; /* Keeps it centered */
+    position: relative; /* Removed absolute */
+    transform: none; /* Keeps icon centered */
 }
 
 /* 🔥 FIXED Medium Tile Text */
