@@ -25,8 +25,8 @@ html, body {
 /* Grid Layout */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Ensures all columns are equal */
-    grid-auto-rows: 1fr; /* Ensures all rows have equal height */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto;
     gap: 7px;
     width: 100vw;
     max-width: 500px;
@@ -43,7 +43,8 @@ html, body {
     align-items: center;
     overflow: hidden;
     width: 100%;
-    aspect-ratio: 1/1; /* Ensures perfect square */
+    height: auto;
+    aspect-ratio: 1/1;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
@@ -78,8 +79,15 @@ html, body {
     font-size: 30px;
     color: white;
     margin: 0;
-    position: relative; /* Changed from absolute to relative */
-    transform: none; /* Removes previous transformation issues */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Adjusted position for tiles with text */
+.tile:not(.small) .tile-content:has(span) i {
+    transform: translate(-50%, -70%);
 }
 
 /* Large Tile */
@@ -118,33 +126,11 @@ html, body {
     text-align: center;
 }
 
-/* 🔥 FIXED Medium Tile (Perfect Height & Alignment) */
+/* Medium Tile */
 .medium {
     grid-column: span 2;
+    aspect-ratio: 2/1;
     width: 100%;
-    aspect-ratio: 2/1; /* Perfect width-to-height ratio */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden; /* Prevents unwanted gaps */
-}
-
-/* 🔥 FIXED Medium Tile Icon (Now Properly Centered) */
-.medium .tile-content i {
-    font-size: 40px;
-    position: relative; /* Removed absolute */
-    transform: none; /* Keeps icon centered */
-}
-
-/* 🔥 FIXED Medium Tile Text */
-.tile.medium span {
-    position: absolute;
-    bottom: 10px;
-    left: 15px;
-    font-size: 16px;
-    color: white;
-    display: block; /* Ensures it always appears */
 }
 
 /* Small Tile Group */
