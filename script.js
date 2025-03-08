@@ -5,17 +5,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const showListBtn = document.getElementById('showList');
     const gridContainer = document.querySelector('.grid-container');
     
-    // Animate tiles with standard Windows animation
-    const tiles = document.querySelectorAll(".tile, .small");
-    tiles.forEach((tile, index) => {
-        tile.style.opacity = "0";
-        tile.style.transform = "scale(0.8)";
-        setTimeout(() => {
-            tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
-            tile.style.opacity = "1";
-            tile.style.transform = "scale(1)";
-        }, index * 100);
-    });
+    // Flag to track if initial animation has played
+    let initialAnimationPlayed = false;
+    
+    // Animate tiles with standard Windows animation - only on first load
+    function animateTiles() {
+        if (!initialAnimationPlayed) {
+            const tiles = document.querySelectorAll(".tile, .small");
+            tiles.forEach((tile, index) => {
+                tile.style.opacity = "0";
+                tile.style.transform = "scale(0.8)";
+                setTimeout(() => {
+                    tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+                    tile.style.opacity = "1";
+                    tile.style.transform = "scale(1)";
+                }, index * 100);
+            });
+            initialAnimationPlayed = true;
+        }
+    }
+    
+    // Run animation on first load
+    animateTiles();
     
     // Toggle between views
     showTilesBtn.addEventListener('click', () => {
@@ -32,16 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showListBtn.classList.remove('active');
         showTilesBtn.classList.add('active');
         
-        // Re-trigger the tile animations
-        tiles.forEach((tile, index) => {
-            tile.style.opacity = "0";
-            tile.style.transform = "scale(0.8)";
-            setTimeout(() => {
-                tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
-                tile.style.opacity = "1";
-                tile.style.transform = "scale(1)";
-            }, index * 100);
-        });
+        // No need to re-trigger animations when switching views
     }
     
     function switchToListView() {
@@ -68,6 +70,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 item.style.display = 'none';
             }
         });
+        
+        // Hide/show section headers based on visible apps
+        const sections = document.querySelectorAll('.letter-header');
+        sections.forEach(section => {
+            const sectionId = section.id;
+            const sectionApps = document.querySelectorAll(`#${sectionId} + .app-item`);
+            let hasVisibleApps = false;
+            
+            sectionApps.forEach(app => {
+                if (app.style.display !== 'none') {
+                    hasVisibleApps = true;
+                }
+            });
+            
+            section.style.display = hasVisibleApps ? 'block' : 'none';
+        });
     });
     
     // Search icon click behavior
@@ -83,6 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const appItems = document.querySelectorAll('.app-item');
             appItems.forEach(item => {
                 item.style.display = 'flex';
+            });
+            
+            // Show all section headers
+            const sections = document.querySelectorAll('.letter-header');
+            sections.forEach(section => {
+                section.style.display = 'block';
             });
         }
     });
