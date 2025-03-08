@@ -13,45 +13,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Get the large tile and its content
     const largeTile = document.querySelector('.large');
-    const titleElement = document.querySelector('.retro-text');
-    const taglineElement = document.querySelector('.tagline');
+    const tileContent = largeTile.querySelector('.tile-content');
     
-    // Store original text content
-    const originalTitle = titleElement.textContent;
-    const originalTagline = taglineElement.textContent;
+    // Store original content
+    const originalHTML = tileContent.innerHTML;
+    const originalTitle = document.querySelector('.retro-text').textContent;
+    const originalTagline = document.querySelector('.tagline').textContent;
     
-    // Create surprise messages for the back of the tile
-    const surpriseMessages = [
-        "Let's Build Something Cool!",
-        "Ready to Scale Your Business?",
-        "Innovative Solutions Await",
-        "Transform Your Digital Presence"
-    ];
+    // Create front and back containers
+    const frontSide = document.createElement('div');
+    frontSide.className = 'tile-front';
     
-    // Clear the text content to start typewriter effect
-    titleElement.textContent = '';
-    taglineElement.textContent = '';
+    const backSide = document.createElement('div');
+    backSide.className = 'tile-back';
     
-    // Add a blinking cursor element
-    const cursor = document.createElement('span');
-    cursor.className = 'cursor';
-    cursor.innerHTML = '_';
-    cursor.style.animation = 'blink 0.7s infinite';
-    titleElement.appendChild(cursor);
+    // Set specific surprise message
+    const surpriseMessage = "Let's Build Something Cool!";
+    backSide.innerHTML = `<div class="surprise-message">📟 "${surpriseMessage}"</div>`;
     
-    // Add CSS for the cursor blink animation
+    // Setup the front side with empty text fields for typewriter effect
+    frontSide.innerHTML = `
+        <div class="tile-content">
+            <h1 class="retro-text"><span class="typed-title"></span><span class="cursor">_</span></h1>
+            <p class="tagline"><span class="typed-tagline"></span></p>
+        </div>
+    `;
+    
+    // Clear and setup the tile content with both sides
+    tileContent.innerHTML = '';
+    tileContent.appendChild(frontSide);
+    tileContent.appendChild(backSide);
+    
+    // Get references to new elements
+    const typedTitle = frontSide.querySelector('.typed-title');
+    const typedTagline = frontSide.querySelector('.typed-tagline');
+    const cursor = frontSide.querySelector('.cursor');
+    
+    // Add CSS for animations
     const style = document.createElement('style');
     style.textContent = `
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+        
+        .cursor {
+            font-weight: bold;
+            animation: blink 0.7s infinite;
+            display: inline-block;
+        }
+        
         .tile.large {
             perspective: 1000px;
-            transform-style: preserve-3d;
         }
+        
+        .tile-content {
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            width: 100%;
+            height: 100%;
+        }
+        
         .tile-front, .tile-back {
             backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             position: absolute;
             top: 0;
             left: 0;
@@ -61,12 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: transform 0.8s;
         }
+        
         .tile-back {
             transform: rotateY(180deg);
             background-color: rgba(0, 87, 183, 0.95);
         }
+        
+        .flipped .tile-content {
+            transform: rotateY(180deg);
+        }
+        
         .surprise-message {
             font-family: 'Press Start 2P', cursive;
             color: white;
@@ -74,66 +104,22 @@ document.addEventListener("DOMContentLoaded", () => {
             font-size: 16px;
             padding: 0 15px;
         }
-        .flipped .tile-front {
-            transform: rotateY(180deg);
-        }
-        .flipped .tile-back {
-            transform: rotateY(0deg);
-        }
     `;
     document.head.appendChild(style);
-    
-    // Create front and back sides for the flip effect
-    const tileContent = largeTile.querySelector('.tile-content');
-    const tileContentHTML = tileContent.innerHTML;
-    
-    // Create front and back containers
-    const frontSide = document.createElement('div');
-    frontSide.className = 'tile-front';
-    frontSide.innerHTML = tileContentHTML;
-    
-    const backSide = document.createElement('div');
-    backSide.className = 'tile-back';
-    
-    // Choose a random surprise message
-    const surpriseMessage = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
-    backSide.innerHTML = `<div class="surprise-message">📟 "${surpriseMessage}"</div>`;
-    
-    // Clear and setup the tile content
-    tileContent.innerHTML = '';
-    tileContent.appendChild(frontSide);
-    tileContent.appendChild(backSide);
-    
-    // Get the newly added elements after DOM manipulation
-    const newTitleElement = frontSide.querySelector('.retro-text');
-    const newTaglineElement = frontSide.querySelector('.tagline');
-    
-    // Clear them again for the typewriter effect
-    newTitleElement.textContent = '';
-    newTaglineElement.textContent = '';
-    
-    // Add cursor to the title element
-    const newCursor = document.createElement('span');
-    newCursor.className = 'cursor';
-    newCursor.innerHTML = '_';
-    newTitleElement.appendChild(newCursor);
     
     // Typewriter effect for title
     let titleIndex = 0;
     function typeTitle() {
         if (titleIndex < originalTitle.length) {
-            newTitleElement.insertBefore(
-                document.createTextNode(originalTitle.charAt(titleIndex)),
-                newCursor
-            );
+            typedTitle.textContent += originalTitle.charAt(titleIndex);
             titleIndex++;
             setTimeout(typeTitle, 150);
         } else {
-            // Move cursor to tagline
-            newTitleElement.removeChild(newCursor);
-            newTaglineElement.appendChild(newCursor);
+            // Move cursor to tagline after typing title
+            cursor.remove();
+            typedTagline.insertAdjacentHTML('afterend', '<span class="cursor">_</span>');
             
-            // Start typing tagline
+            // Start typing tagline after a short delay
             setTimeout(typeTagline, 500);
         }
     }
@@ -142,41 +128,40 @@ document.addEventListener("DOMContentLoaded", () => {
     let taglineIndex = 0;
     function typeTagline() {
         if (taglineIndex < originalTagline.length) {
-            newTaglineElement.insertBefore(
-                document.createTextNode(originalTagline.charAt(taglineIndex)),
-                newCursor
-            );
+            typedTagline.textContent += originalTagline.charAt(taglineIndex);
             taglineIndex++;
             setTimeout(typeTagline, 100);
         } else {
-            // Remove cursor when done
+            // When typing is complete, wait a bit then flip the tile
             setTimeout(() => {
-                newTaglineElement.removeChild(newCursor);
+                // Remove cursor
+                const currentCursor = document.querySelector('.cursor');
+                if (currentCursor) currentCursor.remove();
                 
-                // After typewriter effect completes, flip the tile
+                // Flip the tile to show the back side
+                tileContent.style.transform = 'rotateY(180deg)';
+                
+                // Flip back after 5 seconds
                 setTimeout(() => {
-                    largeTile.classList.add('flipped');
+                    tileContent.style.transform = 'rotateY(0deg)';
                     
-                    // Flip back after 5 seconds
-                    setTimeout(() => {
-                        largeTile.classList.remove('flipped');
-                        
-                        // Restart the whole animation cycle after a delay
-                        setTimeout(restartAnimation, 3000);
-                    }, 5000);
-                }, 1000);
-            }, 500);
+                    // Restart the whole animation cycle after a delay
+                    setTimeout(restartAnimation, 3000);
+                }, 5000);
+            }, 1000);
         }
     }
     
     // Function to restart the entire animation
     function restartAnimation() {
-        // Reset text content
-        newTitleElement.textContent = '';
-        newTaglineElement.textContent = '';
+        // Reset text
+        typedTitle.textContent = '';
+        typedTagline.textContent = '';
         
         // Add cursor back to title
-        newTitleElement.appendChild(newCursor);
+        const currentCursor = document.querySelector('.cursor');
+        if (currentCursor) currentCursor.remove();
+        typedTitle.insertAdjacentHTML('afterend', '<span class="cursor">_</span>');
         
         // Reset indices
         titleIndex = 0;
@@ -186,6 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
         typeTitle();
     }
     
-    // Start the typewriter effect
+    // Start the typewriter effect after a short delay
     setTimeout(typeTitle, 1000);
 });
