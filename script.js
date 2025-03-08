@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Get elements
     const appListView = document.getElementById('appListView');
-    const showTilesBtn = document.getElementById('showTiles');
-    const showListBtn = document.getElementById('showList');
     const gridContainer = document.querySelector('.grid-container');
     
     // Flag to track if initial animation has played
@@ -28,29 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Run animation on first load
     animateTiles();
     
-    // Toggle between views
-    showTilesBtn.addEventListener('click', () => {
-        switchToTileView();
-    });
-    
-    showListBtn.addEventListener('click', () => {
-        switchToListView();
-    });
-    
+    // View switching functions
     function switchToTileView() {
         appListView.classList.remove('active');
         gridContainer.style.display = 'grid';
-        showListBtn.classList.remove('active');
-        showTilesBtn.classList.add('active');
-        
-        // No need to re-trigger animations when switching views
     }
     
     function switchToListView() {
         appListView.classList.add('active');
         gridContainer.style.display = 'none';
-        showTilesBtn.classList.remove('active');
-        showListBtn.classList.add('active');
     }
     
     // For demo purposes, make the tile view active initially
@@ -84,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
             
-            section.style.display = hasVisibleApps ? 'block' : 'none';
+            section.style.display = hasVisibleApps ? 'inline-block' : 'none';
         });
     });
     
@@ -106,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Show all section headers
             const sections = document.querySelectorAll('.letter-header');
             sections.forEach(section => {
-                section.style.display = 'block';
+                section.style.display = 'inline-block';
             });
         }
     });
@@ -137,4 +121,13 @@ document.addEventListener("DOMContentLoaded", () => {
             switchToTileView();
         }
     }
+    
+    // Add click event handler for letter headers (since we removed the jump list)
+    const letterHeaders = document.querySelectorAll('.letter-header');
+    letterHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            // Scroll to the section when clicked
+            header.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
 });
