@@ -157,6 +157,74 @@ html, body {
     aspect-ratio: 1/1;
 }
 
+/* Add these styles to your existing CSS file */
+
+/* Tile resize button styles */
+.resize-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.resize-btn i {
+    font-size: 12px;
+    color: white;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+}
+
+/* Selected tile styles */
+.selected-tile {
+    position: relative;
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.5);
+    animation: glow 1.5s infinite alternate;
+}
+
+.selected-tile .resize-btn,
+.resize-btn.visible {
+    opacity: 1;
+}
+
+/* Glow animation for selected tile */
+@keyframes glow {
+    from {
+        box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+    }
+    to {
+        box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.8);
+    }
+}
+
+/* Tile transition effects */
+.tile {
+    transition: all 0.5s ease-in-out, opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* Ensure small tiles within small-grid stay small */
+.small-grid .tile {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+}
+
+/* Additional style for large tiles */
+.large {
+    grid-column: span 3;
+    grid-row: span 2;
+}
+
 /* App List View Styles */
 .app-list-container {
     display: none;
