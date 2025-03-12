@@ -96,43 +96,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     
     // Add swipe functionality
-// Update these variables at the top where touchStartX and touchEndX are defined
-let touchStartX = 0;
-let touchEndX = 0;
-let touchStartY = 0;
-let touchEndY = 0;
-
-// Update these event listeners
-document.addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-}, false);
-
-document.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    touchEndY = e.changedTouches[0].screenY;
-    handleSwipe();
-}, false);
-
-// Update the handleSwipe function
-function handleSwipe() {
-    const swipeThreshold = 50; // Minimum swipe distance
-    const touchDiffX = touchEndX - touchStartX;
-    const touchDiffY = Math.abs(touchEndY - touchStartY);
+    let touchStartX = 0;
+    let touchEndX = 0;
     
-    // For horizontal swipes, vertical movement should be minimal
-    const isHorizontalSwipe = touchDiffY < 30; // Tolerance for vertical movement
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, false);
     
-    if (touchDiffX < -swipeThreshold) {
-        // Swipe left: always show app list
-        switchToListView();
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, false);
+    
+    function handleSwipe() {
+        const swipeThreshold = 50; // Minimum swipe distance
+        
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // Swipe left: show app list
+            switchToListView();
+        }
+        
+        if (touchEndX > touchStartX + swipeThreshold) {
+            // Swipe right: show tiles
+            switchToTileView();
+        }
     }
-    
-    if (touchDiffX > swipeThreshold && isHorizontalSwipe) {
-        // Swipe right: show tiles only if horizontal
-        switchToTileView();
-    }
-}
     
     // Add click event handler for letter headers (since we removed the jump list)
     const letterHeaders = document.querySelectorAll('.letter-header');
