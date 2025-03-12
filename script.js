@@ -98,26 +98,35 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add swipe functionality
     let touchStartX = 0;
     let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
     
     document.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
     }, false);
     
     document.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
     }, false);
     
     function handleSwipe() {
         const swipeThreshold = 50; // Minimum swipe distance
+        const touchDiffX = touchEndX - touchStartX;
+        const touchDiffY = Math.abs(touchEndY - touchStartY);
+
+        // For horizontal swipes, vertical movement should be minimal
+        const isHorizontalSwipe = touchDiffY < 30; // Tolerance for vertical movement
         
-        if (touchEndX < touchStartX - swipeThreshold) {
-            // Swipe left: show app list
+        if (touchDiffX < -swipeThreshold) {
+            // Swipe left: always show app list
             switchToListView();
         }
         
-        if (touchEndX > touchStartX + swipeThreshold) {
-            // Swipe right: show tiles
+        if (touchDiffX > swipeThreshold && isHorizontalSwipe) {
+            // Swipe right: show tiles only if horizontal
             switchToTileView();
         }
     }
