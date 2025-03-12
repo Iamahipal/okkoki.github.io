@@ -107,20 +107,41 @@ document.addEventListener("DOMContentLoaded", () => {
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
     }, false);
+
+    let touchStartX = 0;
+let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
+
+document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+}, false);
+
+document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+}, false);
     
-    function handleSwipe() {
-        const swipeThreshold = 50; // Minimum swipe distance
-        
-        if (touchEndX < touchStartX - swipeThreshold) {
-            // Swipe left: show app list
-            switchToListView();
-        }
-        
-        if (touchEndX > touchStartX + swipeThreshold) {
-            // Swipe right: show tiles
-            switchToTileView();
-        }
+function handleSwipe() {
+    const swipeThreshold = 50; // Minimum swipe distance
+    const touchDiffX = touchEndX - touchStartX;
+    const touchDiffY = Math.abs(touchEndY - touchStartY); // Track vertical difference
+    
+    // For horizontal swipes, vertical movement should be minimal
+    const isHorizontalSwipe = touchDiffY < 30; // Tolerance for vertical movement
+    
+    if (touchDiffX < -swipeThreshold) {
+        // Swipe left: show app list (always allowed)
+        switchToListView();
     }
+    
+    if (touchDiffX > swipeThreshold && isHorizontalSwipe) {
+        // Swipe right: show tiles (only if it's a horizontal swipe)
+        switchToTileView();
+    }
+}
     
     // Add click event handler for letter headers (since we removed the jump list)
     const letterHeaders = document.querySelectorAll('.letter-header');
