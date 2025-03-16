@@ -161,6 +161,13 @@ html, body {
     aspect-ratio: 1/1;
 }
 
+/* Small tile specific icon positioning */
+.small .tile-content i {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 /* App List View Styles */
 .app-list-container {
     display: none;
@@ -256,40 +263,39 @@ html, body {
     color: white;
 }
 
-/* Enhanced Selection Mode Styles */
+/* Improved Windows Phone Style Selection Mode Styles */
 .tile.selected {
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
     z-index: 10;
-    transform: scale(1.02);
 }
 
 .tile.floating {
-    animation: floatEffect 6s infinite ease-in-out;
+    animation: floatEffect 8s infinite ease-in-out;
 }
 
-/* Subtle floating animations with different delays for varied movement */
+/* Very subtle floating animations with different delays for varied movement */
 .tile.floating:nth-child(3n+1) {
     animation-delay: 0.2s;
 }
 
 .tile.floating:nth-child(3n+2) {
-    animation-delay: 0.7s;
+    animation-delay: 0.8s;
 }
 
 .tile.floating:nth-child(3n+3) {
-    animation-delay: 1.3s;
+    animation-delay: 1.5s;
 }
 
 @keyframes floatEffect {
     0% { transform: translate(0, 0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(2px, -1px); }
-    60% { transform: translate(-1px, -2px); }
+    20% { transform: translate(-1px, 1px); }
+    40% { transform: translate(1px, -1px); }
+    60% { transform: translate(-1px, 0px); }
     80% { transform: translate(1px, 1px); }
     100% { transform: translate(0, 0); }
 }
 
-/* Tile action buttons - Windows Phone style */
+/* Windows Phone style action buttons */
 .tile-actions {
     position: absolute;
     width: 100%;
@@ -300,41 +306,46 @@ html, body {
     pointer-events: none;
 }
 
-.tile-action-btn {
+/* Windows Phone style circular buttons */
+.wp-action-btn {
     position: absolute;
-    width: 32px;
-    height: 32px;
-    background-color: rgba(0, 0, 0, 0.7);
+    width: 24px;
+    height: 24px;
+    background-color: white;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
-    font-size: 14px;
+    color: black;
+    font-size: 12px;
     cursor: pointer;
     pointer-events: auto;
-    transition: transform 0.2s ease, background-color 0.2s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+    z-index: 30;
 }
 
-.tile-action-btn:hover, .tile-action-btn:active {
-    background-color: rgba(0, 87, 183, 0.9);
-    transform: scale(1.1);
+.wp-action-btn:active {
+    transform: scale(0.95);
+    background-color: rgba(220, 220, 220, 0.9);
 }
 
+/* Position for unpin button (X) - top left */
 .unpin-btn {
-    top: -12px;
-    left: -12px;
+    top: -10px;
+    left: -10px;
 }
 
-.info-btn {
-    top: -12px;
-    right: -12px;
-}
-
+/* Position for resize button (arrow) - bottom right */
 .resize-btn {
-    bottom: -12px;
-    right: -12px;
+    bottom: -10px;
+    right: -10px;
+}
+
+/* Pin button in app list */
+.pin-btn {
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /* Resize transitions - smooth Windows Phone style */
@@ -372,58 +383,22 @@ html, body {
     aspect-ratio: 3/1;
 }
 
-/* Fade in/out animation for action buttons */
+/* Windows Phone style animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.tile-action-btn {
-    animation: fadeIn 0.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; /* Windows Phone easing */
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* Animation for tile removal */
 @keyframes removeTile {
     0% { opacity: 1; transform: scale(1); }
-    30% { opacity: 1; transform: scale(1.1); }
-    100% { opacity: 0; transform: scale(0.8) translate(0, 20px); }
+    30% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0; transform: scale(0.8); }
 }
 
 .tile.removing {
     animation: removeTile 0.4s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; /* Windows Phone easing */
     pointer-events: none;
-}
-
-/* App Context Menu (for pin/unpin in app list) */
-.app-context-menu {
-    position: absolute;
-    background-color: rgba(30, 30, 30, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    min-width: 180px;
-    padding: 5px 0;
-    z-index: 100;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.2s ease forwards;
-}
-
-.app-context-option {
-    padding: 12px 15px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-}
-
-.app-context-option:hover {
-    background-color: rgba(0, 87, 183, 0.7);
-}
-
-.app-context-option i {
-    margin-right: 10px;
-    font-size: 16px;
 }
 
 /* Windows Phone style tile push effect on press */
@@ -433,13 +408,50 @@ html, body {
 
 /* Additional animation for newly pinned tile */
 @keyframes pinTile {
-    0% { opacity: 0; transform: scale(0.8) translate(0, -20px); }
+    0% { opacity: 0; transform: scale(0.8); }
     70% { opacity: 1; transform: scale(1.05); }
     100% { opacity: 1; transform: scale(1); }
 }
 
 .tile.pinning {
     animation: pinTile 0.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; /* Windows Phone easing */
+}
+
+/* Button corners for portfolio tile in image 4 & 5 */
+.corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid white;
+    border-radius: 0;
+}
+
+.corner-tl {
+    top: 5px;
+    left: 5px;
+    border-right: 0;
+    border-bottom: 0;
+}
+
+.corner-tr {
+    top: 5px;
+    right: 5px;
+    border-left: 0;
+    border-bottom: 0;
+}
+
+.corner-bl {
+    bottom: 5px;
+    left: 5px;
+    border-right: 0;
+    border-top: 0;
+}
+
+.corner-br {
+    bottom: 5px;
+    right: 5px;
+    border-left: 0;
+    border-top: 0;
 }
 
 /* Responsive Fix */
@@ -456,10 +468,10 @@ html, body {
     .tagline {
         font-size: 12px;
     }
-    .tile-action-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
+    .wp-action-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
     }
 }
 
