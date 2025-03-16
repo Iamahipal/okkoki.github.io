@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const appListView = document.getElementById('appListView');
     const gridContainer = document.querySelector('.grid-container');
     
+    // Store pinned tiles to prevent duplicates
+    let pinnedTiles = new Set();
+    
     // Flag to track if initial animation has played
     let initialAnimationPlayed = false;
     
@@ -20,6 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, index * 100);
             });
             initialAnimationPlayed = true;
+            
+            // Initialize pinned tiles set with current tiles
+            document.querySelectorAll('.tile').forEach(tile => {
+                const appName = tile.querySelector('span')?.textContent;
+                if (appName) {
+                    pinnedTiles.add(appName);
+                }
+            });
         }
     }
     
@@ -198,12 +209,27 @@ document.addEventListener("DOMContentLoaded", () => {
             tile.addEventListener('mouseleave', e => {
                 clearTimeout(pressTimer);
             });
+            
+            // Single click for already selected tile should deselect it
+            tile.addEventListener('click', e => {
+                // If we're in selection mode and clicked a different tile than the selected one
+                if (isSelectionMode && selectedTile !== tile) {
+                    exitSelectionMode();
+                    enterSelectionMode(tile);
+                }
+            });
         });
     }
 
     // Enter selection mode
     function enterSelectionMode(tile) {
-        if (isSelectionMode) return;
+        // If already in selection mode with the same tile, do nothing
+        if (isSelectionMode && selectedTile === tile) return;
+        
+        // If already in selection mode with a different tile, exit first
+        if (isSelectionMode) {
+            exitSelectionMode();
+        }
         
         // Provide haptic feedback if supported
         if (navigator.vibrate) {
@@ -231,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
         addActionButtons(tile);
     }
 
-    // Add action buttons to the selected tile - Updated for Windows Phone style
+    // Add action buttons to the selected tile - Windows Phone style
     function addActionButtons(tile) {
         const actionContainer = document.createElement('div');
         actionContainer.className = 'tile-actions';
@@ -288,8 +314,19 @@ document.addEventListener("DOMContentLoaded", () => {
         tile.classList.add('removing');
         
         // Store tile data for potentially pinning later
-        const tileName = tile.querySelector('span')?.textContent || '';
+        const tileName = tile.querySelector('span')?.textContent || 
+                         tile.getAttribute('data-name') || '';
         const tileIcon = tile.querySelector('i')?.className || '';
+        
+        // Remove from pinnedTiles set
+        if (tileName) {
+            pinnedTiles.delete(tileName);
+        }
+        
+        // Add to App list if necessary
+        if (tileName && tileIcon) {
+            addToAppList(tileName, tileIcon);
+        }
         
         setTimeout(() => {
             // Remove the tile from the grid
@@ -310,10 +347,72 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Rearrange the grid
             rearrangeGrid();
-        }, 300);
+        }, 400); // Match the animation duration in CSS
     }
 
-    // Cycle through tile sizes - Fixed small tile implementation
+    // Add unpinned tile to app list
+    function addToAppList(appName, iconClass) {
+        // Create or find the appropriate section in the app list
+        const firstLetter = appName.charAt(0).toLowerCase();
+        let sectionId = `section-${firstLetter}`;
+        
+        let sectionHeader = document.getElementById(sectionId);
+        if (!sectionHeader) {
+            // Create a new section header if it doesn't exist
+            sectionHeader = document.createElement('div');
+            sectionHeader.className = 'letter-header';
+            sectionHeader.id = sectionId;
+            sectionHeader.textContent = firstLetter;
+            
+            // Find where to insert the new section alphabetically
+            const sections = Array.from(document.querySelectorAll('.letter-header'));
+            let insertionPoint = null;
+            
+            for (let i = 0; i < sections.length; i++) {
+                if (sections[i].textContent > firstLetter) {
+                    insertionPoint = sections[i];
+                    break;
+                }
+            }
+            
+            if (insertionPoint) {
+                appListView.insertBefore(sectionHeader, insertionPoint);
+            } else {
+                appListView.appendChild(sectionHeader);
+            }
+        }
+        
+        // Create app item
+        const appItem = document.createElement('div');
+        appItem.className = 'app-item';
+        
+        const appIcon = document.createElement('div');
+        appIcon.className = 'app-icon';
+        
+        const icon = document.createElement('i');
+        icon.className = iconClass;
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'app-name';
+        nameDiv.textContent = appName;
+        
+        appIcon.appendChild(icon);
+        appItem.appendChild(appIcon);
+        appItem.appendChild(nameDiv);
+        
+        // Insert the app item after its section header
+        const nextSection = sectionHeader.nextElementSibling;
+        if (nextSection && nextSection.classList.contains('letter-header')) {
+            appListView.insertBefore(appItem, nextSection);
+        } else {
+            appListView.appendChild(appItem);
+        }
+        
+        // Add pin functionality to the new app item
+        addPinFunctionalityToAppItem(appItem);
+    }
+
+    // Cycle through tile sizes - Improved to match Windows Phone behavior
     function resizeTile(tile) {
         // Add resizing class for smooth transition
         tile.classList.add('resizing');
@@ -380,10 +479,15 @@ document.addEventListener("DOMContentLoaded", () => {
             // Remove resizing class after transition
             setTimeout(() => {
                 tile.classList.remove('resizing');
+                
+                // DON'T exit selection mode after resizing - allow multiple resizes
+                // Keep selection active and buttons visible
+                
+                // Re-add action buttons if they were removed
+                if (!tile.querySelector('.tile-actions')) {
+                    addActionButtons(tile);
+                }
             }, 300);
-            
-            // Exit selection mode after resizing
-            exitSelectionMode();
         }, 300);
     }
 
@@ -435,61 +539,63 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Add pin functionality to a single app item
+    function addPinFunctionalityToAppItem(appItem) {
+        // Add long press functionality
+        let pressTimer;
+        let startX, startY;
+        
+        appItem.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            
+            pressTimer = setTimeout(() => {
+                showPinOptions(appItem);
+            }, 1000);
+        });
+        
+        appItem.addEventListener('touchmove', e => {
+            const moveX = e.touches[0].clientX;
+            const moveY = e.touches[0].clientY;
+            
+            if (Math.abs(moveX - startX) > 10 || Math.abs(moveY - startY) > 10) {
+                clearTimeout(pressTimer);
+            }
+        });
+        
+        appItem.addEventListener('touchend', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        // Mouse support
+        appItem.addEventListener('mousedown', e => {
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            pressTimer = setTimeout(() => {
+                showPinOptions(appItem);
+            }, 1000);
+        });
+        
+        appItem.addEventListener('mousemove', e => {
+            if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
+                clearTimeout(pressTimer);
+            }
+        });
+        
+        appItem.addEventListener('mouseup', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        appItem.addEventListener('mouseleave', () => {
+            clearTimeout(pressTimer);
+        });
+    }
+
     // Implement pin functionality in app list
     function addPinFunctionalityToAppList() {
         const appItems = document.querySelectorAll('.app-item');
-        
-        appItems.forEach(item => {
-            // Add long press functionality to app items
-            let pressTimer;
-            let startX, startY;
-            
-            item.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                
-                pressTimer = setTimeout(() => {
-                    showPinOptions(item);
-                }, 1000);
-            });
-            
-            item.addEventListener('touchmove', e => {
-                const moveX = e.touches[0].clientX;
-                const moveY = e.touches[0].clientY;
-                
-                if (Math.abs(moveX - startX) > 10 || Math.abs(moveY - startY) > 10) {
-                    clearTimeout(pressTimer);
-                }
-            });
-            
-            item.addEventListener('touchend', () => {
-                clearTimeout(pressTimer);
-            });
-            
-            // Mouse support
-            item.addEventListener('mousedown', e => {
-                startX = e.clientX;
-                startY = e.clientY;
-                
-                pressTimer = setTimeout(() => {
-                    showPinOptions(item);
-                }, 1000);
-            });
-            
-            item.addEventListener('mousemove', e => {
-                if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
-                    clearTimeout(pressTimer);
-                }
-            });
-            
-            item.addEventListener('mouseup', () => {
-                clearTimeout(pressTimer);
-            });
-            
-            item.addEventListener('mouseleave', () => {
-                clearTimeout(pressTimer);
-            });
-        });
+        appItems.forEach(item => addPinFunctionalityToAppItem(item));
     }
 
     // Show pin options for app list items - Windows Phone style
@@ -502,19 +608,31 @@ document.addEventListener("DOMContentLoaded", () => {
         const appName = appItem.querySelector('.app-name').textContent;
         const appIcon = appItem.querySelector('.app-icon i').className;
         
+        // Check if this app is already pinned
+        const isAlreadyPinned = pinnedTiles.has(appName);
+        
         // Create pin option directly on the app item
         const pinBtn = document.createElement('div');
         pinBtn.className = 'wp-action-btn pin-btn';
-        pinBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i>';
+        
+        if (isAlreadyPinned) {
+            // Show disabled pin button if already pinned
+            pinBtn.classList.add('disabled');
+            pinBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i>';
+            pinBtn.title = "Already pinned";
+        } else {
+            // Show active pin button
+            pinBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i>';
+            pinBtn.addEventListener('click', () => {
+                pinAppToStart(appName, appIcon);
+                document.body.removeEventListener('click', removeButton);
+                appItem.removeChild(pinBtn);
+            });
+        }
         
         // Position the pin button
         pinBtn.style.position = 'absolute';
         pinBtn.style.right = '10px';
-        
-        pinBtn.addEventListener('click', () => {
-            pinAppToStart(appName, appIcon);
-            appItem.removeChild(pinBtn);
-        });
         
         // Add button to app item
         appItem.appendChild(pinBtn);
@@ -525,24 +643,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (appItem.contains(pinBtn)) {
                     appItem.removeChild(pinBtn);
                 }
-                document.removeEventListener('click', removeButton);
+                document.body.removeEventListener('click', removeButton);
             }
         };
         
         // Delay adding event listener to prevent immediate closing
         setTimeout(() => {
-            document.addEventListener('click', removeButton);
+            document.body.addEventListener('click', removeButton);
         }, 10);
     }
 
     // Pin app to start screen
     function pinAppToStart(appName, iconClass) {
+        // Exit if already pinned
+        if (pinnedTiles.has(appName)) {
+            return;
+        }
+        
+        // Add to pinnedTiles set
+        pinnedTiles.add(appName);
+        
         // Switch to tile view
         switchToTileView();
         
         // Create new tile
         const newTile = document.createElement('div');
-        newTile.className = 'tile';
+        newTile.className = 'tile pinning';
         
         const tileContent = document.createElement('div');
         tileContent.className = 'tile-content';
@@ -562,18 +688,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Add tile to grid
         gridContainer.appendChild(newTile);
         
-        // Add selection functionality to new tile
-        addLongPressToTiles();
-        
-        // Add appear animation
-        newTile.style.opacity = '0';
-        newTile.style.transform = 'scale(0.8)';
-        
+        // Wait for animation to complete
         setTimeout(() => {
-            newTile.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
-            newTile.style.opacity = '1';
-            newTile.style.transform = 'scale(1)';
-        }, 10);
+            newTile.classList.remove('pinning');
+            
+            // Add selection functionality to new tile
+            addLongPressToTiles();
+        }, 500);
     }
 
     // Add click event to selection overlay to exit selection mode
