@@ -134,13 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Add this to your existing script.js file
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Keep existing code from the original script.js
-
-    // Add tile selection and resizing functionality
-    const gridContainer = document.querySelector('.grid-container');
+    // Tile Selection & Resizing Implementation
     let selectedTile = null;
     let selectionOverlay = document.createElement('div');
     selectionOverlay.className = 'selection-overlay';
@@ -149,16 +143,31 @@ document.addEventListener("DOMContentLoaded", () => {
     // Track if we're in selection mode
     let isSelectionMode = false;
 
-    // Add long press detection
+    // Add long press detection for all tiles
     function addLongPressToTiles() {
         const tiles = document.querySelectorAll('.tile');
         tiles.forEach(tile => {
             let pressTimer;
+            let startX, startY;
             
+            // For touch devices
             tile.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                
                 pressTimer = setTimeout(() => {
                     enterSelectionMode(tile);
                 }, 800); // 800ms long press time
+            });
+            
+            tile.addEventListener('touchmove', e => {
+                // Cancel if moved too far
+                const moveX = e.touches[0].clientX;
+                const moveY = e.touches[0].clientY;
+                
+                if (Math.abs(moveX - startX) > 10 || Math.abs(moveY - startY) > 10) {
+                    clearTimeout(pressTimer);
+                }
             });
             
             tile.addEventListener('touchend', e => {
@@ -167,9 +176,19 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // For mouse users
             tile.addEventListener('mousedown', e => {
+                startX = e.clientX;
+                startY = e.clientY;
+                
                 pressTimer = setTimeout(() => {
                     enterSelectionMode(tile);
                 }, 800);
+            });
+            
+            tile.addEventListener('mousemove', e => {
+                // Cancel if moved too far
+                if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
+                    clearTimeout(pressTimer);
+                }
             });
             
             tile.addEventListener('mouseup', e => {
@@ -275,9 +294,26 @@ document.addEventListener("DOMContentLoaded", () => {
         // Add removing animation
         tile.classList.add('removing');
         
+        // Store tile data for potentially pinning later
+        const tileName = tile.querySelector('span')?.textContent || '';
+        const tileIcon = tile.querySelector('i')?.className || '';
+        
+        // Add to "unpinned tiles" data storage if needed
+        // This would be used if implementing a "pin back" feature from app list
+        
         setTimeout(() => {
             // Remove the tile from the grid
-            gridContainer.removeChild(tile);
+            if (tile.parentElement.classList.contains('small-grid')) {
+                const smallGrid = tile.parentElement;
+                smallGrid.removeChild(tile);
+                
+                // If small-grid is now empty, remove it
+                if (smallGrid.children.length === 0) {
+                    gridContainer.removeChild(smallGrid);
+                }
+            } else {
+                gridContainer.removeChild(tile);
+            }
             
             // Exit selection mode
             exitSelectionMode();
@@ -290,9 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show tile info
     function showTileInfo(tile) {
         // Get tile name
-        const tileName = tile.querySelector('span') ? 
-                         tile.querySelector('span').innerText : 
-                         'App';
+        const tileName = tile.querySelector('span')?.textContent || 'App';
         
         alert(`${tileName} Info:\nThis is a tile for ${tileName}.\nYou can customize this tile or access app settings.`);
         
@@ -328,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Large -> Small
             tile.classList.remove('large');
             
-            // Create a new small-grid if needed
+            // Find existing small-grid with space or create a new one
             let smallGrid = Array.from(gridContainer.children).find(el => 
                 el.classList.contains('small-grid') && el.children.length < 4
             );
@@ -352,14 +386,14 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 tile.classList.remove('resizing');
             }, 300);
-        }, 50);
+            
+            // Exit selection mode after resizing
+            exitSelectionMode();
+        }, 300);
     }
 
     // Rearrange the grid to maintain layout
     function rearrangeGrid() {
-        // This is a simple implementation - you might need more complex logic
-        // depending on your specific layout needs
-        
         // Find all small-grids with fewer than 2 tiles and redistribute
         const smallGrids = document.querySelectorAll('.small-grid');
         smallGrids.forEach(grid => {
@@ -375,13 +409,186 @@ document.addEventListener("DOMContentLoaded", () => {
                 gridContainer.removeChild(grid);
             }
         });
+        
+        // Consolidate small-grids if there are multiple with space
+        const smallGridsArray = Array.from(document.querySelectorAll('.small-grid'));
+        if (smallGridsArray.length > 1) {
+            for (let i = 1; i < smallGridsArray.length; i++) {
+                const currentGrid = smallGridsArray[i];
+                const previousGrid = smallGridsArray[i-1];
+                
+                // If both grids together have 4 or fewer tiles, merge them
+                if (currentGrid.children.length + previousGrid.children.length <= 4) {
+                    while (currentGrid.firstChild) {
+                        previousGrid.appendChild(currentGrid.firstChild);
+                    }
+                    
+                    // Remove the now empty grid
+                    gridContainer.removeChild(currentGrid);
+                }
+            }
+        }
+    }
+
+    // Implement pin functionality in app list
+    function addPinFunctionalityToAppList() {
+        const appItems = document.querySelectorAll('.app-item');
+        
+        appItems.forEach(item => {
+            // Add long press functionality to app items
+            let pressTimer;
+            let startX, startY;
+            
+            item.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                
+                pressTimer = setTimeout(() => {
+                    showPinOptions(item);
+                }, 800);
+            });
+            
+            item.addEventListener('touchmove', e => {
+                const moveX = e.touches[0].clientX;
+                const moveY = e.touches[0].clientY;
+                
+                if (Math.abs(moveX - startX) > 10 || Math.abs(moveY - startY) > 10) {
+                    clearTimeout(pressTimer);
+                }
+            });
+            
+            item.addEventListener('touchend', () => {
+                clearTimeout(pressTimer);
+            });
+            
+            // Mouse support
+            item.addEventListener('mousedown', e => {
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                pressTimer = setTimeout(() => {
+                    showPinOptions(item);
+                }, 800);
+            });
+            
+            item.addEventListener('mousemove', e => {
+                if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
+                    clearTimeout(pressTimer);
+                }
+            });
+            
+            item.addEventListener('mouseup', () => {
+                clearTimeout(pressTimer);
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                clearTimeout(pressTimer);
+            });
+        });
+    }
+
+    // Show pin options for app list items
+    function showPinOptions(appItem) {
+        // Provide haptic feedback if supported
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+        
+        const appName = appItem.querySelector('.app-name').textContent;
+        const appIcon = appItem.querySelector('.app-icon i').className;
+        
+        // Create and show context menu
+        const menu = document.createElement('div');
+        menu.className = 'app-context-menu';
+        
+        const pinOption = document.createElement('div');
+        pinOption.className = 'app-context-option';
+        pinOption.innerHTML = '<i class="fa-solid fa-thumbtack"></i> Pin to Start';
+        pinOption.addEventListener('click', () => {
+            pinAppToStart(appName, appIcon);
+            document.body.removeChild(menu);
+        });
+        
+        const cancelOption = document.createElement('div');
+        cancelOption.className = 'app-context-option';
+        cancelOption.innerHTML = '<i class="fa-solid fa-times"></i> Cancel';
+        cancelOption.addEventListener('click', () => {
+            document.body.removeChild(menu);
+        });
+        
+        menu.appendChild(pinOption);
+        menu.appendChild(cancelOption);
+        
+        // Position menu
+        const rect = appItem.getBoundingClientRect();
+        menu.style.top = `${rect.bottom}px`;
+        menu.style.left = `${rect.left}px`;
+        
+        document.body.appendChild(menu);
+        
+        // Close menu when clicking outside
+        const closeMenu = (e) => {
+            if (!menu.contains(e.target) && e.target !== appItem) {
+                document.body.removeChild(menu);
+                document.removeEventListener('click', closeMenu);
+            }
+        };
+        
+        // Delay adding event listener to prevent immediate closing
+        setTimeout(() => {
+            document.addEventListener('click', closeMenu);
+        }, 10);
+    }
+
+    // Pin app to start screen
+    function pinAppToStart(appName, iconClass) {
+        // Switch to tile view
+        switchToTileView();
+        
+        // Create new tile
+        const newTile = document.createElement('div');
+        newTile.className = 'tile';
+        
+        const tileContent = document.createElement('div');
+        tileContent.className = 'tile-content';
+        
+        // Add icon
+        const icon = document.createElement('i');
+        icon.className = iconClass;
+        
+        // Add name
+        const name = document.createElement('span');
+        name.textContent = appName;
+        
+        tileContent.appendChild(icon);
+        tileContent.appendChild(name);
+        newTile.appendChild(tileContent);
+        
+        // Add tile to grid
+        gridContainer.appendChild(newTile);
+        
+        // Add selection functionality to new tile
+        addLongPressToTiles();
+        
+        // Add appear animation
+        newTile.style.opacity = '0';
+        newTile.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            newTile.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+            newTile.style.opacity = '1';
+            newTile.style.transform = 'scale(1)';
+        }, 10);
     }
 
     // Add click event to selection overlay to exit selection mode
     selectionOverlay.addEventListener('click', exitSelectionMode);
 
-    // Initialize long press detection
+    // Initialize long press detection for tiles
     addLongPressToTiles();
+    
+    // Initialize pin functionality for app list
+    addPinFunctionalityToAppList();
 
     // Add a mutation observer to watch for new tiles
     const observer = new MutationObserver(mutations => {
@@ -394,9 +601,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     observer.observe(gridContainer, { childList: true, subtree: true });
-});
     
-    // Add click event handler for letter headers (since we removed the jump list)
+    // Add click event handler for letter headers
     const letterHeaders = document.querySelectorAll('.letter-header');
     letterHeaders.forEach(header => {
         header.addEventListener('click', () => {
