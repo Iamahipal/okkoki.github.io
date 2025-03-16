@@ -97,7 +97,8 @@ html, body {
 /* Large Tile */
 .large {
     grid-column: span 3;
-    aspect-ratio: 3/1;
+    grid-row: span 2;
+    aspect-ratio: 3/2;
 }
 
 .large .tile-content {
@@ -330,6 +331,13 @@ html, body {
     background-color: rgba(220, 220, 220, 0.9);
 }
 
+/* Disabled pin button for already pinned apps */
+.wp-action-btn.disabled {
+    background-color: rgba(200, 200, 200, 0.6);
+    color: rgba(80, 80, 80, 0.8);
+    cursor: default;
+}
+
 /* Position for unpin button (X) - top left */
 .unpin-btn {
     top: -10px;
@@ -380,7 +388,7 @@ html, body {
 
 /* Ensure large tiles maintain proper aspect ratio during resize */
 .tile.large.resizing {
-    aspect-ratio: 3/1;
+    aspect-ratio: 3/2;
 }
 
 /* Windows Phone style animations */
@@ -389,11 +397,11 @@ html, body {
     to { opacity: 1; }
 }
 
-/* Animation for tile removal */
+/* Animation for tile removal - Windows Phone style slide out */
 @keyframes removeTile {
     0% { opacity: 1; transform: scale(1); }
-    30% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 0; transform: scale(0.8); }
+    30% { opacity: 0.9; transform: scale(1.05); }
+    100% { opacity: 0; transform: scale(0.8) translateY(30px); }
 }
 
 .tile.removing {
@@ -408,7 +416,7 @@ html, body {
 
 /* Additional animation for newly pinned tile */
 @keyframes pinTile {
-    0% { opacity: 0; transform: scale(0.8); }
+    0% { opacity: 0; transform: scale(0.8) translateY(-20px); }
     70% { opacity: 1; transform: scale(1.05); }
     100% { opacity: 1; transform: scale(1); }
 }
@@ -452,6 +460,31 @@ html, body {
     right: 5px;
     border-left: 0;
     border-top: 0;
+}
+
+/* Windows Phone specific button styling */
+.wp-action-btn i {
+    font-size: 12px;
+    position: static;
+    transform: none;
+    margin: 0;
+}
+
+/* Fix for button icon positioning */
+.wp-action-btn i.fa-xmark {
+    font-size: 14px;
+}
+
+.wp-action-btn i.fa-arrow-down-right {
+    font-size: 11px;
+}
+
+/* Remove default tile icon positioning for action buttons */
+.wp-action-btn i.fa-xmark,
+.wp-action-btn i.fa-arrow-down-right,
+.wp-action-btn i.fa-thumbtack {
+    position: static;
+    transform: none;
 }
 
 /* Responsive Fix */
