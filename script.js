@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 pressTimer = setTimeout(() => {
                     enterSelectionMode(tile);
-                }, 800); // 800ms long press time
+                }, 1000); // 1000ms (1 second) long press time as requested
             });
             
             tile.addEventListener('touchmove', e => {
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 pressTimer = setTimeout(() => {
                     enterSelectionMode(tile);
-                }, 800);
+                }, 1000);
             });
             
             tile.addEventListener('mousemove', e => {
@@ -231,31 +231,24 @@ document.addEventListener("DOMContentLoaded", () => {
         addActionButtons(tile);
     }
 
-    // Add action buttons to the selected tile
+    // Add action buttons to the selected tile - Updated for Windows Phone style
     function addActionButtons(tile) {
         const actionContainer = document.createElement('div');
         actionContainer.className = 'tile-actions';
         
-        // Unpin button
+        // Unpin button - Top left
         const unpinBtn = document.createElement('div');
-        unpinBtn.className = 'tile-action-btn unpin-btn';
-        unpinBtn.innerHTML = '<i class="fa-solid fa-thumbtack fa-rotate-90"></i>';
+        unpinBtn.className = 'wp-action-btn unpin-btn';
+        unpinBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
         unpinBtn.addEventListener('click', () => unpinTile(tile));
         
-        // Info button
-        const infoBtn = document.createElement('div');
-        infoBtn.className = 'tile-action-btn info-btn';
-        infoBtn.innerHTML = '<i class="fa-solid fa-info"></i>';
-        infoBtn.addEventListener('click', () => showTileInfo(tile));
-        
-        // Resize button
+        // Resize button - Bottom right
         const resizeBtn = document.createElement('div');
-        resizeBtn.className = 'tile-action-btn resize-btn';
-        resizeBtn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+        resizeBtn.className = 'wp-action-btn resize-btn';
+        resizeBtn.innerHTML = '<i class="fa-solid fa-arrow-down-right"></i>';
         resizeBtn.addEventListener('click', () => resizeTile(tile));
         
         actionContainer.appendChild(unpinBtn);
-        actionContainer.appendChild(infoBtn);
         actionContainer.appendChild(resizeBtn);
         tile.appendChild(actionContainer);
     }
@@ -298,9 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const tileName = tile.querySelector('span')?.textContent || '';
         const tileIcon = tile.querySelector('i')?.className || '';
         
-        // Add to "unpinned tiles" data storage if needed
-        // This would be used if implementing a "pin back" feature from app list
-        
         setTimeout(() => {
             // Remove the tile from the grid
             if (tile.parentElement.classList.contains('small-grid')) {
@@ -323,18 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 300);
     }
 
-    // Show tile info
-    function showTileInfo(tile) {
-        // Get tile name
-        const tileName = tile.querySelector('span')?.textContent || 'App';
-        
-        alert(`${tileName} Info:\nThis is a tile for ${tileName}.\nYou can customize this tile or access app settings.`);
-        
-        // Exit selection mode
-        exitSelectionMode();
-    }
-
-    // Cycle through tile sizes
+    // Cycle through tile sizes - Fixed small tile implementation
     function resizeTile(tile) {
         // Add resizing class for smooth transition
         tile.classList.add('resizing');
@@ -343,6 +322,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tile.classList.contains('small')) {
             // Small -> Regular
             tile.classList.remove('small');
+            
+            // Add back the text if it was hidden
+            const tileName = tile.getAttribute('data-name');
+            if (tileName) {
+                const tileContent = tile.querySelector('.tile-content');
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = tileName;
+                tileContent.appendChild(nameSpan);
+            }
             
             // If it's in a small-grid, move it out
             if (tile.parentElement.classList.contains('small-grid')) {
@@ -362,6 +350,13 @@ document.addEventListener("DOMContentLoaded", () => {
             // Large -> Small
             tile.classList.remove('large');
             
+            // Store the tile name before removing it for small size
+            const nameSpan = tile.querySelector('span');
+            if (nameSpan) {
+                tile.setAttribute('data-name', nameSpan.textContent);
+                nameSpan.remove();
+            }
+            
             // Find existing small-grid with space or create a new one
             let smallGrid = Array.from(gridContainer.children).find(el => 
                 el.classList.contains('small-grid') && el.children.length < 4
@@ -373,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 gridContainer.appendChild(smallGrid);
             }
             
-            // Move the tile to the small-grid
+            // Add small class and move to small-grid
             tile.classList.add('small');
             smallGrid.appendChild(tile);
         }
@@ -401,6 +396,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Move remaining tiles out of this small-grid
                 while (grid.firstChild) {
                     const tile = grid.firstChild;
+                    
+                    // Restore name if it was stored
+                    const tileName = tile.getAttribute('data-name');
+                    if (tileName && !tile.querySelector('span')) {
+                        const tileContent = tile.querySelector('.tile-content');
+                        const nameSpan = document.createElement('span');
+                        nameSpan.textContent = tileName;
+                        tileContent.appendChild(nameSpan);
+                    }
+                    
                     tile.classList.remove('small');
                     gridContainer.appendChild(tile);
                 }
@@ -445,7 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 pressTimer = setTimeout(() => {
                     showPinOptions(item);
-                }, 800);
+                }, 1000);
             });
             
             item.addEventListener('touchmove', e => {
@@ -468,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 pressTimer = setTimeout(() => {
                     showPinOptions(item);
-                }, 800);
+                }, 1000);
             });
             
             item.addEventListener('mousemove', e => {
@@ -487,7 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Show pin options for app list items
+    // Show pin options for app list items - Windows Phone style
     function showPinOptions(appItem) {
         // Provide haptic feedback if supported
         if (navigator.vibrate) {
@@ -497,46 +502,36 @@ document.addEventListener("DOMContentLoaded", () => {
         const appName = appItem.querySelector('.app-name').textContent;
         const appIcon = appItem.querySelector('.app-icon i').className;
         
-        // Create and show context menu
-        const menu = document.createElement('div');
-        menu.className = 'app-context-menu';
+        // Create pin option directly on the app item
+        const pinBtn = document.createElement('div');
+        pinBtn.className = 'wp-action-btn pin-btn';
+        pinBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i>';
         
-        const pinOption = document.createElement('div');
-        pinOption.className = 'app-context-option';
-        pinOption.innerHTML = '<i class="fa-solid fa-thumbtack"></i> Pin to Start';
-        pinOption.addEventListener('click', () => {
+        // Position the pin button
+        pinBtn.style.position = 'absolute';
+        pinBtn.style.right = '10px';
+        
+        pinBtn.addEventListener('click', () => {
             pinAppToStart(appName, appIcon);
-            document.body.removeChild(menu);
+            appItem.removeChild(pinBtn);
         });
         
-        const cancelOption = document.createElement('div');
-        cancelOption.className = 'app-context-option';
-        cancelOption.innerHTML = '<i class="fa-solid fa-times"></i> Cancel';
-        cancelOption.addEventListener('click', () => {
-            document.body.removeChild(menu);
-        });
+        // Add button to app item
+        appItem.appendChild(pinBtn);
         
-        menu.appendChild(pinOption);
-        menu.appendChild(cancelOption);
-        
-        // Position menu
-        const rect = appItem.getBoundingClientRect();
-        menu.style.top = `${rect.bottom}px`;
-        menu.style.left = `${rect.left}px`;
-        
-        document.body.appendChild(menu);
-        
-        // Close menu when clicking outside
-        const closeMenu = (e) => {
-            if (!menu.contains(e.target) && e.target !== appItem) {
-                document.body.removeChild(menu);
-                document.removeEventListener('click', closeMenu);
+        // Remove button when clicking elsewhere
+        const removeButton = (e) => {
+            if (!pinBtn.contains(e.target) && e.target !== appItem) {
+                if (appItem.contains(pinBtn)) {
+                    appItem.removeChild(pinBtn);
+                }
+                document.removeEventListener('click', removeButton);
             }
         };
         
         // Delay adding event listener to prevent immediate closing
         setTimeout(() => {
-            document.addEventListener('click', closeMenu);
+            document.addEventListener('click', removeButton);
         }, 10);
     }
 
