@@ -20,7 +20,6 @@ html, body {
     align-items: flex-start;
     font-family: 'Segoe UI', 'Roboto', sans-serif;
     overflow-y: auto;
-    overflow-x: hidden;
 }
 
 /* Grid Layout */
@@ -34,7 +33,6 @@ html, body {
     padding: 5px;
     box-sizing: border-box;
     margin-top: 0;
-    position: relative;
 }
 
 /* Standard Tile */
@@ -49,9 +47,7 @@ html, body {
     aspect-ratio: 1/1;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, background-color 0.3s ease-out;
-    user-select: none;
-    touch-action: pan-x pan-y;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
 /* Tile Content Positioning */
@@ -97,8 +93,7 @@ html, body {
 /* Large Tile */
 .large {
     grid-column: span 3;
-    grid-row: span 2;
-    aspect-ratio: 3/2;
+    aspect-ratio: 3/1;
 }
 
 .large .tile-content {
@@ -162,13 +157,6 @@ html, body {
     aspect-ratio: 1/1;
 }
 
-/* Small tile specific icon positioning */
-.small .tile-content i {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
 /* App List View Styles */
 .app-list-container {
     display: none;
@@ -180,7 +168,6 @@ html, body {
     position: relative;
     overflow-y: auto;
     font-family: 'Segoe UI', 'Roboto', sans-serif;
-    z-index: 5;
 }
 
 .app-list-container.active {
@@ -239,13 +226,6 @@ html, body {
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    user-select: none;
-    transition: background-color 0.2s ease;
-}
-
-.app-item:active {
-    background-color: rgba(0, 87, 183, 0.3);
 }
 
 .app-icon {
@@ -264,39 +244,40 @@ html, body {
     color: white;
 }
 
-/* Improved Windows Phone Style Selection Mode Styles */
+/* Add these styles to your existing style.css file */
+
+/* Selection mode styles */
 .tile.selected {
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
     z-index: 10;
 }
 
 .tile.floating {
-    animation: floatEffect 8s infinite ease-in-out;
+    animation: floatEffect 3s infinite ease-in-out;
 }
 
-/* Very subtle floating animations with different delays for varied movement */
+/* Floating animations with different delays for varied movement */
 .tile.floating:nth-child(3n+1) {
     animation-delay: 0.2s;
 }
 
 .tile.floating:nth-child(3n+2) {
-    animation-delay: 0.8s;
+    animation-delay: 0.5s;
 }
 
 .tile.floating:nth-child(3n+3) {
-    animation-delay: 1.5s;
+    animation-delay: 0.8s;
 }
 
 @keyframes floatEffect {
     0% { transform: translate(0, 0); }
-    20% { transform: translate(-1px, 1px); }
-    40% { transform: translate(1px, -1px); }
-    60% { transform: translate(-1px, 0px); }
-    80% { transform: translate(1px, 1px); }
+    25% { transform: translate(-3px, 2px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(1px, 3px); }
     100% { transform: translate(0, 0); }
 }
 
-/* Windows Phone style action buttons */
+/* Tile action buttons */
 .tile-actions {
     position: absolute;
     width: 100%;
@@ -307,78 +288,56 @@ html, body {
     pointer-events: none;
 }
 
-/* Windows Phone style circular buttons */
-.wp-action-btn {
+.tile-action-btn {
     position: absolute;
     width: 24px;
     height: 24px;
-    background-color: white;
+    background-color: rgba(0, 0, 0, 0.7);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: black;
+    color: white;
     font-size: 12px;
     cursor: pointer;
     pointer-events: auto;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease;
-    z-index: 30;
 }
 
-.wp-action-btn:active {
-    transform: scale(0.95);
-    background-color: rgba(220, 220, 220, 0.9);
-}
-
-/* Disabled pin button for already pinned apps */
-.wp-action-btn.disabled {
-    background-color: rgba(200, 200, 200, 0.6);
-    color: rgba(80, 80, 80, 0.8);
-    cursor: default;
-}
-
-/* Position for unpin button (X) - top left */
 .unpin-btn {
     top: -10px;
     left: -10px;
 }
 
-/* Position for resize button (arrow) - bottom right */
+.info-btn {
+    top: -10px;
+    right: -10px;
+}
+
 .resize-btn {
     bottom: -10px;
     right: -10px;
 }
 
-/* Pin button in app list */
-.pin-btn {
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-/* Resize transitions - smooth Windows Phone style */
+/* Resize transitions */
 .tile.resizing {
-    transition: all 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); /* Windows Phone easing */
-    z-index: 15;
+    transition: grid-column 0.3s ease-out, grid-row 0.3s ease-out,
+                width 0.3s ease-out, height 0.3s ease-out;
 }
 
-/* Improved overlay for selection mode */
+/* Overlay for selection mode */
 .selection-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.3);
     z-index: 5;
     display: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
 }
 
 .selection-overlay.active {
     display: block;
-    opacity: 1;
 }
 
 /* Ensure medium tiles maintain proper aspect ratio during resize */
@@ -388,104 +347,32 @@ html, body {
 
 /* Ensure large tiles maintain proper aspect ratio during resize */
 .tile.large.resizing {
-    aspect-ratio: 3/2;
+    aspect-ratio: 3/1;
 }
 
-/* Windows Phone style animations */
+/* Fade in/out animation for action buttons */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-/* Animation for tile removal - Windows Phone style slide out */
+.tile-action-btn {
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Animation for tile removal */
 @keyframes removeTile {
-    0% { opacity: 1; transform: scale(1); }
-    30% { opacity: 0.9; transform: scale(1.05); }
-    100% { opacity: 0; transform: scale(0.8) translateY(30px); }
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.8); }
 }
 
 .tile.removing {
-    animation: removeTile 0.4s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; /* Windows Phone easing */
-    pointer-events: none;
+    animation: removeTile 0.3s ease-out forwards;
 }
 
-/* Windows Phone style tile push effect on press */
-.tile:active:not(.selected) {
-    transform: scale(0.97);
-}
+/* REMOVED: Jump list - as requested */
 
-/* Additional animation for newly pinned tile */
-@keyframes pinTile {
-    0% { opacity: 0; transform: scale(0.8) translateY(-20px); }
-    70% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-.tile.pinning {
-    animation: pinTile 0.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; /* Windows Phone easing */
-}
-
-/* Button corners for portfolio tile in image 4 & 5 */
-.corner {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border: 2px solid white;
-    border-radius: 0;
-}
-
-.corner-tl {
-    top: 5px;
-    left: 5px;
-    border-right: 0;
-    border-bottom: 0;
-}
-
-.corner-tr {
-    top: 5px;
-    right: 5px;
-    border-left: 0;
-    border-bottom: 0;
-}
-
-.corner-bl {
-    bottom: 5px;
-    left: 5px;
-    border-right: 0;
-    border-top: 0;
-}
-
-.corner-br {
-    bottom: 5px;
-    right: 5px;
-    border-left: 0;
-    border-top: 0;
-}
-
-/* Windows Phone specific button styling */
-.wp-action-btn i {
-    font-size: 12px;
-    position: static;
-    transform: none;
-    margin: 0;
-}
-
-/* Fix for button icon positioning */
-.wp-action-btn i.fa-xmark {
-    font-size: 14px;
-}
-
-.wp-action-btn i.fa-arrow-down-right {
-    font-size: 11px;
-}
-
-/* Remove default tile icon positioning for action buttons */
-.wp-action-btn i.fa-xmark,
-.wp-action-btn i.fa-arrow-down-right,
-.wp-action-btn i.fa-thumbtack {
-    position: static;
-    transform: none;
-}
+/* REMOVED: Toggle view buttons - as requested */
 
 /* Responsive Fix */
 @media screen and (max-width: 600px) {
@@ -493,30 +380,12 @@ html, body {
         gap: 7px;
     }
     .tile i {
-        font-size: 26px;
+        font-size: 30px;
     }
     .retro-text {
         font-size: 24px;
     }
     .tagline {
         font-size: 12px;
-    }
-    .wp-action-btn {
-        width: 22px;
-        height: 22px;
-        font-size: 10px;
-    }
-}
-
-/* Ensure proper tile sizing for small devices */
-@media screen and (max-width: 400px) {
-    .grid-container {
-        gap: 5px;
-    }
-    .tile span {
-        font-size: 12px;
-    }
-    .tile i {
-        font-size: 22px;
     }
 }
