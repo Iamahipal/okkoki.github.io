@@ -95,28 +95,40 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    // Add swipe functionality
+    // Add swipe functionality with improved horizontal detection
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchEndX = 0;
+    let touchEndY = 0;
     
     document.addEventListener('touchstart', e => {
         touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
     }, false);
     
     document.addEventListener('touchend', e => {
         touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
         handleSwipe();
     }, false);
     
     function handleSwipe() {
         const swipeThreshold = 50; // Minimum swipe distance
+        const angleThreshold = 30; // Maximum angle in degrees for horizontal swipe
         
-        if (touchEndX < touchStartX - swipeThreshold) {
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        
+        // Calculate the angle of the swipe (in degrees)
+        const angle = Math.abs(Math.atan2(deltaY, deltaX) * 180 / Math.PI);
+        const isHorizontalSwipe = angle <= angleThreshold || angle >= (180 - angleThreshold);
+        
+        if (deltaX < -swipeThreshold && isHorizontalSwipe) {
             // Swipe left: show app list
             switchToListView();
         }
         
-        if (touchEndX > touchStartX + swipeThreshold) {
+        if (deltaX > swipeThreshold && isHorizontalSwipe) {
             // Swipe right: show tiles
             switchToTileView();
         }
