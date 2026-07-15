@@ -1,407 +1,549 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Get elements
-    const appListView = document.getElementById('appListView');
-    const gridContainer = document.querySelector('.grid-container');
-    
-    // Flag to track if initial animation has played
-    let initialAnimationPlayed = false;
-    
-    // Animate tiles with standard Windows animation - only on first load
-    function animateTiles() {
-        if (!initialAnimationPlayed) {
-            const tiles = document.querySelectorAll(".tile, .small");
-            tiles.forEach((tile, index) => {
-                tile.style.opacity = "0";
-                tile.style.transform = "scale(0.8)";
-                setTimeout(() => {
-                    tile.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
-                    tile.style.opacity = "1";
-                    tile.style.transform = "scale(1)";
-                }, index * 100);
-            });
-            initialAnimationPlayed = true;
-        }
-    }
-    
-    // Run animation on first load
-    animateTiles();
-    
-    // View switching functions
-    function switchToTileView() {
-        appListView.classList.remove('active');
-        gridContainer.style.display = 'grid';
-    }
-    
-    function switchToListView() {
-        appListView.classList.add('active');
-        gridContainer.style.display = 'none';
-    }
-    
-    // For demo purposes, make the tile view active initially
-    switchToTileView();
-    
-    // Add search functionality
-    const searchInput = document.getElementById('searchApps');
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const appItems = document.querySelectorAll('.app-item');
-        
-        appItems.forEach(item => {
-            const appName = item.querySelector('.app-name').textContent.toLowerCase();
-            if (appName.includes(searchTerm)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
+/* ================================================================
+   OKKOKI — Windows Phone Metro UI
+   Turnstile open/close, tile tilt, live tiles, app list, edit mode.
+   ================================================================ */
+(() => {
+    "use strict";
+
+    const $  = (sel, ctx = document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
+    /* ---------------- App data ---------------- */
+    const p    = (t) => `<p class="metro-p">${t}</p>`;
+    const big  = (t) => `<p class="metro-big">${t}</p>`;
+    const item = (icon, title, sub) =>
+        `<div class="metro-item"><div class="metro-item-icon"><i class="${icon}"></i></div>` +
+        `<div><div class="metro-item-title">${title}</div><div class="metro-item-sub">${sub}</div></div></div>`;
+    const person = (color, initials, name, role) =>
+        `<div class="metro-item"><div class="avatar" style="background:${color}">${initials}</div>` +
+        `<div><div class="metro-item-title">${name}</div><div class="metro-item-sub">${role}</div></div></div>`;
+    const social = (icon, label) =>
+        [`<div class="social-hero"><i class="${icon}"></i></div>`, p(label),
+         `<a class="metro-btn" href="#" onclick="return false">follow @okkoki</a>`];
+    const post = (title, date, snippet) =>
+        `<div class="blog-post"><div class="blog-post-title">${title}</div>` +
+        `<div class="blog-post-date">${date}</div><p class="metro-p">${snippet}</p></div>`;
+
+    const MONTHS = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
+    const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const APPS = [
+        { id: "8bit", name: "8-Bit", icon: "fa-solid fa-heart", blocks: () => [
+            `<div class="retro-block"><span class="retro-text">OKKOKI</span></div>`,
+            p("Where it all started — a love for pixels, play and personality. We bring that same retro heart to every brand we build."),
+        ]},
+        { id: "blog", name: "Blog", icon: "fa-solid fa-blog", blocks: () => [
+            post("5 ways to grow your local business", "jul 10, 2026", "Simple, low-budget moves that bring real customers through the door."),
+            post("why your shop needs a website in 2026", "jun 28, 2026", "Your customers search online first. Here's how to be what they find."),
+            post("social media that actually sells", "jun 12, 2026", "Stop posting into the void — start posting with purpose."),
+        ]},
+        { id: "calendar", name: "Calendar", icon: "fa-solid fa-calendar", blocks: () => {
+            const d = new Date();
+            return [
+                `<p class="big-date">${d.getDate()}</p><p class="big-date-sub">${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getFullYear()}</p>`,
+                item("fa-solid fa-mug-hot", "free growth call", "book a 30-min chat about your business"),
+                p("No more events today."),
+            ];
+        }},
+        { id: "camera", name: "Camera", icon: "fa-solid fa-camera", blocks: () => [
+            `<div class="social-hero"><i class="fa-solid fa-camera"></i></div>`,
+            p("Product photography and brand shoots that make small businesses look big."),
+        ]},
+        { id: "email", name: "Email", icon: "fa-solid fa-envelope", blocks: () => [
+            big("Let's talk about your business."),
+            item("fa-solid fa-envelope", "hello@okkoki.com", "we reply within one business day"),
+            `<a class="metro-btn" href="mailto:hello@okkoki.com">send email</a>`,
+        ]},
+        { id: "facebook", name: "Facebook", icon: "fa-brands fa-facebook-f", blocks: () =>
+            social("fa-brands fa-facebook-f", "Daily tips, client wins and behind-the-scenes from the OKKOKI team.") },
+        { id: "instagram", name: "Instagram", icon: "fa-brands fa-instagram", blocks: () =>
+            social("fa-brands fa-instagram", "Our freshest work, reels and brand glow-ups — in squares.") },
+        { id: "maps", name: "Maps", icon: "fa-solid fa-location-dot", blocks: () => [
+            `<div class="social-hero"><i class="fa-solid fa-location-dot"></i></div>`,
+            big("We work with small businesses everywhere."),
+            p("Fully remote, globally available. Wherever you are, we can help you grow."),
+        ]},
+        { id: "mission", name: "Mission", icon: "fa-solid fa-bullseye", blocks: () => [
+            big("Fueling small business growth."),
+            p("OKKOKI exists to give small businesses the digital firepower of big brands — websites, social media and branding that punch above their weight."),
+            p("We believe every corner shop, studio and startup deserves to be found, remembered and loved."),
+        ]},
+        { id: "music", name: "Music", icon: "fa-solid fa-music", blocks: () => [
+            `<div class="social-hero"><i class="fa-solid fa-music"></i></div>`,
+            big("now playing — metro beats"),
+            p("The soundtrack of the grind. Volume up, business growing."),
+        ]},
+        { id: "note", name: "Note", icon: "fa-solid fa-note-sticky", blocks: () => [
+            big("Ideas worth writing down:"),
+            p("&bull; A website is your hardest-working employee.<br>&bull; Consistency beats virality.<br>&bull; Your brand is what people say when you're not in the room."),
+        ]},
+        { id: "people", name: "People", icon: "fa-solid fa-users", blocks: () => [
+            person("#60a917", "AK", "arjun k.", "founder &amp; strategy"),
+            person("#fa6800", "SR", "sana r.", "design lead"),
+            person("#aa00ff", "MJ", "mike j.", "social media"),
+            person("#d80073", "YOU", "your business", "the next success story"),
+        ]},
+        { id: "phone", name: "Phone", icon: "fa-solid fa-phone", blocks: () => [
+            big("Prefer to talk it out?"),
+            item("fa-solid fa-phone", "+1 (555) 012-3456", "mon–fri, 9am–6pm"),
+            `<a class="metro-btn" href="tel:+15550123456">call now</a>`,
+        ]},
+        { id: "portfolio", name: "Portfolio", icon: "fa-solid fa-folder-open", blocks: () => [
+            `<div class="portfolio-grid">
+                <div class="pf" style="background:#e51400">cafe kiosk</div>
+                <div class="pf" style="background:#60a917">daily fit</div>
+                <div class="pf" style="background:#fa6800">style studio</div>
+                <div class="pf" style="background:#aa00ff">book nook</div>
+                <div class="pf" style="background:#0050ef">urban eats</div>
+                <div class="pf" style="background:#d80073">glow salon</div>
+            </div>`,
+        ]},
+        { id: "recorder", name: "Recorder", icon: "fa-solid fa-microphone", blocks: () => [
+            `<div class="social-hero"><i class="fa-solid fa-microphone"></i></div>`,
+            p("Voice notes, podcasts, brand stories — we help you say it loud and clear."),
+        ]},
+        { id: "screensaver", name: "Screensaver", icon: "fa-solid fa-table-cells", blocks: () => [
+            `<div class="portfolio-grid">
+                <div class="pf" style="background:#1ba1e2"></div>
+                <div class="pf" style="background:#0057b7"></div>
+                <div class="pf" style="background:#0050ef"></div>
+                <div class="pf" style="background:#1a7fe0"></div>
+            </div>`,
+            p("Fifty shades of Metro blue."),
+        ]},
+        { id: "service", name: "Service", icon: "fa-solid fa-users-gear", blocks: () => [
+            item("fa-solid fa-laptop-code", "web development", "fast, modern websites that convert visitors"),
+            item("fa-solid fa-hashtag", "social media marketing", "content and campaigns that build community"),
+            item("fa-solid fa-pen-nib", "branding &amp; design", "logos and identities people remember"),
+            item("fa-solid fa-chart-line", "seo &amp; growth", "get found by the customers searching for you"),
+        ]},
+        { id: "twitter", name: "Twitter", icon: "fa-brands fa-twitter", blocks: () =>
+            social("fa-brands fa-twitter", "Hot takes on small business, marketing and design — 280 characters at a time.") },
+        { id: "whatsapp", name: "WhatsApp", icon: "fa-brands fa-whatsapp", blocks: () => [
+            `<div class="social-hero"><i class="fa-brands fa-whatsapp"></i></div>`,
+            big("Chat with us directly."),
+            p("Quick questions, quick answers. Message us any time."),
+            `<a class="metro-btn" href="#" onclick="return false">start chat</a>`,
+        ]},
+        { id: "youtube", name: "YouTube", icon: "fa-brands fa-youtube", blocks: () =>
+            social("fa-brands fa-youtube", "Tutorials, case studies and growth tips for small business owners.") },
+    ];
+
+    const appById = (id) => APPS.find((a) => a.id === id);
+
+    /* ---------------- DOM refs ---------------- */
+    const viewport     = $("#viewport");
+    const startScreen  = $("#startScreen");
+    const listScreen   = $("#appListScreen");
+    const appScreen    = $("#appScreen");
+    const tileGrid     = $("#tileGrid");
+    const appListEl    = $("#appList");
+    const jumpGrid     = $("#jumpGrid");
+    const searchInput  = $("#searchApps");
+
+    /* ---------------- State ---------------- */
+    let current = "start";        // 'start' | 'list' | 'app'
+    let openedFrom = "start";     // where the open app returns to
+    let busy = false;             // animation lock
+    let editMode = false;
+    let suppressClick = false;    // eat the click after a long-press
+
+    /* ================================================================
+       Animation helpers
+       ================================================================ */
+    function animOnce(el, cls) {
+        return new Promise((resolve) => {
+            const done = () => { el.classList.remove(cls); el.removeEventListener("animationend", done); resolve(); };
+            el.addEventListener("animationend", done);
+            el.classList.add(cls);
+            setTimeout(done, 600); // safety net
         });
-        
-        // Hide/show section headers based on visible apps
-        const sections = document.querySelectorAll('.letter-header');
-        sections.forEach(section => {
-            const sectionId = section.id;
-            const sectionApps = document.querySelectorAll(`#${sectionId} + .app-item`);
-            let hasVisibleApps = false;
-            
-            sectionApps.forEach(app => {
-                if (app.style.display !== 'none') {
-                    hasVisibleApps = true;
+    }
+
+    /* Staggered turnstile on a set of elements. dir: 'in' | 'out' */
+    function turnstile(els, dir, step = 25) {
+        return new Promise((resolve) => {
+            els = [...els];
+            if (!els.length) return resolve();
+            els.forEach((el, i) => {
+                el.classList.remove("ts-in", "ts-out");
+                void el.offsetWidth; // restart animation
+                el.style.animationDelay = (i * step) + "ms";
+                el.classList.add(dir === "in" ? "ts-in" : "ts-out");
+            });
+            const total = els.length * step + (dir === "in" ? 500 : 300);
+            setTimeout(() => {
+                if (dir === "in") {
+                    els.forEach((el) => { el.classList.remove("ts-in"); el.style.animationDelay = ""; });
                 }
-            });
-            
-            section.style.display = hasVisibleApps ? 'inline-block' : 'none';
+                resolve();
+            }, total);
         });
-    });
-    
-    // Search icon click behavior
-    const searchIcon = document.querySelector('.search-icon');
-    searchIcon.addEventListener('click', () => {
-        if (searchInput.style.display === 'none') {
-            searchInput.style.display = 'block';
-            searchInput.focus();
+    }
+
+    const gridEls = () => $$(".grid-container > *, .all-apps", startScreen);
+    const appEls  = () => $$("[data-anim]", appScreen);
+
+    function showOnly(screen) {
+        [startScreen, listScreen, appScreen].forEach((s) => s.classList.toggle("active", s === screen));
+    }
+
+    /* ================================================================
+       Screen navigation
+       ================================================================ */
+    async function openApp(id, tileEl) {
+        const app = appById(id);
+        if (!app || busy || editMode) return;
+        busy = true;
+        openedFrom = current;
+        buildAppPage(app);
+
+        if (current === "start") {
+            if (tileEl) tileEl.classList.add("launching");
+            await turnstile(gridEls(), "out", 18);
+            if (tileEl) tileEl.classList.remove("launching");
         } else {
-            searchInput.style.display = 'none';
-            searchInput.value = '';
-            // Reset search results
-            const appItems = document.querySelectorAll('.app-item');
-            appItems.forEach(item => {
-                item.style.display = 'flex';
-            });
-            
-            // Show all section headers
-            const sections = document.querySelectorAll('.letter-header');
-            sections.forEach(section => {
-                section.style.display = 'inline-block';
-            });
+            await animOnce(listScreen, "slide-out-l");
         }
+
+        showOnly(appScreen);
+        appScreen.scrollTop = 0;
+        current = "app";
+        await turnstile(appEls(), "in", 60);
+        busy = false;
+    }
+
+    async function closeApp() {
+        if (busy || current !== "app") return;
+        busy = true;
+        await turnstile(appEls(), "out", 35);
+        const dest = openedFrom === "list" ? listScreen : startScreen;
+        showOnly(dest);
+        current = openedFrom;
+        if (dest === startScreen) {
+            await turnstile(gridEls(), "in", 22);
+        } else {
+            await animOnce(listScreen, "slide-in-r");
+        }
+        busy = false;
+    }
+
+    async function goStart() {
+        if (busy || current === "start") return;
+        busy = true;
+        if (current === "app") {
+            await turnstile(appEls(), "out", 25);
+        } else {
+            await animOnce(listScreen, "slide-out-r");
+        }
+        showOnly(startScreen);
+        startScreen.scrollTop = 0;
+        current = "start";
+        await turnstile(gridEls(), "in", 22);
+        busy = false;
+    }
+
+    async function goList(focusSearch = false) {
+        if (busy || current === "list") {
+            if (focusSearch && current === "list") searchInput.focus();
+            return;
+        }
+        busy = true;
+        if (current === "app") {
+            await turnstile(appEls(), "out", 25);
+        }
+        showOnly(listScreen);
+        listScreen.scrollTop = 0;
+        current = "list";
+        await animOnce(listScreen, "slide-in-r");
+        busy = false;
+        if (focusSearch) searchInput.focus();
+    }
+
+    function goBack() {
+        if (current === "app") closeApp();
+        else if (current === "list") goStart();
+    }
+
+    /* ================================================================
+       App page builder
+       ================================================================ */
+    function buildAppPage(app) {
+        const blocks = app.blocks ? app.blocks() : [p("coming soon")];
+        appScreen.innerHTML =
+            `<div class="app-page">
+                <header data-anim>
+                    <div class="app-brand">okkoki</div>
+                    <h1 class="page-title">${app.name.toLowerCase()}</h1>
+                </header>
+                ${blocks.map((b) => `<div class="app-block" data-anim>${b}</div>`).join("")}
+            </div>`;
+    }
+
+    /* ================================================================
+       App list + alphabet jump grid
+       ================================================================ */
+    const LETTERS = ["#", ..."abcdefghijklmnopqrstuvwxyz"];
+    const letterOf = (name) => (/^[a-z]/i.test(name) ? name[0].toLowerCase() : "#");
+
+    function renderAppList() {
+        const groups = new Map();
+        [...APPS].sort((a, b) => a.name.localeCompare(b.name)).forEach((a) => {
+            const l = letterOf(a.name);
+            if (!groups.has(l)) groups.set(l, []);
+            groups.get(l).push(a);
+        });
+        appListEl.innerHTML = LETTERS.filter((l) => groups.has(l)).map((l) =>
+            `<div class="list-group" data-letter="${l}">
+                <button class="letter-header">${l}</button>
+                ${groups.get(l).map((a) =>
+                    `<div class="app-item" data-app="${a.id}">
+                        <div class="app-icon"><i class="${a.icon}"></i></div>
+                        <div class="app-name">${a.name}</div>
+                    </div>`).join("")}
+            </div>`).join("");
+
+        jumpGrid.innerHTML = LETTERS.map((l, i) =>
+            `<div class="jump-cell ${groups.has(l) ? "on" : "off"}" data-letter="${l}" style="animation-delay:${i * 12}ms">${l}</div>`
+        ).join("");
+    }
+
+    appListEl.addEventListener("click", (e) => {
+        if (e.target.closest(".letter-header")) { jumpGrid.classList.add("active"); return; }
+        const it = e.target.closest(".app-item");
+        if (it) openApp(it.dataset.app, null);
     });
-    
-    // Add swipe functionality with improved horizontal detection
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-    
-    document.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-    }, false);
-    
-    document.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        touchEndY = e.changedTouches[0].screenY;
-        handleSwipe();
-    }, false);
-    
-    function handleSwipe() {
-        const swipeThreshold = 50; // Minimum swipe distance
-        const angleThreshold = 30; // Maximum angle in degrees for horizontal swipe
-        
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
-        
-        // Calculate the angle of the swipe (in degrees)
-        const angle = Math.abs(Math.atan2(deltaY, deltaX) * 180 / Math.PI);
-        const isHorizontalSwipe = angle <= angleThreshold || angle >= (180 - angleThreshold);
-        
-        if (deltaX < -swipeThreshold && isHorizontalSwipe) {
-            // Swipe left: show app list
-            switchToListView();
-        }
-        
-        if (deltaX > swipeThreshold && isHorizontalSwipe) {
-            // Swipe right: show tiles
-            switchToTileView();
-        }
+
+    jumpGrid.addEventListener("click", (e) => {
+        const cell = e.target.closest(".jump-cell.on");
+        jumpGrid.classList.remove("active");
+        if (!cell) return;
+        const group = $(`.list-group[data-letter="${cell.dataset.letter}"]`, appListEl);
+        if (group) group.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    /* Search */
+    searchInput.addEventListener("input", () => {
+        const q = searchInput.value.trim().toLowerCase();
+        $$(".app-item", appListEl).forEach((it) => {
+            const match = $(".app-name", it).textContent.toLowerCase().includes(q);
+            it.style.display = match ? "" : "none";
+        });
+        $$(".list-group", appListEl).forEach((g) => {
+            const any = $$(".app-item", g).some((it) => it.style.display !== "none");
+            g.style.display = any ? "" : "none";
+        });
+    });
+
+    $("#searchToggle").addEventListener("click", () => {
+        searchInput.value = "";
+        searchInput.dispatchEvent(new Event("input"));
+        searchInput.focus();
+    });
+
+    /* ================================================================
+       Start screen: tap to open, tilt on press, long-press edit mode
+       ================================================================ */
+    tileGrid.addEventListener("click", (e) => {
+        if (suppressClick) { suppressClick = false; return; }
+        if (editMode) return;
+        const tile = e.target.closest(".tile[data-app]");
+        if (tile) openApp(tile.dataset.app, tile);
+    });
+
+    tileGrid.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    /* --- Tilt (WP signature press effect) + long-press detection --- */
+    let pressTimer = null;
+    let tiltedTile = null;
+    let pressX = 0, pressY = 0;
+
+    function applyTilt(tile, e) {
+        const r = tile.getBoundingClientRect();
+        const dx = (e.clientX - r.left) / r.width - 0.5;
+        const dy = (e.clientY - r.top) / r.height - 0.5;
+        tile.style.transition = "transform 0.1s ease";
+        tile.style.transform =
+            `perspective(700px) rotateX(${(-dy * 12).toFixed(1)}deg) rotateY(${(dx * 12).toFixed(1)}deg) scale(0.975)`;
     }
 
-    // Add this to your existing script.js file
+    function releaseTilt() {
+        if (!tiltedTile) return;
+        tiltedTile.style.transition = "transform 0.18s ease";
+        tiltedTile.style.transform = "";
+        tiltedTile = null;
+    }
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Keep existing code from the original script.js
+    function cancelPress() {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+        releaseTilt();
+    }
 
-    // Add tile selection and resizing functionality
-    const gridContainer = document.querySelector('.grid-container');
+    tileGrid.addEventListener("pointerdown", (e) => {
+        const tile = e.target.closest(".tile");
+        if (!tile || editMode || busy) return;
+        pressX = e.clientX; pressY = e.clientY;
+        tiltedTile = tile;
+        applyTilt(tile, e);
+        pressTimer = setTimeout(() => {
+            suppressClick = true;
+            releaseTilt();
+            enterEditMode(tile);
+        }, 650);
+    });
+
+    tileGrid.addEventListener("pointermove", (e) => {
+        if (!tiltedTile) return;
+        if (Math.hypot(e.clientX - pressX, e.clientY - pressY) > 12) cancelPress(); // it's a scroll
+        else applyTilt(tiltedTile, e);
+    });
+
+    ["pointerup", "pointercancel", "pointerleave"].forEach((ev) =>
+        tileGrid.addEventListener(ev, cancelPress)
+    );
+
+    /* ================================================================
+       Edit mode (long-press): unpin & resize
+       ================================================================ */
+    const overlay = document.createElement("div");
+    overlay.className = "selection-overlay";
+    viewport.appendChild(overlay);
     let selectedTile = null;
-    let selectionOverlay = document.createElement('div');
-    selectionOverlay.className = 'selection-overlay';
-    document.body.appendChild(selectionOverlay);
 
-    // Track if we're in selection mode
-    let isSelectionMode = false;
-
-    // Add long press detection
-    function addLongPressToTiles() {
-        const tiles = document.querySelectorAll('.tile');
-        tiles.forEach(tile => {
-            let pressTimer;
-            
-            tile.addEventListener('touchstart', e => {
-                pressTimer = setTimeout(() => {
-                    enterSelectionMode(tile);
-                }, 800); // 800ms long press time
-            });
-            
-            tile.addEventListener('touchend', e => {
-                clearTimeout(pressTimer);
-            });
-            
-            // For mouse users
-            tile.addEventListener('mousedown', e => {
-                pressTimer = setTimeout(() => {
-                    enterSelectionMode(tile);
-                }, 800);
-            });
-            
-            tile.addEventListener('mouseup', e => {
-                clearTimeout(pressTimer);
-            });
-            
-            tile.addEventListener('mouseleave', e => {
-                clearTimeout(pressTimer);
-            });
-        });
-    }
-
-    // Enter selection mode
-    function enterSelectionMode(tile) {
-        if (isSelectionMode) return;
-        
-        // Provide haptic feedback if supported
-        if (navigator.vibrate) {
-            navigator.vibrate(50);
-        }
-        
-        isSelectionMode = true;
+    function enterEditMode(tile) {
+        if (editMode) return;
+        editMode = true;
         selectedTile = tile;
-        
-        // Add selected class to tile
-        tile.classList.add('selected');
-        
-        // Create floating effect on other tiles
-        const allTiles = document.querySelectorAll('.tile');
-        allTiles.forEach(t => {
-            if (t !== tile) {
-                t.classList.add('floating');
-            }
-        });
-        
-        // Show selection overlay
-        selectionOverlay.classList.add('active');
-        
-        // Add action buttons
-        addActionButtons(tile);
+        if (navigator.vibrate) navigator.vibrate(40);
+        tile.classList.add("selected");
+        $$(".tile", tileGrid).forEach((t) => { if (t !== tile) t.classList.add("floating"); });
+        overlay.classList.add("active");
+
+        const unpin = document.createElement("div");
+        unpin.className = "tile-action-btn unpin-btn";
+        unpin.innerHTML = '<i class="fa-solid fa-thumbtack fa-rotate-90"></i>';
+        unpin.addEventListener("click", (e) => { e.stopPropagation(); unpinTile(tile); });
+
+        const resize = document.createElement("div");
+        resize.className = "tile-action-btn resize-btn";
+        resize.innerHTML = '<i class="fa-solid fa-expand"></i>';
+        resize.addEventListener("click", (e) => { e.stopPropagation(); resizeTile(tile); });
+
+        tile.append(unpin, resize);
     }
 
-    // Add action buttons to the selected tile
-    function addActionButtons(tile) {
-        const actionContainer = document.createElement('div');
-        actionContainer.className = 'tile-actions';
-        
-        // Unpin button
-        const unpinBtn = document.createElement('div');
-        unpinBtn.className = 'tile-action-btn unpin-btn';
-        unpinBtn.innerHTML = '<i class="fa-solid fa-thumbtack fa-rotate-90"></i>';
-        unpinBtn.addEventListener('click', () => unpinTile(tile));
-        
-        // Info button
-        const infoBtn = document.createElement('div');
-        infoBtn.className = 'tile-action-btn info-btn';
-        infoBtn.innerHTML = '<i class="fa-solid fa-info"></i>';
-        infoBtn.addEventListener('click', () => showTileInfo(tile));
-        
-        // Resize button
-        const resizeBtn = document.createElement('div');
-        resizeBtn.className = 'tile-action-btn resize-btn';
-        resizeBtn.innerHTML = '<i class="fa-solid fa-expand"></i>';
-        resizeBtn.addEventListener('click', () => resizeTile(tile));
-        
-        actionContainer.appendChild(unpinBtn);
-        actionContainer.appendChild(infoBtn);
-        actionContainer.appendChild(resizeBtn);
-        tile.appendChild(actionContainer);
-    }
-
-    // Exit selection mode
-    function exitSelectionMode() {
-        if (!isSelectionMode) return;
-        
-        isSelectionMode = false;
-        
-        // Remove selected class
+    function exitEditMode() {
+        if (!editMode) return;
+        editMode = false;
         if (selectedTile) {
-            selectedTile.classList.remove('selected');
-            
-            // Remove action buttons
-            const actions = selectedTile.querySelector('.tile-actions');
-            if (actions) {
-                selectedTile.removeChild(actions);
-            }
+            selectedTile.classList.remove("selected");
+            $$(".tile-action-btn", selectedTile).forEach((b) => b.remove());
         }
-        
-        // Remove floating effect from all tiles
-        const allTiles = document.querySelectorAll('.tile');
-        allTiles.forEach(tile => {
-            tile.classList.remove('floating');
-        });
-        
-        // Hide selection overlay
-        selectionOverlay.classList.remove('active');
-        
+        $$(".tile", tileGrid).forEach((t) => t.classList.remove("floating"));
+        overlay.classList.remove("active");
         selectedTile = null;
     }
 
-    // Unpin a tile
+    overlay.addEventListener("click", exitEditMode);
+
     function unpinTile(tile) {
-        // Add removing animation
-        tile.classList.add('removing');
-        
+        tile.classList.add("removing");
         setTimeout(() => {
-            // Remove the tile from the grid
-            gridContainer.removeChild(tile);
-            
-            // Exit selection mode
-            exitSelectionMode();
-            
-            // Rearrange the grid
-            rearrangeGrid();
+            const parent = tile.parentElement;
+            tile.remove();
+            if (parent.classList.contains("small-grid") && parent.children.length === 0) parent.remove();
+            exitEditMode();
         }, 300);
     }
 
-    // Show tile info
-    function showTileInfo(tile) {
-        // Get tile name
-        const tileName = tile.querySelector('span') ? 
-                         tile.querySelector('span').innerText : 
-                         'App';
-        
-        alert(`${tileName} Info:\nThis is a tile for ${tileName}.\nYou can customize this tile or access app settings.`);
-        
-        // Exit selection mode
-        exitSelectionMode();
-    }
-
-    // Cycle through tile sizes
+    /* Cycle small -> regular -> medium -> large -> small */
     function resizeTile(tile) {
-        // Add resizing class for smooth transition
-        tile.classList.add('resizing');
-        
-        // Determine current size and cycle to next size
-        if (tile.classList.contains('small')) {
-            // Small -> Regular
-            tile.classList.remove('small');
-            
-            // If it's in a small-grid, move it out
-            if (tile.parentElement.classList.contains('small-grid')) {
-                const smallGrid = tile.parentElement;
-                const gridPos = Array.from(gridContainer.children).indexOf(smallGrid);
-                
-                gridContainer.insertBefore(tile, gridContainer.children[gridPos + 1]);
+        if (tile.classList.contains("small")) {
+            tile.classList.remove("small");
+            const smallGrid = tile.parentElement;
+            if (smallGrid.classList.contains("small-grid")) {
+                smallGrid.after(tile);
+                if (smallGrid.children.length === 0) smallGrid.remove();
             }
-        } else if (!tile.classList.contains('medium') && !tile.classList.contains('large')) {
-            // Regular -> Medium
-            tile.classList.add('medium');
-        } else if (tile.classList.contains('medium')) {
-            // Medium -> Large
-            tile.classList.remove('medium');
-            tile.classList.add('large');
-        } else if (tile.classList.contains('large')) {
-            // Large -> Small
-            tile.classList.remove('large');
-            
-            // Create a new small-grid if needed
-            let smallGrid = Array.from(gridContainer.children).find(el => 
-                el.classList.contains('small-grid') && el.children.length < 4
-            );
-            
-            if (!smallGrid) {
-                smallGrid = document.createElement('div');
-                smallGrid.className = 'small-grid';
-                gridContainer.appendChild(smallGrid);
+        } else if (tile.classList.contains("medium")) {
+            tile.classList.remove("medium");
+            tile.classList.add("large");
+        } else if (tile.classList.contains("large")) {
+            tile.classList.remove("large");
+            tile.classList.add("small");
+            let grid = $$(".small-grid", tileGrid).find((g) => g.children.length < 4);
+            if (!grid) {
+                grid = document.createElement("div");
+                grid.className = "small-grid";
+                tileGrid.appendChild(grid);
             }
-            
-            // Move the tile to the small-grid
-            tile.classList.add('small');
-            smallGrid.appendChild(tile);
+            grid.appendChild(tile);
+        } else {
+            tile.classList.add("medium");
         }
-        
-        // Rearrange the grid after resizing
-        setTimeout(() => {
-            rearrangeGrid();
-            
-            // Remove resizing class after transition
-            setTimeout(() => {
-                tile.classList.remove('resizing');
-            }, 300);
-        }, 50);
     }
 
-    // Rearrange the grid to maintain layout
-    function rearrangeGrid() {
-        // This is a simple implementation - you might need more complex logic
-        // depending on your specific layout needs
-        
-        // Find all small-grids with fewer than 2 tiles and redistribute
-        const smallGrids = document.querySelectorAll('.small-grid');
-        smallGrids.forEach(grid => {
-            if (grid.children.length < 2) {
-                // Move remaining tiles out of this small-grid
-                while (grid.firstChild) {
-                    const tile = grid.firstChild;
-                    tile.classList.remove('small');
-                    gridContainer.appendChild(tile);
-                }
-                
-                // Remove the empty small-grid
-                gridContainer.removeChild(grid);
-            }
-        });
+    /* ================================================================
+       Live tiles
+       ================================================================ */
+    function fillCalendarTile() {
+        const d = new Date();
+        $("#calDay").textContent = d.getDate();
+        $("#calWeekday").textContent = DAYS[d.getDay()];
+        $("#calMonth").textContent = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
     }
 
-    // Add click event to selection overlay to exit selection mode
-    selectionOverlay.addEventListener('click', exitSelectionMode);
+    setInterval(() => {
+        if (current !== "start" || busy || editMode || document.hidden) return;
+        const lives = $$(".tile.live", tileGrid);
+        if (!lives.length) return;
+        const t = lives[Math.floor(Math.random() * lives.length)];
+        t.classList.toggle("flipped");
+    }, 3200);
 
-    // Initialize long press detection
-    addLongPressToTiles();
+    /* ================================================================
+       Status bar clock
+       ================================================================ */
+    function tickClock() {
+        const d = new Date();
+        let h = d.getHours() % 12;
+        if (h === 0) h = 12;
+        $("#statusClock").textContent = `${h}:${String(d.getMinutes()).padStart(2, "0")}`;
+    }
+    tickClock();
+    setInterval(tickClock, 15000);
 
-    // Add a mutation observer to watch for new tiles
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                // Re-add long press detection for new tiles
-                addLongPressToTiles();
-            }
-        });
-    });
+    /* ================================================================
+       Nav bar + all-apps arrow + swipe
+       ================================================================ */
+    $("#navBack").addEventListener("click", goBack);
+    $("#navStart").addEventListener("click", () => { exitEditMode(); goStart(); });
+    $("#navSearch").addEventListener("click", () => { exitEditMode(); goList(true); });
+    $("#allAppsBtn").addEventListener("click", () => goList());
 
-    observer.observe(gridContainer, { childList: true, subtree: true });
-});
-    
-    // Add click event handler for letter headers (since we removed the jump list)
-    const letterHeaders = document.querySelectorAll('.letter-header');
-    letterHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            // Scroll to the section when clicked
-            header.scrollIntoView({ behavior: 'smooth' });
-        });
-    });
-});
+    let touchStartX = 0, touchStartY = 0;
+    viewport.addEventListener("touchstart", (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    viewport.addEventListener("touchend", (e) => {
+        if (editMode || busy || current === "app") return;
+        const dx = e.changedTouches[0].screenX - touchStartX;
+        const dy = e.changedTouches[0].screenY - touchStartY;
+        const angle = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI);
+        const horizontal = angle <= 30 || angle >= 150;
+        if (!horizontal || Math.abs(dx) < 50) return;
+        if (dx < 0 && current === "start") goList();
+        if (dx > 0 && current === "list") goStart();
+    }, { passive: true });
+
+    /* ================================================================
+       Boot
+       ================================================================ */
+    renderAppList();
+    fillCalendarTile();
+    turnstile(gridEls(), "in", 40);   // WP boot animation
+})();
