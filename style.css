@@ -85,6 +85,24 @@ html, body {
     color: var(--accent-lite);
 }
 
+.nav-btn .icon { width: 19px; height: 19px; }
+.all-apps-btn .icon, .search-bar .search-icon .icon { width: 17px; height: 17px; }
+.app-icon .icon { width: 22px; height: 22px; }
+.metro-item-icon .icon { width: 26px; height: 26px; }
+.metro-btn .icon { width: 16px; height: 16px; }
+.social-hero .icon { width: 66px; height: 66px; }
+.cal-nav .icon { width: 14px; height: 14px; }
+.lock-hint .icon { width: 14px; height: 14px; }
+.weather-now > .icon { width: 62px; height: 62px; color: var(--accent-lite); }
+.weather-day .icon { width: 22px; height: 22px; margin: 8px 0; color: var(--accent-lite); }
+.music-art .icon { width: 40px; height: 40px; }
+.music-play .icon { width: 22px; height: 22px; }
+.music-track .icon { width: 20px; height: 20px; }
+.tile-action-btn .icon { width: 15px; height: 15px; }
+.tile.small .tile-action-btn .icon { width: 12px; height: 12px; }
+.cam-btn .icon { width: 20px; height: 20px; }
+.cam-shutter .icon { width: 26px; height: 26px; }
+
 /* ================================================================
    START SCREEN — WP unit grid
    small = 1x1 · medium = 2x2 · wide = 4x2 · large = 4x4
@@ -166,14 +184,32 @@ html, body {
 
 .tile.small .tile-label { display: none; }
 
-.tile i {
-    font-size: 30px;
-    color: #fff;
+.icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    display: inline-block;
+    vertical-align: -0.125em;
     pointer-events: none;
+    flex: none;
 }
 
-.tile.small i { font-size: 19px; }
-.tile.wide i, .tile.large i { font-size: 44px; }
+/* Standardized icon scale — proportional to tile size */
+.tile .tile-icon, .tile .face-static .icon, .tile .live-slot .icon {
+    width: 44px;
+    height: 44px;
+}
+
+.tile.small .tile-icon, .tile.small .face-static .icon, .tile.small .live-slot .icon {
+    width: 32px;
+    height: 32px;
+}
+
+.tile.wide .tile-icon, .tile.wide .face-static .icon, .tile.wide .live-slot .icon,
+.tile.large .tile-icon, .tile.large .face-static .icon, .tile.large .live-slot .icon {
+    width: 60px;
+    height: 60px;
+}
 
 /* Face text used by live faces */
 .face-line {
@@ -316,7 +352,7 @@ html, body {
 }
 
 .ts-in {
-    animation: tsIn 0.5s var(--ease-wp) backwards;
+    animation: tsIn 0.45s var(--ease-wp) backwards;
     transform-origin: left center;
 }
 
@@ -697,6 +733,7 @@ html, body {
 .tile.selected {
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
     z-index: 40;
+    touch-action: none;   /* so drag-reorder gets pointer moves, not scroll */
 }
 
 .tile.floating { animation: floatEffect 3s infinite ease-in-out; }
@@ -729,18 +766,12 @@ html, body {
     -webkit-tap-highlight-color: transparent;
 }
 
-.tile-action-btn i {
-    font-size: 13px !important;
-    color: #fff;
-    position: static;
-}
-
 .tile-action-btn:active {
     background: #fff;
     transform: scale(0.9);
 }
 
-.tile-action-btn:active i { color: #000; }
+.tile-action-btn:active .icon { fill: #000; }
 
 @keyframes btnFadeIn {
     from { opacity: 0; transform: scale(0.6); }
@@ -752,7 +783,6 @@ html, body {
 
 /* On 1x1 tiles two 34px buttons don't fit stacked — shrink them */
 .tile.small .tile-action-btn { width: 28px; height: 28px; }
-.tile.small .tile-action-btn i { font-size: 11px !important; }
 .tile.small .unpin-btn  { top: 4px; right: 4px; }
 .tile.small .resize-btn { bottom: 4px; right: 4px; }
 
@@ -788,12 +818,12 @@ html, body {
    ================================================================ */
 
 /* Settings can flip the whole Start to solid accent tiles */
-body.tiles-solid .tile.transparent {
+body[data-tiles="solid"] .tile.transparent {
     background-image: none;
     background-color: var(--accent);
 }
 
-body.tiles-solid .tile.transparent::after { background: none; }
+body[data-tiles="solid"] .tile.transparent::after { background: none; }
 
 /* ---------------- Lock screen ---------------- */
 .lock-screen {
@@ -1058,7 +1088,6 @@ body.tiles-solid .tile.transparent::after { background: none; }
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 38px;
     color: #fff;
 }
 
@@ -1121,8 +1150,6 @@ body.tiles-solid .tile.transparent::after { background: none; }
 .music-track.active { background: var(--accent); }
 .music-track.active .metro-small { color: rgba(255, 255, 255, 0.8); }
 
-.music-track i { width: 22px; text-align: center; font-size: 16px; }
-
 .music-track-name {
     font-size: 17px;
     font-weight: 400;
@@ -1134,11 +1161,6 @@ body.tiles-solid .tile.transparent::after { background: none; }
     align-items: center;
     gap: 20px;
     margin-bottom: 22px;
-}
-
-.weather-now > i {
-    font-size: 64px;
-    color: var(--accent-lite);
 }
 
 .weather-temp {
@@ -1160,13 +1182,6 @@ body.tiles-solid .tile.transparent::after { background: none; }
     text-align: center;
 }
 
-.weather-day i {
-    display: block;
-    font-size: 20px;
-    margin: 8px 0;
-    color: var(--accent-lite);
-}
-
 .weather-range { font-size: 14px; font-weight: 400; }
 .weather-range span { color: var(--text-dim); }
 
@@ -1178,3 +1193,196 @@ body.tiles-solid .tile.transparent::after { background: none; }
     background: #000;
     margin-bottom: 16px;
 }
+
+/* ================================================================
+   V4 — Liquid Glass 2026, wallpaper layer, drag-reorder,
+   Camera & Photos apps, grouped Settings
+   ================================================================ */
+
+/* Shared wallpaper layer (visible in glass mode; parallax via transform) */
+.wallpaper-layer {
+    position: absolute;
+    inset: 0;
+    height: calc(100% + 150px);
+    background: #000 url('windows10-background.jpg') center / cover no-repeat;
+    display: none;
+    z-index: 0;
+    will-change: transform;
+}
+
+/* Screens stay z-auto: they paint above the wallpaper by DOM order, and
+   tile/overlay z-indexes keep working within the viewport context. */
+
+body[data-tiles="glass"] .wallpaper-layer { display: block; }
+body[data-tiles="glass"] #startScreen { background: transparent; }
+
+body[data-tiles="glass"] .tile.transparent {
+    background-image: none;
+    background-color: rgba(14, 24, 40, 0.36);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    backdrop-filter: blur(16px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Top-edge light sheen instead of the classic dark overlay */
+body[data-tiles="glass"] .tile.transparent::after {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 42%);
+    border-radius: inherit;
+}
+
+body[data-tiles="glass"] .tile.selected {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 10px 34px rgba(0, 0, 0, 0.5);
+}
+
+body[data-tiles="glass"] .jump-grid {
+    background: rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(22px);
+    backdrop-filter: blur(22px);
+}
+
+body[data-tiles="glass"] .all-apps-btn,
+body[data-tiles="glass"] .search-bar .search-icon {
+    border-radius: 50%;
+    background: rgba(14, 24, 40, 0.35);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    body[data-tiles="glass"] .tile.transparent {
+        background-color: rgba(14, 24, 40, 0.82);
+    }
+}
+
+/* ---------------- Drag-to-reorder ---------------- */
+.drag-ghost {
+    position: fixed;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.88;
+    transform: scale(1.05);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
+    transition: none;
+}
+
+.tile.drag-src {
+    opacity: 0.25;
+}
+
+/* ---------------- Camera app ---------------- */
+.cam-stage {
+    position: relative;
+    background: #0d0d0d;
+    max-width: 560px;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.cam-stage video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cam-stage video.mirror { transform: scaleX(-1); }
+
+.cam-flash {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cam-flash.on { animation: camFlash 0.28s ease-out; }
+
+@keyframes camFlash {
+    0% { opacity: 0.9; }
+    100% { opacity: 0; }
+}
+
+.cam-controls {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    max-width: 560px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.cam-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cam-btn:active { background: #fff; }
+.cam-btn:active .icon { fill: #000; }
+
+.cam-shutter {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cam-shutter:active { transform: scale(0.9); }
+
+/* ---------------- Photos app ---------------- */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+    gap: 6px;
+    max-width: 640px;
+    margin-bottom: 12px;
+}
+
+.photo-cell {
+    aspect-ratio: 1 / 1;
+    background: #161616 center / cover no-repeat;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.photo-cell:active { opacity: 0.8; }
+
+.photo-view {
+    max-width: 640px;
+    background: #0d0d0d;
+    margin-bottom: 10px;
+}
+
+.photo-view img {
+    display: block;
+    width: 100%;
+    max-height: 62vh;
+    object-fit: contain;
+}
+
+/* ---------------- Settings groups ---------------- */
+.settings-group {
+    margin-bottom: 26px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #1c1c1c;
+}
+
+.settings-group:last-child { border-bottom: none; }

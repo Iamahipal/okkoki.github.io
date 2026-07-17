@@ -1,9 +1,10 @@
 /* ================================================================
-   OKKOKI — Windows Phone experience on the web
-   App registry, WP unit-grid layout, transparent-tile wallpaper
-   sync with parallax, multi-face live tiles, turnstile navigation,
-   lock screen, Settings personalization, and classic WP apps
-   (Music, Videos, Calculator, Calendar, Notes, Weather).
+   OKKOKI — Windows Phone reimagined for 2026
+   Liquid-glass tile system with classic WP modes, persistent
+   layout (resize/unpin/drag-reorder), lock screen, Settings,
+   and built-in apps: Music, Videos, Calculator, Calendar, Notes,
+   Weather, Camera, Photos. Icons: Fluent UI System Icons (MIT)
+   + Simple Icons, inlined as an SVG sprite in index.html.
    ================================================================ */
 (() => {
     "use strict";
@@ -14,6 +15,9 @@
     const MONTHS = ["January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November", "December"];
     const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    /* Sprite icon helper */
+    const ic = (name, cls = "icon") => `<svg class="${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 
     /* ================================================================
        Contact details — replace the placeholders with real ones.
@@ -44,9 +48,17 @@
         return `rgb(${mix(n >> 16 & 255)}, ${mix(n >> 8 & 255)}, ${mix(n & 255)})`;
     }
 
+    const glassSupported = () =>
+        (window.CSS && (CSS.supports("backdrop-filter", "blur(1px)") || CSS.supports("-webkit-backdrop-filter", "blur(1px)")));
+
     const getAccent = () => localStorage.getItem("okkoki_accent") || DEFAULT_ACCENT;
-    const tilesSolid = () => localStorage.getItem("okkoki_tiles") === "solid";
     const lockEnabled = () => localStorage.getItem("okkoki_lock") !== "off";
+
+    function tileStyle() {
+        const s = localStorage.getItem("okkoki_tiles");
+        if (s === "glass" || s === "transparent" || s === "solid") return s;
+        return glassSupported() ? "glass" : "transparent";
+    }
 
     function setAccent(hex) {
         document.documentElement.style.setProperty("--accent", hex);
@@ -56,7 +68,7 @@
 
     function applySettings() {
         if (getAccent() !== DEFAULT_ACCENT) setAccent(getAccent());
-        document.body.classList.toggle("tiles-solid", tilesSolid());
+        document.body.dataset.tiles = tileStyle();
     }
 
     /* ---------------- Page block builders ---------------- */
@@ -64,15 +76,15 @@
     const big  = (t) => `<p class="metro-big">${t}</p>`;
     const small = (t) => `<p class="metro-small">${t}</p>`;
     const item = (icon, title, sub) =>
-        `<div class="metro-item"><div class="metro-item-icon"><i class="${icon}"></i></div>` +
+        `<div class="metro-item"><div class="metro-item-icon">${ic(icon)}</div>` +
         `<div><div class="metro-item-title">${title}</div><div class="metro-item-sub">${sub}</div></div></div>`;
     const btn = (href, icon, label, primary = false) =>
-        `<a class="metro-btn${primary ? " primary" : ""}" href="${href}"><i class="${icon}"></i> ${label}</a>`;
+        `<a class="metro-btn${primary ? " primary" : ""}" href="${href}">${ic(icon)} ${label}</a>`;
     const openBtn = (appId, icon, label, primary = false) =>
-        `<button class="metro-btn${primary ? " primary" : ""}" data-open="${appId}"><i class="${icon}"></i> ${label}</button>`;
+        `<button class="metro-btn${primary ? " primary" : ""}" data-open="${appId}">${ic(icon)} ${label}</button>`;
     const social = (icon, label) => [
-        `<div class="social-hero"><i class="${icon}"></i></div>`, p(label),
-        `<a class="metro-btn" href="#" onclick="return false"><i class="${icon}"></i> Follow @okkoki</a>`,
+        `<div class="social-hero">${ic(icon)}</div>`, p(label),
+        `<a class="metro-btn" href="#" onclick="return false">${ic(icon)} Follow @okkoki</a>`,
         small("Replace the link above with your real profile URL."),
     ];
     const post = (title, date, snippet) =>
@@ -81,29 +93,28 @@
 
     /* ================================================================
        APP REGISTRY — the single source of truth.
-       Adding a future app = one entry here. Give it `page` (built-in
-       metro page) OR `embed` (an iframe app under apps/<id>/).
+       icon = sprite symbol id (see the inline SVG sprite in index.html)
        ================================================================ */
     const APPS = [
-        { id: "services", name: "Services", icon: "fa-solid fa-rocket", page: () => [
-            item("fa-solid fa-laptop-code", "Website building", "Fast, modern sites that turn visitors into customers"),
-            item("fa-solid fa-bullhorn", "Paid media", "Google &amp; Meta ads managed for real return, not vanity clicks"),
-            item("fa-solid fa-chart-line", "SEO &amp; growth", "Get found by the people already searching for you"),
-            item("fa-solid fa-hashtag", "Social media", "Content and community that keep your brand top of mind"),
-            openBtn("book", "fa-solid fa-calendar-check", "Book a free growth call", true),
+        { id: "services", name: "Services", icon: "rocket", page: () => [
+            item("briefcase", "Website building", "Fast, modern sites that turn visitors into customers"),
+            item("news", "Paid media", "Google &amp; Meta ads managed for real return, not vanity clicks"),
+            item("search", "SEO &amp; growth", "Get found by the people already searching for you"),
+            item("contact", "Social media", "Content and community that keep your brand top of mind"),
+            openBtn("book", "book", "Book a free growth call", true),
         ]},
-        { id: "book", name: "Book a Call", icon: "fa-solid fa-calendar-check", page: () => [
+        { id: "book", name: "Book a Call", icon: "book", page: () => [
             big("Let's grow your business."),
             p("The first 30-minute growth call is free — we'll look at where you are, what's possible, and whether we're a fit. No pressure, no jargon."),
-            btn(`https://wa.me/${CONTACT.whatsapp}`, "fa-brands fa-whatsapp", "WhatsApp", true) +
-            btn(`mailto:${CONTACT.email}`, "fa-solid fa-envelope", "Email") +
-            btn(`tel:${CONTACT.phone}`, "fa-solid fa-phone", "Call"),
+            btn(`https://wa.me/${CONTACT.whatsapp}`, "brand-whatsapp", "WhatsApp", true) +
+            btn(`mailto:${CONTACT.email}`, "mail", "Email") +
+            btn(`tel:${CONTACT.phone}`, "call", "Call"),
             /* Scheduler slot: paste a Calendly inline embed (or any form
                service snippet) inside this div and it appears here. */
             `<div id="booking-embed" class="booking-embed"></div>`,
             small("Prefer a scheduler? A Calendly embed drops straight into this page — see apps/README.md."),
         ]},
-        { id: "portfolio", name: "Portfolio", icon: "fa-solid fa-folder-open", page: () => [
+        { id: "portfolio", name: "Portfolio", icon: "briefcase", page: () => [
             p("A few of the small businesses we've helped look big:"),
             `<div class="portfolio-grid">
                 <div class="pf" style="background:#e51400">Cafe kiosk</div>
@@ -115,77 +126,90 @@
             </div>`,
             small("Each square will become a case study — and future self-built apps will live on the start screen as their own tiles."),
         ]},
-        { id: "about", name: "About", icon: "fa-solid fa-user", page: () => [
+        { id: "about", name: "About", icon: "person", page: () => [
             big("The human behind OKKOKI."),
             p("I've spent years in digital marketing — building websites, running paid media, and growing search and social presence. OKKOKI is where that experience goes to work for small businesses that deserve to punch above their weight."),
             p("This site is also my long-term playground: every tile is an app, and over the years I'll keep shipping new ones — tools, experiments and mini-products — straight onto this start screen."),
-            openBtn("book", "fa-solid fa-calendar-check", "Work with me", true),
+            openBtn("book", "book", "Work with me", true),
         ]},
-        { id: "blog", name: "Blog", icon: "fa-solid fa-blog", page: () => [
+        { id: "blog", name: "Blog", icon: "news", page: () => [
             post("5 ways to grow your local business", "Jul 10, 2026", "Simple, low-budget moves that bring real customers through the door."),
             post("Why your shop needs a website in 2026", "Jun 28, 2026", "Your customers search online first. Here's how to be what they find."),
             post("Paid ads that actually pay", "Jun 12, 2026", "Stop boosting posts into the void — start running campaigns with purpose."),
         ]},
-        { id: "contact", name: "Contact", icon: "fa-solid fa-address-card", page: () => [
-            item("fa-solid fa-envelope", CONTACT.email, "We reply within one business day"),
-            item("fa-solid fa-phone", CONTACT.phoneDisplay, "Mon–Fri, 9am–6pm"),
-            item("fa-brands fa-whatsapp", "WhatsApp", "Quickest way to reach us"),
-            btn(`mailto:${CONTACT.email}`, "fa-solid fa-envelope", "Email", true) +
-            btn(`https://wa.me/${CONTACT.whatsapp}`, "fa-brands fa-whatsapp", "WhatsApp"),
+        { id: "contact", name: "Contact", icon: "contact", page: () => [
+            item("mail", CONTACT.email, "We reply within one business day"),
+            item("call", CONTACT.phoneDisplay, "Mon–Fri, 9am–6pm"),
+            item("brand-whatsapp", "WhatsApp", "Quickest way to reach us"),
+            btn(`mailto:${CONTACT.email}`, "mail", "Email", true) +
+            btn(`https://wa.me/${CONTACT.whatsapp}`, "brand-whatsapp", "WhatsApp"),
         ]},
-        { id: "music", name: "Music", icon: "fa-solid fa-music", page: () =>
+        { id: "music", name: "Music", icon: "music", page: () =>
             [`<div id="musicApp">${musicBody()}</div>`] },
-        { id: "videos", name: "Videos", icon: "fa-solid fa-film", page: () => [
+        { id: "videos", name: "Videos", icon: "filmstrip", page: () => [
             `<video class="video-player" controls preload="metadata"
                 src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"></video>`,
-            item("fa-solid fa-film", "Flower (demo)", "Sample CC0 clip — replace with your showreel"),
+            item("filmstrip", "Flower (demo)", "Sample CC0 clip — replace with your showreel"),
             p("Drop your own clips here as you build them — every video becomes part of the portfolio."),
         ]},
-        { id: "calculator", name: "Calculator", icon: "fa-solid fa-calculator", page: () => {
+        { id: "calculator", name: "Calculator", icon: "calculator", page: () => {
             calcReset();
             return [`<div id="calcApp">${calcBody()}</div>`];
         }},
-        { id: "calendar", name: "Calendar", icon: "fa-solid fa-calendar", page: () => {
+        { id: "calendar", name: "Calendar", icon: "calendar", page: () => {
             const d = new Date(); calY = d.getFullYear(); calM = d.getMonth();
             return [`<div id="calApp">${calendarBody()}</div>`];
         }},
-        { id: "notes", name: "Notes", icon: "fa-solid fa-note-sticky", page: () => {
+        { id: "notes", name: "Notes", icon: "notepad", page: () => {
             noteEditing = null;
             return [`<div id="notesApp">${notesBody()}</div>`];
         }},
-        { id: "weather", name: "Weather", icon: "fa-solid fa-cloud-sun", page: () =>
+        { id: "weather", name: "Weather", icon: "weather", page: () =>
             [`<div id="weatherApp"><p class="metro-p">Getting your weather…</p></div>`] },
-        { id: "settings", name: "Settings", icon: "fa-solid fa-gear", page: () =>
+        { id: "camera", name: "Camera", icon: "camera", page: () => [
+            `<div id="cameraApp">
+                <div class="cam-stage"><video id="camVideo" playsinline muted></video><div class="cam-flash" id="camFlash"></div></div>
+                <div class="cam-controls">
+                    <button class="cam-btn" data-cam="switch" aria-label="Switch camera">${ic("camera-switch")}</button>
+                    <button class="cam-shutter" data-cam="shot" aria-label="Take photo">${ic("camera")}</button>
+                    <button class="cam-btn" data-open="photos" aria-label="Open photos">${ic("photos")}</button>
+                </div>
+                <div id="camMsg"></div>
+            </div>`,
+        ]},
+        { id: "photos", name: "Photos", icon: "photos", page: () =>
+            [`<div id="photosApp">${photosBody()}</div>`] },
+        { id: "settings", name: "Settings", icon: "gear", page: () =>
             [`<div id="settingsApp">${settingsBody()}</div>`] },
-        { id: "facebook", name: "Facebook", icon: "fa-brands fa-facebook-f",
-          page: () => social("fa-brands fa-facebook-f", "Daily tips, client wins and behind-the-scenes from OKKOKI.") },
-        { id: "instagram", name: "Instagram", icon: "fa-brands fa-instagram",
-          page: () => social("fa-brands fa-instagram", "Our freshest work, reels and brand glow-ups — in squares.") },
-        { id: "twitter", name: "Twitter", icon: "fa-brands fa-twitter",
-          page: () => social("fa-brands fa-twitter", "Hot takes on small business, marketing and design.") },
-        { id: "youtube", name: "YouTube", icon: "fa-brands fa-youtube",
-          page: () => social("fa-brands fa-youtube", "Tutorials, case studies and growth tips for small business owners.") },
-        { id: "whatsapp", name: "WhatsApp", icon: "fa-brands fa-whatsapp", page: () => [
-            `<div class="social-hero"><i class="fa-brands fa-whatsapp"></i></div>`,
+        { id: "facebook", name: "Facebook", icon: "brand-facebook",
+          page: () => social("brand-facebook", "Daily tips, client wins and behind-the-scenes from OKKOKI.") },
+        { id: "instagram", name: "Instagram", icon: "brand-instagram",
+          page: () => social("brand-instagram", "Our freshest work, reels and brand glow-ups — in squares.") },
+        { id: "twitter", name: "X", icon: "brand-x",
+          page: () => social("brand-x", "Hot takes on small business, marketing and design.") },
+        { id: "youtube", name: "YouTube", icon: "brand-youtube",
+          page: () => social("brand-youtube", "Tutorials, case studies and growth tips for small business owners.") },
+        { id: "whatsapp", name: "WhatsApp", icon: "brand-whatsapp", page: () => [
+            `<div class="social-hero">${ic("brand-whatsapp")}</div>`,
             big("Chat with us directly."),
             p("Quick questions, quick answers. Message us any time."),
-            btn(`https://wa.me/${CONTACT.whatsapp}`, "fa-brands fa-whatsapp", "Start chat", true),
+            btn(`https://wa.me/${CONTACT.whatsapp}`, "brand-whatsapp", "Start chat", true),
         ]},
-        { id: "email", name: "Email", icon: "fa-solid fa-envelope", page: () => [
+        { id: "email", name: "Email", icon: "mail", page: () => [
             big("Let's talk about your business."),
-            item("fa-solid fa-envelope", CONTACT.email, "We reply within one business day"),
-            btn(`mailto:${CONTACT.email}`, "fa-solid fa-envelope", "Send email", true),
+            item("mail", CONTACT.email, "We reply within one business day"),
+            btn(`mailto:${CONTACT.email}`, "mail", "Send email", true),
         ]},
-        { id: "phone", name: "Phone", icon: "fa-solid fa-phone", page: () => [
+        { id: "phone", name: "Phone", icon: "call", page: () => [
             big("Prefer to talk it out?"),
-            item("fa-solid fa-phone", CONTACT.phoneDisplay, "Mon–Fri, 9am–6pm"),
-            btn(`tel:${CONTACT.phone}`, "fa-solid fa-phone", "Call now", true),
+            item("call", CONTACT.phoneDisplay, "Mon–Fri, 9am–6pm"),
+            btn(`tel:${CONTACT.phone}`, "call", "Call now", true),
         ]},
-        { id: "8bit", name: "8-Bit", icon: "fa-solid fa-heart", page: () => [
+        { id: "8bit", name: "8-Bit", icon: "heart", page: () => [
             `<div class="retro-block"><span class="retro-text">OKKOKI</span></div>`,
             p("Where it all started — a love for pixels, play and personality. We bring that same retro heart to every brand we build."),
         ]},
-        { id: "screensaver", name: "Screensaver", icon: "fa-solid fa-table-cells", page: () => [
+        { id: "screensaver", name: "Screensaver", icon: "color", page: () => [
             `<div class="portfolio-grid">
                 <div class="pf" style="background:#1ba1e2"></div>
                 <div class="pf" style="background:#0057b7"></div>
@@ -195,19 +219,19 @@
             p("Fifty shades of Metro blue."),
         ]},
         /* Example of a future embedded tile app — see apps/README.md */
-        { id: "demo", name: "Demo App", icon: "fa-solid fa-cube", embed: "apps/demo/index.html" },
+        { id: "demo", name: "Demo App", icon: "cube", embed: "apps/demo/index.html" },
     ];
 
     const appById = (id) => APPS.find((a) => a.id === id);
 
     /* ================================================================
-       START SCREEN LAYOUT — which tiles are pinned, in order.
-       Sizes: small (1x1) · medium (2x2) · wide (4x2) · large (4x4).
-       hero: wide on 4-column phones, large on 6+ column screens.
-       All tiles transparent by default (uniform WP 8.1 look); the
-       Settings app can switch the whole Start to solid accent.
+       START SCREEN TILES
+       TILE_DEFS: per-tile config (app, live faces...) keyed by tile id.
+       DEFAULT_LAYOUT: the pinned order + sizes for first-time visitors.
+       The user's own layout (resizes, unpins, drag order) is persisted
+       in localStorage and survives until browser data is cleared.
        ================================================================ */
-    const face = (icon) => `<i class="${icon}"></i>`;
+    const face = (icon) => ic(icon, "icon tile-icon");
     const line = (t, sub) => `<p class="face-line">${t}</p>` + (sub ? `<p class="face-sub">${sub}</p>` : "");
     const fill = (color) => `<div style="position:absolute;inset:0;background:${color}"></div>`;
 
@@ -217,78 +241,128 @@
                `<span class="cal-side">${DAYS[d.getDay()]}<br>${MONTHS[d.getMonth()]} ${d.getFullYear()}</span></div>`;
     }
 
-    const START = [
-        { app: "about", hero: true, label: false,
-          live: { template: "peek" }, faces: [
+    function photoFaces() {
+        const photos = loadPhotos();
+        const faces = [face("photos")];
+        photos.slice(0, 3).forEach((ph) => {
+            faces.push(`<div style="position:absolute;inset:0;background:url(${ph.src}) center/cover"></div>`);
+        });
+        return faces;
+    }
+
+    const TILE_DEFS = {
+        hero: { app: "about", label: false, live: { template: "peek" }, faces: [
             `<h1 class="retro-text">OKKOKI</h1><p class="tagline">Fueling Small Business Growth</p>`,
             line("Web &bull; Paid media &bull; SEO &bull; Social", "Digital marketing for small business"),
             line("Book a free 30-min growth call", "Tap to meet the human behind OKKOKI"),
         ]},
-        { app: "services", size: "medium",
-          live: { template: "peek" }, faces: [
-            face("fa-solid fa-rocket"),
-            line("Website building"),
-            line("Paid media"),
-            line("SEO &amp; social"),
+        services: { app: "services", live: { template: "peek" }, faces: [
+            face("rocket"), line("Website building"), line("Paid media"), line("SEO &amp; social"),
         ]},
-        { app: "book", size: "medium",
-          live: { template: "peek" }, faces: [
-            face("fa-solid fa-calendar-check"),
-            line("Free 30-min growth call"),
+        book: { app: "book", live: { template: "peek" }, faces: [
+            face("book"), line("Free 30-min growth call"),
         ]},
-        { app: "portfolio", size: "medium",
-          live: { template: "flip" }, faces: [
-            face("fa-solid fa-folder-open"),
-            line("Cafe kiosk", "Web + branding"),
-            line("Glow salon", "Paid media"),
-            line("Daily fit", "SEO + social"),
+        portfolio: { app: "portfolio", live: { template: "flip" }, faces: [
+            face("briefcase"), line("Cafe kiosk", "Web + branding"),
+            line("Glow salon", "Paid media"), line("Daily fit", "SEO + social"),
         ]},
-        { app: "blog", size: "medium",
-          live: { template: "flip" }, faces: [
-            face("fa-solid fa-blog"),
-            line("5 ways to grow your local business"),
-            line("Paid ads that actually pay"),
+        blog: { app: "blog", live: { template: "flip" }, faces: [
+            face("news"), line("5 ways to grow your local business"), line("Paid ads that actually pay"),
         ]},
-        { app: "about", size: "medium" },
-        { app: "contact", size: "medium" },
-        { app: "facebook",  size: "small" },
-        { app: "instagram", size: "small" },
-        { app: "twitter",   size: "small" },
-        { app: "youtube",   size: "small" },
-        { app: "screensaver", size: "medium",
-          live: { template: "flip" }, faces: [
-            face("fa-solid fa-table-cells"),
-            fill("#1ba1e2"), fill("#aa00ff"), fill("#60a917"), fill("#fa6800"),
+        about: { app: "about" },
+        contact: { app: "contact" },
+        facebook:  { app: "facebook" },
+        instagram: { app: "instagram" },
+        twitter:   { app: "twitter" },
+        youtube:   { app: "youtube" },
+        screensaver: { app: "screensaver", live: { template: "flip" }, faces: [
+            face("color"), fill("#1ba1e2"), fill("#aa00ff"), fill("#60a917"), fill("#fa6800"),
         ]},
-        { app: "music", size: "medium",
-          live: { template: "peek" }, faces: [
-            face("fa-solid fa-music"),
-            line("Metro beats", "Built-in chiptune radio"),
+        camera: { app: "camera" },
+        photos: { app: "photos", live: { template: "flip" }, facesFn: photoFaces },
+        music: { app: "music", live: { template: "peek" }, faces: [
+            face("music"), line("Metro beats", "Built-in chiptune radio"),
         ]},
-        { app: "calendar", size: "medium",
-          live: { template: "flip" }, faces: [
-            calFace(),
-            line("No events today", "Tap to open the calendar"),
+        calendar: { app: "calendar", live: { template: "flip" }, facesFn: () => [
+            calFace(), line("No events today", "Tap to open the calendar"),
         ]},
-        { app: "whatsapp", size: "small" },
-        { app: "email",    size: "small" },
-        { app: "phone",    size: "small" },
-        { app: "8bit",     size: "small" },
-        { app: "demo", size: "medium",
-          live: { template: "peek" }, faces: [
-            face("fa-solid fa-cube"),
-            line("Your future apps live here", "One folder, one registry line"),
+        whatsapp: { app: "whatsapp" },
+        email:    { app: "email" },
+        phone:    { app: "phone" },
+        "8bit":   { app: "8bit" },
+        demo: { app: "demo", live: { template: "peek" }, faces: [
+            face("cube"), line("Your future apps live here", "One folder, one registry line"),
         ]},
-        { app: "calculator", size: "small" },
-        { app: "notes",      size: "small" },
-        { app: "videos",     size: "small" },
-        { app: "weather",    size: "small" },
-        { app: "settings", size: "medium",
-          live: { template: "peek" }, faces: [
-            face("fa-solid fa-gear"),
-            line("Make it yours", "Accent color &amp; tile style"),
+        calculator: { app: "calculator" },
+        notes:      { app: "notes" },
+        videos:     { app: "videos" },
+        weather:    { app: "weather" },
+        settings: { app: "settings", live: { template: "peek" }, faces: [
+            face("gear"), line("Make it yours", "Style, accent &amp; more"),
         ]},
+    };
+
+    const DEFAULT_LAYOUT = [
+        { id: "hero", size: "hero" },
+        { id: "services", size: "medium" },
+        { id: "book", size: "medium" },
+        { id: "portfolio", size: "medium" },
+        { id: "blog", size: "medium" },
+        { id: "about", size: "medium" },
+        { id: "contact", size: "medium" },
+        { id: "facebook", size: "small" },
+        { id: "instagram", size: "small" },
+        { id: "twitter", size: "small" },
+        { id: "youtube", size: "small" },
+        { id: "screensaver", size: "medium" },
+        { id: "camera", size: "medium" },
+        { id: "photos", size: "medium" },
+        { id: "music", size: "medium" },
+        { id: "calendar", size: "medium" },
+        { id: "whatsapp", size: "small" },
+        { id: "email", size: "small" },
+        { id: "phone", size: "small" },
+        { id: "8bit", size: "small" },
+        { id: "demo", size: "medium" },
+        { id: "calculator", size: "small" },
+        { id: "notes", size: "small" },
+        { id: "videos", size: "small" },
+        { id: "weather", size: "small" },
+        { id: "settings", size: "medium" },
     ];
+
+    const LAYOUT_KEY = "okkoki_layout_v1";
+    const KNOWN_KEY = "okkoki_known_v1";
+
+    function loadLayout() {
+        let saved = null;
+        try { saved = JSON.parse(localStorage.getItem(LAYOUT_KEY)); } catch { /* corrupted -> defaults */ }
+        if (!Array.isArray(saved)) return DEFAULT_LAYOUT.map((t) => ({ ...t }));
+        let known = [];
+        try { known = JSON.parse(localStorage.getItem(KNOWN_KEY)) || []; } catch { /* ignore */ }
+        const layout = saved.filter((t) => t && TILE_DEFS[t.id]);
+        // Tiles added in newer versions of the site get appended; tiles the
+        // user unpinned themselves (already "known") stay unpinned.
+        DEFAULT_LAYOUT.forEach((d) => {
+            if (!known.includes(d.id) && !layout.some((t) => t.id === d.id)) layout.push({ ...d });
+        });
+        return layout;
+    }
+
+    function saveLayout() {
+        const entries = [];
+        [...tileGrid.children].forEach((el) => {
+            if (el.classList.contains("tile-group")) {
+                [...el.children].forEach((t) => entries.push({ id: t.dataset.tid, size: "small" }));
+            } else {
+                const size = el.classList.contains("hero") ? "hero"
+                    : (SIZE_CYCLE.find((s) => el.classList.contains(s)) || "medium");
+                entries.push({ id: el.dataset.tid, size });
+            }
+        });
+        localStorage.setItem(LAYOUT_KEY, JSON.stringify(entries));
+        localStorage.setItem(KNOWN_KEY, JSON.stringify(DEFAULT_LAYOUT.map((d) => d.id)));
+    }
 
     /* ---------------- DOM refs ---------------- */
     const viewport    = $("#viewport");
@@ -301,6 +375,7 @@
     const jumpInner   = $("#jumpInner");
     const searchInput = $("#searchApps");
     const lockScreen  = $("#lockScreen");
+    const wallpaperLayer = $("#wallpaperLayer");
 
     /* ---------------- State ---------------- */
     let current = "start";        // 'start' | 'list' | 'app'
@@ -308,62 +383,62 @@
     let busy = false;
     let editMode = false;
     let suppressClick = false;
-    let activeApp = null;         // id of the open app
+    let activeApp = null;
+    let photosDirty = false;      // photos changed -> rebuild Photos live tile
 
     /* ================================================================
        Start screen rendering + unit-grid layout math
        ================================================================ */
     function tileHTML(t) {
-        const app = appById(t.app);
-        const faces = t.faces || [face(app.icon)];
-        const live = t.live && faces.length > 1;
-        const cls = ["tile", t.hero ? "hero" : (t.size || "medium"),
-                     t.variant || "transparent",
-                     live ? `live live-${t.live.template}` : ""].join(" ").trim();
+        const def = TILE_DEFS[t.id];
+        const app = appById(def.app);
+        const faces = def.facesFn ? def.facesFn() : (def.faces || [face(app.icon)]);
+        const live = def.live && faces.length > 1;
+        const sizeCls = t.size === "hero" ? "hero" : (t.size || "medium");
+        const cls = ["tile", sizeCls, "transparent", live ? `live live-${def.live.template}` : ""].join(" ").trim();
         const body = live
             ? `<div class="tile-body"><div class="live-slot slot-a">${faces[0]}</div><div class="live-slot slot-b">${faces[1]}</div></div>`
             : `<div class="tile-body"><div class="face-static">${faces[0]}</div></div>`;
-        const label = t.label === false ? "" : `<span class="tile-label">${app.name}</span>`;
-        return `<div class="${cls}" data-app="${app.id}">${body}${label}</div>`;
+        const label = def.label === false ? "" : `<span class="tile-label">${app.name}</span>`;
+        return `<div class="${cls}" data-app="${app.id}" data-tid="${t.id}">${body}${label}</div>`;
     }
 
-    function renderStart() {
-        // Consecutive small tiles pack into 2x2 groups (one medium footprint)
+    function renderStart(layout) {
+        layout = layout || loadLayout();
         let html = "";
-        for (let i = 0; i < START.length;) {
-            if (!START[i].hero && (START[i].size || "medium") === "small") {
+        for (let i = 0; i < layout.length;) {
+            if (layout[i].size === "small") {
                 const chunk = [];
-                while (i < START.length && (START[i].size || "medium") === "small" && chunk.length < 4) {
-                    chunk.push(START[i]); i++;
+                while (i < layout.length && layout[i].size === "small" && chunk.length < 4) {
+                    chunk.push(layout[i]); i++;
                 }
                 html += `<div class="tile-group">${chunk.map(tileHTML).join("")}</div>`;
             } else {
-                html += tileHTML(START[i]); i++;
+                html += tileHTML(layout[i]); i++;
             }
         }
         tileGrid.innerHTML = html;
 
         // Wire live tiles to their face queues
         liveTiles.length = 0;
-        const els = $$(".tile", tileGrid);
-        START.forEach((t, i) => {
-            if (t.live && t.faces && t.faces.length > 1) {
+        layout.forEach((t) => {
+            const def = TILE_DEFS[t.id];
+            const faces = def.facesFn ? def.facesFn() : def.faces;
+            if (def.live && faces && faces.length > 1) {
+                const el = $(`.tile[data-tid="${t.id}"]`, tileGrid);
+                if (!el) return;
                 liveTiles.push({
-                    el: els[i],
-                    body: $(".tile-body", els[i]),
-                    faces: t.faces,
-                    template: t.live.template,
-                    idx: 0,
-                    showingA: true,
-                    animating: false,
-                    due: Date.now() + 2600 + liveTiles.length * 1400 + Math.random() * 2500,
+                    el, body: $(".tile-body", el),
+                    faces, template: def.live.template,
+                    idx: 0, showingA: true, animating: false,
+                    due: Date.now() + 2400 + liveTiles.length * 1200 + Math.random() * 2200,
                 });
             }
         });
+        layoutGrid();
     }
 
-    /* Columns/unit size so the WP math is exact at every width:
-       cols is even (mediums are 2 units), unit fills the row. */
+    /* Columns/unit size so the WP math is exact at every width */
     function layoutGrid() {
         const w = viewport.clientWidth;
         const gap = 6, pad = 16;
@@ -382,8 +457,8 @@
     }
 
     /* ================================================================
-       Transparent tiles — shared wallpaper alignment + parallax.
-       Works everywhere (incl. iOS) unlike background-attachment:fixed.
+       Wallpaper — glass mode: one layer blurred through the tiles;
+       transparent mode: per-tile aligned background (works on iOS).
        ================================================================ */
     const PARALLAX = 0.12;
     const wallpaper = new Image();
@@ -392,7 +467,13 @@
     wallpaper.src = "windows10-background.jpg";
 
     function syncWallpaper() {
-        if (document.body.classList.contains("tiles-solid")) return;
+        const mode = document.body.dataset.tiles;
+        if (mode === "glass") {
+            const drift = Math.min(startScreen.scrollTop * PARALLAX, 140);
+            wallpaperLayer.style.transform = `translateY(${(-drift).toFixed(1)}px)`;
+            return;
+        }
+        if (mode === "solid") return;
         const tiles = $$(".tile.transparent", tileGrid);
         if (!tiles.length) return;
         const vp = viewport.getBoundingClientRect();
@@ -421,8 +502,7 @@
     window.addEventListener("resize", () => { layoutGrid(); requestWallpaper(); });
 
     /* ================================================================
-       Live tile engine — multi-face queues, flip & peek templates,
-       organic randomized scheduling.
+       Live tile engine
        ================================================================ */
     const liveTiles = [];
 
@@ -455,11 +535,11 @@
         for (const t of liveTiles) {
             if (!t.animating && now >= t.due && tileGrid.contains(t.el)) {
                 advanceLive(t);
-                t.due = now + 4500 + Math.random() * 5000;
-                break; // one tile per tick keeps motion organic, never synchronized
+                t.due = now + 3500 + Math.random() * 4500;
+                break;
             }
         }
-    }, 420);
+    }, 350);
 
     /* ================================================================
        Animation helpers (turnstile)
@@ -483,7 +563,7 @@
                 el.style.animationDelay = (i * step) + "ms";
                 el.classList.add(dir === "in" ? "ts-in" : "ts-out");
             });
-            const total = els.length * step + (dir === "in" ? 500 : 300);
+            const total = els.length * step + (dir === "in" ? 460 : 300);
             setTimeout(() => {
                 if (dir === "in") {
                     els.forEach((el) => { el.classList.remove("ts-in"); el.style.animationDelay = ""; });
@@ -498,6 +578,12 @@
 
     function showOnly(screen) {
         [startScreen, listScreen, appScreen].forEach((s) => s.classList.toggle("active", s === screen));
+    }
+
+    function refreshPhotosTileIfNeeded() {
+        if (!photosDirty) return;
+        photosDirty = false;
+        renderStart();
     }
 
     /* ================================================================
@@ -521,20 +607,26 @@
         showOnly(appScreen);
         appScreen.scrollTop = 0;
         current = "app";
-        await turnstile(appEls(), "in", 60);
+        await turnstile(appEls(), "in", 55);
         busy = false;
+    }
+
+    function leaveApp() {
+        stopCamera();
+        activeApp = null;
     }
 
     async function closeApp() {
         if (busy || current !== "app") return;
         busy = true;
-        activeApp = null;
+        leaveApp();
         await turnstile(appEls(), "out", 35);
         const dest = openedFrom === "list" ? listScreen : startScreen;
+        if (dest === startScreen) refreshPhotosTileIfNeeded();
         showOnly(dest);
         current = openedFrom;
         if (dest === startScreen) {
-            await turnstile(gridEls(), "in", 18);
+            await turnstile(gridEls(), "in", 16);
             requestWallpaper();
         } else {
             await animOnce(listScreen, "slide-in-r");
@@ -545,16 +637,17 @@
     async function goStart() {
         if (busy || current === "start") return;
         busy = true;
-        activeApp = null;
         if (current === "app") {
+            leaveApp();
             await turnstile(appEls(), "out", 25);
         } else {
             await animOnce(listScreen, "slide-out-r");
         }
+        refreshPhotosTileIfNeeded();
         showOnly(startScreen);
         startScreen.scrollTop = 0;
         current = "start";
-        await turnstile(gridEls(), "in", 18);
+        await turnstile(gridEls(), "in", 16);
         requestWallpaper();
         busy = false;
     }
@@ -566,7 +659,7 @@
         }
         busy = true;
         if (current === "app") {
-            activeApp = null;
+            leaveApp();
             await turnstile(appEls(), "out", 25);
         }
         showOnly(listScreen);
@@ -585,9 +678,10 @@
     }
 
     /* ================================================================
-       App pages (built-in metro pages or embedded iframe apps)
+       App pages
        ================================================================ */
     function buildAppPage(app) {
+        stopCamera();
         const blocks = app.embed
             ? [`<iframe class="app-embed" src="${app.embed}" loading="lazy" title="${app.name}"></iframe>`]
             : (app.page ? app.page() : [p("Coming soon.")]);
@@ -601,6 +695,7 @@
             </div>`;
         activeApp = app.id;
         if (app.id === "weather") loadWeather();
+        if (app.id === "camera") startCamera();
     }
 
     /* Buttons inside app pages that open another app (e.g. Book) */
@@ -613,12 +708,11 @@
         await turnstile(appEls(), "out", 25);
         buildAppPage(app);
         appScreen.scrollTop = 0;
-        await turnstile(appEls(), "in", 60);
+        await turnstile(appEls(), "in", 55);
         busy = false;
     });
 
-    /* Delegated in-app interactions (calculator, calendar, notes,
-       music, weather retry, settings) */
+    /* Delegated in-app interactions */
     appScreen.addEventListener("click", (e) => {
         const q = (sel) => e.target.closest(sel);
         let b;
@@ -628,10 +722,13 @@
         if ((b = q("[data-track]")))   { Music.play(+b.dataset.track); return; }
         if ((b = q("[data-music]")))   { Music.playing ? Music.stop() : Music.play(); return; }
         if ((b = q("[data-weather]"))) { loadWeather(); return; }
+        if ((b = q("[data-cam]")))     { cameraAction(b.dataset.cam); return; }
+        if ((b = q("[data-photo]")))   { photoView = +b.dataset.photo; rerender("photosApp", photosBody); return; }
+        if ((b = q("[data-pv]")))      { photoViewerAction(b.dataset.pv); return; }
         if ((b = q("[data-accent]")))  { setAccent(b.dataset.accent); rerender("settingsApp", settingsBody); return; }
-        if ((b = q("[data-tiles]")))   {
-            localStorage.setItem("okkoki_tiles", b.dataset.tiles);
-            document.body.classList.toggle("tiles-solid", b.dataset.tiles === "solid");
+        if ((b = q("[data-set-tiles]"))) {
+            localStorage.setItem("okkoki_tiles", b.dataset.setTiles);
+            document.body.dataset.tiles = b.dataset.setTiles;
             requestWallpaper();
             rerender("settingsApp", settingsBody);
             return;
@@ -639,6 +736,14 @@
         if ((b = q("[data-lock]")))    {
             localStorage.setItem("okkoki_lock", b.dataset.lock);
             rerender("settingsApp", settingsBody);
+            return;
+        }
+        if ((b = q("[data-reset]")))   {
+            if (confirm("Reset everything? Your layout, notes, photos and settings on this device will be erased.")) {
+                localStorage.clear();
+                sessionStorage.clear();
+                location.reload();
+            }
         }
     });
 
@@ -648,7 +753,7 @@
     }
 
     /* ================================================================
-       CLASSIC APP: Music — WebAudio chiptune player (Zune vibes)
+       APP: Music — WebAudio chiptune player
        ================================================================ */
     const Music = {
         ctx: null, playing: false, cur: 0, step: 0, timer: null,
@@ -678,7 +783,7 @@
             const tr = this.tracks[this.cur], t = this.ctx.currentTime;
             this.voice("triangle", tr.bass[this.step], t, 0.22, 0.20);
             this.voice("square",   tr.lead[this.step], t, 0.15, 0.07);
-            if (this.step % 4 === 2) this.voice("square", 118, t, 0.03, 0.02); // hat
+            if (this.step % 4 === 2) this.voice("square", 118, t, 0.03, 0.02);
             this.step = (this.step + 1) % 16;
             const bar = $("#musicProg");
             if (bar) bar.style.width = ((this.step / 16) * 100) + "%";
@@ -704,7 +809,7 @@
         const tr = Music.tracks[Music.cur];
         return `
         <div class="music-hero">
-            <div class="music-art"><i class="fa-solid fa-music"></i></div>
+            <div class="music-art">${ic("music")}</div>
             <div>
                 <div class="music-state">${Music.playing ? "Now playing" : "Paused"}</div>
                 <div class="music-title">${tr.name}</div>
@@ -714,12 +819,12 @@
         <div class="music-progress"><div class="music-progress-fill" id="musicProg"></div></div>
         <div class="music-controls">
             <button class="music-play" data-music aria-label="Play or pause">
-                <i class="fa-solid ${Music.playing ? "fa-pause" : "fa-play"}"></i>
+                ${ic(Music.playing ? "pause" : "play")}
             </button>
         </div>
         ${Music.tracks.map((t, i) => `
             <div class="music-track${i === Music.cur ? " active" : ""}" data-track="${i}">
-                <i class="fa-solid ${i === Music.cur && Music.playing ? "fa-volume-high" : "fa-music"}"></i>
+                ${ic(i === Music.cur && Music.playing ? "speaker" : "music")}
                 <div><div class="music-track-name">${t.name}</div>
                 <div class="metro-small">${t.bpm} bpm &bull; generated live in your browser</div></div>
             </div>`).join("")}
@@ -727,7 +832,7 @@
     }
 
     /* ================================================================
-       CLASSIC APP: Calculator
+       APP: Calculator
        ================================================================ */
     const Calc = { d: "0", acc: null, op: null, fresh: true };
     const calcReset = () => { Calc.d = "0"; Calc.acc = null; Calc.op = null; Calc.fresh = true; };
@@ -777,7 +882,7 @@
     }
 
     /* ================================================================
-       CLASSIC APP: Calendar
+       APP: Calendar
        ================================================================ */
     let calY = new Date().getFullYear(), calM = new Date().getMonth();
 
@@ -800,9 +905,9 @@
         }
         return `
         <div class="cal-head">
-            <button class="cal-nav" data-cal="prev" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="cal-nav" data-cal="prev" aria-label="Previous month">${ic("chevron-left")}</button>
             <span class="cal-title">${MONTHS[calM]} ${calY}</span>
-            <button class="cal-nav" data-cal="next" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="cal-nav" data-cal="next" aria-label="Next month">${ic("chevron-right")}</button>
         </div>
         <div class="cal-grid">
             ${["S", "M", "T", "W", "T", "F", "S"].map((d) => `<div class="cal-dow">${d}</div>`).join("")}
@@ -812,9 +917,9 @@
     }
 
     /* ================================================================
-       CLASSIC APP: Notes (saved on this device)
+       APP: Notes (saved on this device)
        ================================================================ */
-    let noteEditing = null; // null = list view, -1 = new, n = editing note n
+    let noteEditing = null;
 
     function loadNotes() {
         try { return JSON.parse(localStorage.getItem("okkoki_notes")) || []; }
@@ -853,13 +958,13 @@
             return `
             <textarea id="noteText" class="note-editor" placeholder="Write a note…">${n ? esc(n.text) : ""}</textarea>
             <div>
-                <button class="metro-btn primary" data-note="save"><i class="fa-solid fa-check"></i> Save</button>
-                ${n ? `<button class="metro-btn" data-note="del"><i class="fa-solid fa-trash"></i> Delete</button>` : ""}
-                <button class="metro-btn" data-note="back"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="metro-btn primary" data-note="save">${ic("check")} Save</button>
+                ${n ? `<button class="metro-btn" data-note="del">${ic("delete")} Delete</button>` : ""}
+                <button class="metro-btn" data-note="back">${ic("arrow-left")} Back</button>
             </div>`;
         }
         return `
-        <button class="metro-btn primary" data-note="new"><i class="fa-solid fa-plus"></i> New note</button>
+        <button class="metro-btn primary" data-note="new">${ic("add")} New note</button>
         ${notes.length ? notes.map((n, i) => `
             <div class="note-card" data-note="open" data-i="${i}">
                 <div class="note-text">${esc(n.text).slice(0, 120)}${n.text.length > 120 ? "…" : ""}</div>
@@ -869,23 +974,23 @@
     }
 
     /* ================================================================
-       CLASSIC APP: Weather (Open-Meteo, no API key)
+       APP: Weather (Open-Meteo, no API key)
        ================================================================ */
     const WMO = [
-        [[0], "fa-sun", "Clear"], [[1, 2], "fa-cloud-sun", "Partly cloudy"],
-        [[3], "fa-cloud", "Overcast"], [[45, 48], "fa-smog", "Fog"],
-        [[51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82], "fa-cloud-rain", "Rain"],
-        [[71, 73, 75, 77, 85, 86], "fa-snowflake", "Snow"],
-        [[95, 96, 99], "fa-cloud-bolt", "Storm"],
+        [[0], "sun", "Clear"], [[1, 2], "weather", "Partly cloudy"],
+        [[3], "cloud", "Overcast"], [[45, 48], "fog", "Fog"],
+        [[51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82], "rain", "Rain"],
+        [[71, 73, 75, 77, 85, 86], "snow", "Snow"],
+        [[95, 96, 99], "storm", "Storm"],
     ];
-    const wmoIcon = (c) => (WMO.find(([codes]) => codes.includes(c)) || [null, "fa-cloud", "Cloudy"]);
+    const wmoIcon = (c) => (WMO.find(([codes]) => codes.includes(c)) || [null, "cloud", "Cloudy"]);
 
     function weatherFail(msg) {
         const el = $("#weatherApp");
         if (el) el.innerHTML = `
-            <div class="social-hero"><i class="fa-solid fa-cloud-sun"></i></div>
+            <div class="social-hero">${ic("weather")}</div>
             ${p(msg)}
-            <button class="metro-btn primary" data-weather><i class="fa-solid fa-rotate-right"></i> Try again</button>`;
+            <button class="metro-btn primary" data-weather>${ic("retry")} Try again</button>`;
     }
 
     function loadWeather() {
@@ -893,8 +998,6 @@
         if (!el) return;
         el.innerHTML = p("Getting your weather…");
         if (!navigator.geolocation) return weatherFail("Your browser doesn't support location — can't fetch local weather.");
-        // Some browsers leave the permission prompt unresolved forever —
-        // guard with our own timer so the page never hangs on "Getting…".
         let settled = false;
         const guard = setTimeout(() => {
             if (!settled) { settled = true; weatherFail("Couldn't get your location — allow location access and try again."); }
@@ -912,17 +1015,17 @@
                 const cw = d.current_weather;
                 const [, icon, label] = wmoIcon(cw.weathercode);
                 const days = d.daily.time.slice(0, 5).map((t, i) => {
-                    const [, ic] = wmoIcon(d.daily.weathercode[i]);
+                    const [, dic] = wmoIcon(d.daily.weathercode[i]);
                     return `<div class="weather-day">
                         <div class="metro-small">${DAYS[new Date(t + "T00:00").getDay()].slice(0, 3)}</div>
-                        <i class="fa-solid ${ic}"></i>
+                        ${ic(dic)}
                         <div class="weather-range">${Math.round(d.daily.temperature_2m_max[i])}° <span>${Math.round(d.daily.temperature_2m_min[i])}°</span></div>
                     </div>`;
                 }).join("");
                 const wEl = $("#weatherApp");
                 if (wEl) wEl.innerHTML = `
                     <div class="weather-now">
-                        <i class="fa-solid ${icon}"></i>
+                        ${ic(icon)}
                         <div><div class="weather-temp">${Math.round(cw.temperature)}°</div>
                         <div class="metro-small">${label} &bull; wind ${Math.round(cw.windspeed)} km/h</div></div>
                     </div>
@@ -940,27 +1043,163 @@
     }
 
     /* ================================================================
-       Settings app body
+       APP: Camera + Photos (stored in the browser)
+       ================================================================ */
+    const PHOTOS_KEY = "okkoki_photos";
+    const PHOTOS_MAX = 24;
+    let camStream = null;
+    let camFacing = "user";
+    let photoView = null;
+
+    function loadPhotos() {
+        try { return JSON.parse(localStorage.getItem(PHOTOS_KEY)) || []; }
+        catch { return []; }
+    }
+
+    function savePhotos(photos) {
+        while (true) {
+            try {
+                localStorage.setItem(PHOTOS_KEY, JSON.stringify(photos));
+                return true;
+            } catch {
+                if (!photos.length) return false;
+                photos.pop(); // storage full -> drop the oldest and retry
+            }
+        }
+    }
+
+    function camMsg(html) {
+        const el = $("#camMsg");
+        if (el) el.innerHTML = html;
+    }
+
+    async function startCamera() {
+        stopCamera();
+        const v = $("#camVideo");
+        if (!v) return;
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            return camMsg(p("This browser doesn't support the camera."));
+        }
+        try {
+            camStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: camFacing, width: { ideal: 1280 } }, audio: false,
+            });
+            v.srcObject = camStream;
+            v.classList.toggle("mirror", camFacing === "user");
+            await v.play();
+            camMsg(small("Photos are saved only in this browser — clear site data and they're gone."));
+        } catch {
+            camMsg(p("Couldn't access the camera — allow camera access and try again.") +
+                   `<button class="metro-btn primary" data-cam="retry">${ic("retry")} Try again</button>`);
+        }
+    }
+
+    function stopCamera() {
+        if (camStream) {
+            camStream.getTracks().forEach((t) => t.stop());
+            camStream = null;
+        }
+    }
+
+    function cameraAction(action) {
+        if (action === "switch") {
+            camFacing = camFacing === "user" ? "environment" : "user";
+            startCamera();
+        }
+        if (action === "retry") startCamera();
+        if (action === "shot") {
+            const v = $("#camVideo");
+            if (!v || !camStream || !v.videoWidth) return;
+            const scale = Math.min(1, 1080 / Math.max(v.videoWidth, v.videoHeight));
+            const c = document.createElement("canvas");
+            c.width = Math.round(v.videoWidth * scale);
+            c.height = Math.round(v.videoHeight * scale);
+            c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+            const photos = loadPhotos();
+            photos.unshift({ src: c.toDataURL("image/jpeg", 0.72), at: Date.now() });
+            while (photos.length > PHOTOS_MAX) photos.pop();
+            const ok = savePhotos(photos);
+            photosDirty = true;
+            const flash = $("#camFlash");
+            if (flash) { flash.classList.remove("on"); void flash.offsetWidth; flash.classList.add("on"); }
+            camMsg(ok ? small(`Saved — ${loadPhotos().length} photo${loadPhotos().length === 1 ? "" : "s"} in Photos.`)
+                      : p("Storage is full — couldn't save the photo."));
+        }
+    }
+
+    function photosBody() {
+        const photos = loadPhotos();
+        if (photoView != null && photos[photoView]) {
+            const ph = photos[photoView];
+            return `
+            <div class="photo-view"><img src="${ph.src}" alt="Photo"></div>
+            <div class="metro-small" style="margin-bottom:12px">${new Date(ph.at).toLocaleString()}</div>
+            <div>
+                <button class="metro-btn" data-pv="del">${ic("delete")} Delete</button>
+                <button class="metro-btn" data-pv="back">${ic("arrow-left")} All photos</button>
+            </div>`;
+        }
+        photoView = null;
+        if (!photos.length) {
+            return `${p("No photos yet — everything you shoot stays in this browser only.")}` +
+                   openBtn("camera", "camera", "Open camera", true);
+        }
+        return `<div class="photo-grid">
+            ${photos.map((ph, i) => `<div class="photo-cell" data-photo="${i}" style="background-image:url(${ph.src})"></div>`).join("")}
+        </div>
+        ${small(`${photos.length} photo${photos.length === 1 ? "" : "s"} — saved in this browser only.`)}`;
+    }
+
+    function photoViewerAction(action) {
+        if (action === "del" && photoView != null) {
+            const photos = loadPhotos();
+            photos.splice(photoView, 1);
+            savePhotos(photos);
+            photosDirty = true;
+            photoView = null;
+        }
+        if (action === "back") photoView = null;
+        rerender("photosApp", photosBody);
+    }
+
+    /* ================================================================
+       APP: Settings — organized WP-style
        ================================================================ */
     function settingsBody() {
-        const acc = getAccent(), solid = tilesSolid(), lock = lockEnabled();
+        const acc = getAccent(), style = tileStyle(), lock = lockEnabled();
+        const seg = (attr, val, icon, label, active) =>
+            `<button class="metro-btn${active ? " primary" : ""}" data-${attr}="${val}">${ic(icon)} ${label}</button>`;
         return `
-        ${big("Make it yours.")}
-        <div class="settings-label">Accent color</div>
-        <div class="swatch-grid">
-            ${WP_COLORS.map(([n, h]) => `<button class="swatch${h === acc ? " active" : ""}" data-accent="${h}" style="background:${h}" title="${n}" aria-label="${n}"></button>`).join("")}
+        <div class="settings-group">
+            <div class="settings-label">Start + theme</div>
+            ${small("Tile style")}
+            <div>
+                ${seg("set-tiles", "glass", "sparkle", "Glass", style === "glass")}
+                ${seg("set-tiles", "transparent", "image", "Classic", style === "transparent")}
+                ${seg("set-tiles", "solid", "square", "Solid", style === "solid")}
+            </div>
+            ${small("Accent color")}
+            <div class="swatch-grid">
+                ${WP_COLORS.map(([n, h]) => `<button class="swatch${h === acc ? " active" : ""}" data-accent="${h}" style="background:${h}" title="${n}" aria-label="${n}"></button>`).join("")}
+            </div>
         </div>
-        <div class="settings-label">Tile style</div>
-        <div>
-            <button class="metro-btn${!solid ? " primary" : ""}" data-tiles="transparent"><i class="fa-solid fa-image"></i> Transparent</button>
-            <button class="metro-btn${solid ? " primary" : ""}" data-tiles="solid"><i class="fa-solid fa-square"></i> Solid</button>
+        <div class="settings-group">
+            <div class="settings-label">Lock screen</div>
+            <div>
+                ${seg("lock", "on", "lock", "On", lock)}
+                ${seg("lock", "off", "unlock", "Off", !lock)}
+            </div>
         </div>
-        <div class="settings-label">Lock screen</div>
-        <div>
-            <button class="metro-btn${lock ? " primary" : ""}" data-lock="on"><i class="fa-solid fa-lock"></i> On</button>
-            <button class="metro-btn${!lock ? " primary" : ""}" data-lock="off"><i class="fa-solid fa-lock-open"></i> Off</button>
+        <div class="settings-group">
+            <div class="settings-label">Storage</div>
+            ${p(`${loadPhotos().length} photos &bull; ${loadNotes().length} notes &bull; layout ${localStorage.getItem(LAYOUT_KEY) ? "customized" : "default"} — all saved in this browser only.`)}
+            <button class="metro-btn" data-reset>${ic("delete")} Reset everything</button>
         </div>
-        ${small("Choices are saved on this device.")}`;
+        <div class="settings-group">
+            <div class="settings-label">About</div>
+            ${p("OKKOKI OS 4.0 — Windows Phone, reimagined for 2026.")}
+            ${small("Icons: Fluent UI System Icons (Microsoft, MIT) &amp; Simple Icons. Weather: Open-Meteo.")}
+        </div>`;
     }
 
     /* ================================================================
@@ -981,7 +1220,7 @@
                 <button class="letter-header">${l}</button>
                 ${groups.get(l).map((a) =>
                     `<div class="app-item" data-app="${a.id}">
-                        <div class="app-icon"><i class="${a.icon}"></i></div>
+                        <div class="app-icon">${ic(a.icon)}</div>
                         <div class="app-name">${a.name}</div>
                     </div>`).join("")}
             </div>`).join("");
@@ -1071,6 +1310,15 @@
             suppressClick = true;
             releaseTilt();
             enterEditMode(tile);
+            // Keep holding -> drag to reorder (the WP gesture)
+            const r = tile.getBoundingClientRect();
+            drag = {
+                tile, active: false,
+                sx: pressX, sy: pressY,
+                ox: pressX - r.left, oy: pressY - r.top,
+                w: r.width, h: r.height,
+                ghost: null, lastTarget: null, lastAfter: null,
+            };
         }, 650);
     });
 
@@ -1085,7 +1333,7 @@
     );
 
     /* ================================================================
-       Edit mode: unpin / resize (small -> medium -> wide -> large)
+       Edit mode: unpin / resize / drag-to-reorder
        ================================================================ */
     const overlay = document.createElement("div");
     overlay.className = "selection-overlay";
@@ -1103,12 +1351,12 @@
 
         const unpin = document.createElement("div");
         unpin.className = "tile-action-btn unpin-btn";
-        unpin.innerHTML = '<i class="fa-solid fa-thumbtack fa-rotate-90"></i>';
+        unpin.innerHTML = ic("pin");
         unpin.addEventListener("click", (e) => { e.stopPropagation(); unpinTile(tile); });
 
         const resize = document.createElement("div");
         resize.className = "tile-action-btn resize-btn";
-        resize.innerHTML = '<i class="fa-solid fa-expand"></i>';
+        resize.innerHTML = ic("resize");
         resize.addEventListener("click", (e) => { e.stopPropagation(); resizeTile(tile); });
 
         tile.append(unpin, resize);
@@ -1136,6 +1384,7 @@
             tile.remove();
             if (parent.classList.contains("tile-group") && !parent.children.length) parent.remove();
             exitEditMode();
+            saveLayout();
             requestWallpaper();
         }, 300);
     }
@@ -1153,9 +1402,6 @@
             group.after(tile);
             if (!group.children.length) group.remove();
         } else if (next === "small" && !group) {
-            // Join a small-group with space; otherwise start a new one at the
-            // end of the grid so no hole is left where the tile used to be
-            // (dense flow backfills the vacated 2x2 area).
             let g = $$(".tile-group", tileGrid).find((el) => el.children.length < 4);
             if (!g) {
                 g = document.createElement("div");
@@ -1164,8 +1410,146 @@
             }
             g.appendChild(tile);
         }
+        saveLayout();
         requestWallpaper();
     }
+
+    /* ---- Drag-to-reorder (drag the selected tile in edit mode) ---- */
+    let drag = null;
+
+    tileGrid.addEventListener("pointerdown", (e) => {
+        if (!editMode || busy) return;
+        const tile = e.target.closest(".tile");
+        if (!tile || tile !== selectedTile || e.target.closest(".tile-action-btn")) return;
+        const r = tile.getBoundingClientRect();
+        drag = {
+            tile, active: false,
+            sx: e.clientX, sy: e.clientY,
+            ox: e.clientX - r.left, oy: e.clientY - r.top,
+            w: r.width, h: r.height,
+            ghost: null, lastTarget: null, lastAfter: null,
+        };
+    });
+
+    function startDrag() {
+        drag.active = true;
+        suppressClick = true;
+        const g = drag.tile.cloneNode(true);
+        $$(".tile-action-btn", g).forEach((b) => b.remove());
+        g.classList.remove("selected", "floating");
+        g.classList.add("drag-ghost");
+        g.style.width = drag.w + "px";
+        g.style.height = drag.h + "px";
+        document.body.appendChild(g);
+        drag.ghost = g;
+        drag.tile.classList.add("drag-src");
+        overlay.style.pointerEvents = "none";
+    }
+
+    function gridChildOf(el) {
+        while (el && el.parentElement !== tileGrid) el = el.parentElement;
+        return el;
+    }
+
+    function moveDrag(e) {
+        drag.ghost.style.left = (e.clientX - drag.ox) + "px";
+        drag.ghost.style.top = (e.clientY - drag.oy) + "px";
+
+        // Auto-scroll near the vertical edges
+        const vp = viewport.getBoundingClientRect();
+        if (e.clientY < vp.top + 70) startScreen.scrollTop -= 14;
+        else if (e.clientY > vp.bottom - 70) startScreen.scrollTop += 14;
+
+        const under = document.elementFromPoint(e.clientX, e.clientY);
+        if (!under) return;
+        const isSmall = drag.tile.classList.contains("small");
+        const targetTile = under.closest(".tile");
+        const targetGroup = under.closest(".tile-group");
+
+        if (isSmall) {
+            // Small tiles: reorder within/between groups, or drop at grid level
+            if (targetTile && targetTile !== drag.tile && targetTile.classList.contains("small")) {
+                const grp = targetTile.parentElement;
+                if (grp === drag.tile.parentElement || grp.children.length < 4) {
+                    const r = targetTile.getBoundingClientRect();
+                    const after = e.clientX > r.left + r.width / 2;
+                    placeTile(targetTile, after, grp);
+                }
+                return;
+            }
+            if (targetGroup && targetGroup !== drag.tile.parentElement && targetGroup.children.length < 4) {
+                if (drag.lastTarget !== targetGroup) {
+                    const src = drag.tile.parentElement;
+                    targetGroup.appendChild(drag.tile);
+                    cleanupGroup(src);
+                    drag.lastTarget = targetGroup; drag.lastAfter = null;
+                }
+                return;
+            }
+            const child = gridChildOf(targetTile || targetGroup || under.closest("#tileGrid > *"));
+            if (child && child !== drag.tile.parentElement && !child.contains(drag.tile)) {
+                const r = child.getBoundingClientRect();
+                const after = e.clientY > r.top + r.height / 2 || (e.clientX > r.left + r.width / 2 && e.clientY > r.top);
+                if (drag.lastTarget !== child || drag.lastAfter !== after) {
+                    const src = drag.tile.parentElement;
+                    const g = document.createElement("div");
+                    g.className = "tile-group";
+                    child[after ? "after" : "before"](g);
+                    g.appendChild(drag.tile);
+                    cleanupGroup(src);
+                    drag.lastTarget = child; drag.lastAfter = after;
+                }
+            }
+            return;
+        }
+
+        // Medium+ tiles reorder at grid-child level (groups move as units)
+        const child = gridChildOf(targetTile || targetGroup);
+        if (!child || child === drag.tile) return;
+        const r = child.getBoundingClientRect();
+        const after = e.clientX > r.left + r.width / 2 || e.clientY > r.top + r.height / 2;
+        if (drag.lastTarget === child && drag.lastAfter === after) return;
+        child[after ? "after" : "before"](drag.tile);
+        drag.lastTarget = child; drag.lastAfter = after;
+    }
+
+    function cleanupGroup(el) {
+        if (el && el.classList && el.classList.contains("tile-group") && !el.children.length) el.remove();
+    }
+
+    function placeTile(refTile, after, grp) {
+        if (drag.lastTarget === refTile && drag.lastAfter === after) return;
+        const src = drag.tile.parentElement;
+        refTile[after ? "after" : "before"](drag.tile);
+        if (src !== grp) cleanupGroup(src);
+        drag.lastTarget = refTile; drag.lastAfter = after;
+    }
+
+    function endDrag() {
+        if (drag.active) {
+            drag.ghost.remove();
+            drag.tile.classList.remove("drag-src");
+            overlay.style.pointerEvents = "";
+            saveLayout();
+            layoutGrid();
+            requestWallpaper();
+        }
+        drag = null;
+    }
+
+    document.addEventListener("pointermove", (e) => {
+        if (!drag) return;
+        if (!drag.active) {
+            if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 8) return;
+            startDrag();
+        }
+        e.preventDefault();
+        moveDrag(e);
+    });
+
+    ["pointerup", "pointercancel"].forEach((ev) =>
+        document.addEventListener(ev, () => { if (drag) endDrag(); })
+    );
 
     /* ================================================================
        Nav bar + all-apps arrow + swipe + keyboard
@@ -1177,7 +1561,6 @@
 
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") { goBack(); return; }
-        // Calculator keyboard input
         if (activeApp === "calculator" && current === "app") {
             const map = { "+": "+", "-": "−", "*": "×", "/": "÷", Enter: "=", "=": "=", ".": ".", "%": "%", Backspace: "C" };
             if (/^[0-9]$/.test(e.key)) calcKey(e.key);
@@ -1241,15 +1624,16 @@
     }
 
     function bootStart() {
-        turnstile(gridEls(), "in", 35).then(requestWallpaper);
+        turnstile(gridEls(), "in", 32).then(requestWallpaper);
     }
 
     /* ================================================================
        Boot
        ================================================================ */
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     applySettings();
     renderStart();
-    layoutGrid();
+    startScreen.scrollTop = 0;
     renderAppList();
     syncWallpaper();
     initLockScreen();
