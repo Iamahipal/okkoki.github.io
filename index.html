@@ -10,6 +10,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- WP lock screen: swipe/click up to unlock (once per session) -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-content">
+            <div class="lock-time" id="lockTime">12:00</div>
+            <div class="lock-date" id="lockDate">Monday, January 1</div>
+            <div class="lock-hint"><i class="fa-solid fa-chevron-up"></i> swipe up to unlock</div>
+        </div>
+    </div>
+
     <div class="shell">
         <main class="viewport" id="viewport">
             <!-- START SCREEN — tiles are generated from the app registry in script.js -->
