@@ -194,6 +194,11 @@
         { app: "email",    size: "small", variant: "transparent" },
         { app: "phone",    size: "small", variant: "transparent" },
         { app: "8bit",     size: "small", variant: "transparent" },
+        { app: "demo", size: "medium", variant: "accent",
+          live: { template: "peek" }, faces: [
+            face("fa-solid fa-cube"),
+            line("your future apps live here", "one folder, one registry line"),
+        ]},
     ];
 
     /* ---------------- DOM refs ---------------- */
@@ -477,6 +482,8 @@
     }
 
     function goBack() {
+        if (editMode) { exitEditMode(); return; }
+        if (jumpGrid.classList.contains("active")) { jumpGrid.classList.remove("active"); return; }
         if (current === "app") closeApp();
         else if (current === "list") goStart();
     }
@@ -702,11 +709,14 @@
             group.after(tile);
             if (!group.children.length) group.remove();
         } else if (next === "small" && !group) {
+            // Join a small-group with space; otherwise start a new one at the
+            // end of the grid so no hole is left where the tile used to be
+            // (dense flow backfills the vacated 2x2 area).
             let g = $$(".tile-group", tileGrid).find((el) => el.children.length < 4);
             if (!g) {
                 g = document.createElement("div");
                 g.className = "tile-group";
-                tile.before(g);
+                tileGrid.appendChild(g);
             }
             g.appendChild(tile);
         }
@@ -720,6 +730,10 @@
     $("#navStart").addEventListener("click", () => { exitEditMode(); goStart(); });
     $("#navSearch").addEventListener("click", () => { exitEditMode(); goList(true); });
     $("#allAppsBtn").addEventListener("click", () => goList());
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") goBack();
+    });
 
     let touchStartX = 0, touchStartY = 0;
     viewport.addEventListener("touchstart", (e) => {

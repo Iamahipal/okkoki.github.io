@@ -24,7 +24,7 @@ html, body {
     padding: 0;
     height: 100%;
     background: var(--surface);
-    font-family: 'Segoe UI', 'Segoe WP', 'Open Sans', 'Roboto', sans-serif;
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
     color: #fff;
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
@@ -153,12 +153,14 @@ html, body {
 .tile-label {
     position: absolute;
     z-index: 3;
-    bottom: 6px;
-    left: 9px;
+    bottom: 7px;
+    left: 10px;
     color: #fff;
-    font-size: 13px;
-    font-weight: 400;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
     text-transform: capitalize;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
     pointer-events: none;
 }
 
@@ -176,9 +178,10 @@ html, body {
 /* Face text used by live faces */
 .face-line {
     font-size: 16px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.35;
     margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .tile.small .face-line { font-size: 10px; }
@@ -211,11 +214,14 @@ html, body {
 }
 
 .tagline {
-    font-family: 'Press Start 2P', cursive;
-    font-size: clamp(8px, 1.6vw, 12px);
-    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(10px, 2vw, 14px);
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
     margin: 0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 /* ---------------- Transparent tiles (WP 8.1) ----------------
@@ -510,7 +516,7 @@ html, body {
 
 .page-title {
     font-size: clamp(40px, 8vw, 54px);
-    font-weight: 200;
+    font-weight: 300;
     letter-spacing: -1px;
     text-transform: lowercase;
     margin: 0 0 22px;
@@ -529,7 +535,7 @@ html, body {
 
 .metro-big {
     font-size: 26px;
-    font-weight: 200;
+    font-weight: 300;
     line-height: 1.35;
     color: #fff;
     margin: 0 0 14px;
@@ -626,7 +632,7 @@ html, body {
 
 .big-date {
     font-size: 92px;
-    font-weight: 200;
+    font-weight: 300;
     line-height: 1;
     margin: 0;
 }
@@ -707,27 +713,46 @@ html, body {
 
 .tile-action-btn {
     position: absolute;
-    width: 26px;
-    height: 26px;
-    background: #fff;
-    color: #000;
-    border-radius: 50%;   /* authentic WP edit buttons are round */
+    width: 34px;
+    height: 34px;
+    background: rgba(0, 0, 0, 0.62);
+    border: 2px solid #fff;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 12px;
     cursor: pointer;
     z-index: 45;
-    animation: btnFadeIn 0.2s ease-out backwards;
+    animation: btnFadeIn 0.18s ease-out backwards;
+    -webkit-tap-highlight-color: transparent;
 }
+
+.tile-action-btn i {
+    font-size: 13px !important;
+    color: #fff;
+    position: static;
+}
+
+.tile-action-btn:active {
+    background: #fff;
+    transform: scale(0.9);
+}
+
+.tile-action-btn:active i { color: #000; }
 
 @keyframes btnFadeIn {
     from { opacity: 0; transform: scale(0.6); }
     to   { opacity: 1; transform: scale(1); }
 }
 
-.unpin-btn  { top: -10px; right: -10px; }
-.resize-btn { bottom: -10px; right: -10px; }
+.unpin-btn  { top: 7px; right: 7px; }
+.resize-btn { bottom: 7px; right: 7px; }
+
+/* On 1x1 tiles two 34px buttons don't fit stacked — shrink them */
+.tile.small .tile-action-btn { width: 28px; height: 28px; }
+.tile.small .tile-action-btn i { font-size: 11px !important; }
+.tile.small .unpin-btn  { top: 4px; right: 4px; }
+.tile.small .resize-btn { bottom: 4px; right: 4px; }
 
 @keyframes removeTile {
     to { opacity: 0; transform: scale(0.7); }
