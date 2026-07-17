@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo App</title>
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: 'Segoe UI', 'Open Sans', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 24px;
+        box-sizing: border-box;
+    }
+    .box {
+        width: 96px;
+        height: 96px;
+        background: #0057b7;
+        margin-bottom: 24px;
+        animation: spin 4s linear infinite;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+    h1 { font-weight: 200; font-size: 34px; margin: 0 0 10px; text-transform: lowercase; }
+    p  { font-weight: 300; color: #bbb; max-width: 420px; line-height: 1.5; }
+    button {
+        margin-top: 18px;
+        background: none;
+        border: 2px solid #fff;
+        color: #fff;
+        font-family: inherit;
+        font-size: 15px;
+        padding: 9px 20px;
+        cursor: pointer;
+    }
+    button:active { background: #fff; color: #000; }
+</style>
+</head>
+<body>
+    <div class="box"></div>
+    <h1>demo app</h1>
+    <p>This is a self-contained app embedded from <code>apps/demo/</code>.
+       Future tools and experiments plug into the start screen exactly like this —
+       one folder, one registry line.</p>
+    <button id="tryBtn">try me</button>
+    <script>
+        let n = 0;
+        document.getElementById('tryBtn').onclick = function () {
+            this.textContent = 'clicked ' + (++n) + 'x';
+        };
+    </script>
+</body>
+</html>
