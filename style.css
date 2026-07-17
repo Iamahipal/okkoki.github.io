@@ -1,15 +1,19 @@
 /* ================================================================
-   OKKOKI — Windows Phone Metro UI
-   Flat black surface, solid accent tiles, turnstile animations.
+   OKKOKI — Windows Phone experience on the web
+   Full-viewport, no phone container. Authentic WP unit-grid tiles
+   (small 1x1 / medium 2x2 / wide 4x2 / large 4x4), transparent
+   tiles over a shared wallpaper, turnstile animations.
    ================================================================ */
 
 :root {
-    --accent: #0057b7;          /* OKKOKI brand blue */
+    --accent: #0057b7;           /* OKKOKI brand blue */
     --accent-lite: #1a7fe0;
     --surface: #000;
     --nav: #0a0a0a;
     --text-dim: #9a9a9a;
-    --tile-gap: 7px;
+    --gap: 6px;
+    --unit: 88px;                /* recomputed by layoutGrid() in JS */
+    --cols: 4;
     --ease-wp: cubic-bezier(0.17, 0.67, 0.3, 1);
 }
 
@@ -19,62 +23,24 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    background: #000;
+    background: var(--surface);
     font-family: 'Segoe UI', 'Segoe WP', 'Open Sans', 'Roboto', sans-serif;
     color: #fff;
     -webkit-font-smoothing: antialiased;
-}
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
 }
 
-/* ---------------- Phone shell ---------------- */
-.phone {
+/* ---------------- Full-viewport shell (no container chrome) ---------------- */
+.shell {
     width: 100%;
-    max-width: 480px;
     height: 100vh;
     height: 100dvh;
     display: flex;
     flex-direction: column;
     background: var(--surface);
-    position: relative;
-    overflow: hidden;
     touch-action: manipulation;
 }
 
-/* Desktop: present a device frame */
-@media (min-width: 640px) {
-    body { background: #141414; }
-    .phone {
-        height: min(92vh, 900px);
-        border: 12px solid #1c1c1c;
-        border-radius: 34px;
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), inset 0 0 0 2px #000;
-    }
-}
-
-/* ---------------- Status bar ---------------- */
-.status-bar {
-    flex: none;
-    height: 26px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 9px;
-    padding: 0 12px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    user-select: none;
-}
-
-.status-bar i { font-size: 10px; }
-
-/* ---------------- Viewport & screens ---------------- */
 .viewport {
     flex: 1;
     position: relative;
@@ -120,23 +86,22 @@ body {
 }
 
 /* ================================================================
-   START SCREEN — tile grid
+   START SCREEN — WP unit grid
+   small = 1x1 · medium = 2x2 · wide = 4x2 · large = 4x4
    ================================================================ */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: auto;
-    gap: var(--tile-gap);
-    padding: 8px 8px 0;
-    width: 100%;
+    grid-template-columns: repeat(var(--cols), var(--unit));
+    grid-auto-rows: var(--unit);
+    grid-auto-flow: dense;
+    gap: var(--gap);
+    justify-content: center;
+    padding: 10px 8px 0;
 }
 
 .tile {
-    background-color: var(--accent);
     position: relative;
-    overflow: visible;              /* edit-mode buttons overhang */
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    background-color: var(--accent);
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
@@ -145,200 +110,177 @@ body {
     will-change: transform;
 }
 
-.tile-content {
+.tile.small  { grid-column: span 1; grid-row: span 1; }
+.tile.medium { grid-column: span 2; grid-row: span 2; }
+.tile.wide   { grid-column: span 4; grid-row: span 2; }
+.tile.large  { grid-column: span 4; grid-row: span 4; }
+
+/* A 2x2 pack of small tiles occupies exactly one medium footprint */
+.tile-group {
+    grid-column: span 2;
+    grid-row: span 2;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: var(--gap);
+}
+
+.tile-group .tile.small { grid-column: auto; grid-row: auto; }
+
+/* Body holds the live-tile slots (or a single static face) */
+.tile-body {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.live-slot, .face-static {
     position: absolute;
     inset: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    padding: 8px 10px;
+    text-align: center;
     overflow: hidden;
 }
 
-.tile span {
+/* Accent tiles: slots carry the solid color so peek/flip stays opaque */
+.tile.accent .live-slot { background: var(--accent); }
+
+/* Label lives outside the faces so it never animates away (WP behavior) */
+.tile-label {
+    position: absolute;
+    z-index: 3;
+    bottom: 6px;
+    left: 9px;
     color: #fff;
     font-size: 13px;
     font-weight: 400;
-    position: absolute;
-    bottom: 8px;
-    left: 10px;
     text-transform: capitalize;
     pointer-events: none;
 }
 
+.tile.small .tile-label { display: none; }
+
 .tile i {
     font-size: 30px;
     color: #fff;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     pointer-events: none;
 }
 
-.tile:not(.small) .tile-content:has(span) i {
-    transform: translate(-50%, -70%);
+.tile.small i { font-size: 19px; }
+.tile.wide i, .tile.large i { font-size: 44px; }
+
+/* Face text used by live faces */
+.face-line {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.35;
+    margin: 0;
 }
 
-/* Large tile */
-.large {
-    grid-column: span 3;
-    aspect-ratio: 3 / 1;
+.tile.small .face-line { font-size: 10px; }
+
+.face-sub {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 5px 0 0;
 }
 
+.tile-badge {
+    position: absolute;
+    z-index: 3;
+    right: 9px;
+    bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Brand tile typography */
 .retro-text {
     font-family: 'Press Start 2P', cursive;
-    font-size: 30px;
+    font-size: clamp(18px, 4.5vw, 34px);
     font-weight: normal;
     color: #fff;
     letter-spacing: 2px;
     margin: 0 0 10px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
     text-transform: uppercase;
 }
 
 .tagline {
     font-family: 'Press Start 2P', cursive;
-    font-size: 11px;
+    font-size: clamp(8px, 1.6vw, 12px);
     color: #fff;
     margin: 0;
-    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* Medium tile */
-.medium {
-    grid-column: span 2;
-    aspect-ratio: 2 / 1;
+/* ---------------- Transparent tiles (WP 8.1) ----------------
+   background-size/position are set by the wallpaper sync engine
+   in script.js so the image aligns across tiles + parallaxes.  */
+.tile.transparent {
+    background-color: #101418;
+    background-image: url('windows10-background.jpg');
+    background-repeat: no-repeat;
 }
 
-/* Small tile group */
-.small-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: var(--tile-gap);
-    width: 100%;
-    aspect-ratio: 1 / 1;
-}
-
-.small { aspect-ratio: 1 / 1; }
-
-/* ---------------- Live tiles (flip) ---------------- */
-.tile.live { perspective: 700px; }
-
-.tile-flipper {
+.tile.transparent::after {
+    content: '';
     position: absolute;
     inset: 0;
+    z-index: 0;
+    background: rgba(0, 0, 0, 0.38);
+    pointer-events: none;
+}
+
+/* ---------------- Live tile templates ---------------- */
+/* flip: rotates around the horizontal axis between two slots */
+.tile.live-flip { perspective: 700px; }
+
+.tile.live-flip .tile-body {
     transform-style: preserve-3d;
-    transition: transform 0.65s cubic-bezier(0.4, 0.1, 0.2, 1);
+    transition: transform 0.7s cubic-bezier(0.4, 0.1, 0.2, 1);
 }
 
-.tile.flipped .tile-flipper { transform: rotateX(180deg); }
+.tile.live-flip .tile-body.flipped { transform: rotateX(180deg); }
 
-.tile-face {
-    position: absolute;
-    inset: 0;
+.tile.live-flip .live-slot {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    background: var(--accent);
-    overflow: hidden;
 }
 
-.tile-face.back { transform: rotateX(180deg); }
+.tile.live-flip .live-slot.slot-b { transform: rotateX(180deg); }
 
-.back-line {
-    font-size: 17px;
-    font-weight: 300;
-    margin: 0 0 6px;
-    text-align: center;
+/* peek: content slides up, next face slides in from below */
+.tile.live-peek .tile-body { overflow: hidden; }
+
+.tile.live-peek .live-slot {
+    transition: transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.back-sub {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.75);
-    margin: 0;
-    text-align: center;
-}
+.tile.live-peek .live-slot.slot-b { transform: translateY(100%); }
+.tile.live-peek .tile-body.peeked .slot-a { transform: translateY(-100%); }
+.tile.live-peek .tile-body.peeked .slot-b { transform: translateY(0); }
 
-.back-note { justify-content: flex-start; align-items: flex-start; }
-
-.back-post {
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1.35;
-    margin: 6px 2px;
-    text-align: left;
-}
-
-.mini-avatars {
-    display: flex;
-    gap: 5px;
-    margin: 8px 0;
-}
-
-.mini-avatars span {
-    position: static;
-    width: 30px;
-    height: 30px;
-    background: rgba(255, 255, 255, 0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-/* Calendar live tile front */
-.cal-front { justify-content: flex-start; align-items: flex-start; }
-
-.cal-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 2px 4px;
-}
-
-.cal-day {
-    position: static !important;
-    font-size: 62px !important;
-    font-weight: 200;
-    line-height: 1;
-    text-transform: none !important;
-}
-
-.cal-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.cal-meta span {
-    position: static;
-    font-size: 15px;
-    font-weight: 300;
-    text-transform: capitalize;
-}
-
-.cal-meta .cal-month {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.75);
-}
+.no-anim, .no-anim * { transition: none !important; }
 
 /* ---------------- "All apps" arrow ---------------- */
 .all-apps {
-    padding: 14px 8px 24px;
+    display: flex;
+    justify-content: center;
+    padding: 16px 8px 26px;
 }
 
 .all-apps-btn {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border: 2px solid #fff;
-    border-radius: 50%;
     background: none;
     color: #fff;
-    font-size: 14px;
+    font-size: 15px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -372,7 +314,6 @@ body {
     transform-origin: left center;
 }
 
-/* Tapped tile flies toward the viewer ("continuum") */
 @keyframes tileLaunch {
     to { transform: scale(1.7); opacity: 0; }
 }
@@ -382,7 +323,6 @@ body {
     z-index: 60;
 }
 
-/* Slide transitions between Start and App List */
 @keyframes slideInR  { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes slideOutR { from { transform: translateX(0); } to { transform: translateX(100%); } }
 @keyframes slideOutL { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-35%); opacity: 0; } }
@@ -399,10 +339,12 @@ body {
     top: 0;
     z-index: 20;
     background: var(--surface);
-    padding: 12px 12px 8px;
+    padding: 12px 14px 8px;
     display: flex;
     align-items: center;
     gap: 12px;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 .search-bar .search-icon {
@@ -410,7 +352,6 @@ body {
     height: 40px;
     flex: none;
     border: 2px solid #fff;
-    border-radius: 50%;
     background: none;
     color: #fff;
     font-size: 14px;
@@ -435,15 +376,24 @@ body {
 
 .search-bar input::placeholder { color: #666; }
 
-.app-list { padding: 0 12px 30px; }
+.app-list {
+    padding: 0 14px 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+    columns: 21rem;
+    column-gap: 44px;
+}
 
-.list-group { scroll-margin-top: 66px; }
+.list-group {
+    break-inside: avoid;
+    scroll-margin-top: 66px;
+}
 
 .letter-header {
     display: flex;
     align-items: flex-end;
-    width: 54px;
-    height: 54px;
+    width: 52px;
+    height: 52px;
     padding: 4px 8px;
     margin: 14px 0 8px;
     background: none;
@@ -466,6 +416,7 @@ body {
 }
 
 .app-item:active .app-name { color: var(--accent-lite); }
+.app-item:active .app-icon { transform: scale(0.92); }
 
 .app-icon {
     width: 46px;
@@ -478,6 +429,7 @@ body {
     background: var(--accent);
     color: #fff;
     font-size: 18px;
+    transition: transform 0.1s ease;
 }
 
 .app-name {
@@ -493,14 +445,19 @@ body {
     z-index: 200;
     background: rgba(0, 0, 0, 0.94);
     display: none;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 7px;
-    padding: 14px;
-    align-content: start;
     overflow-y: auto;
+    padding: 16px;
 }
 
-.jump-grid.active { display: grid; }
+.jump-grid.active { display: block; }
+
+.jump-inner {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    max-width: 440px;
+    margin: 0 auto;
+}
 
 @keyframes jumpZoom {
     from { transform: scale(0.85); opacity: 0; }
@@ -513,8 +470,8 @@ body {
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: flex-end;
-    padding: 8px 10px;
-    font-size: 26px;
+    padding: 7px 10px;
+    font-size: 24px;
     font-weight: 300;
     text-transform: lowercase;
     user-select: none;
@@ -536,7 +493,11 @@ body {
 /* ================================================================
    APP PAGES
    ================================================================ */
-.app-page { padding: 16px 20px 44px; }
+.app-page {
+    padding: 18px 20px 44px;
+    max-width: 760px;
+    margin: 0 auto;
+}
 
 .app-brand {
     font-size: 13px;
@@ -548,7 +509,7 @@ body {
 }
 
 .page-title {
-    font-size: 50px;
+    font-size: clamp(40px, 8vw, 54px);
     font-weight: 200;
     letter-spacing: -1px;
     text-transform: lowercase;
@@ -572,6 +533,12 @@ body {
     line-height: 1.35;
     color: #fff;
     margin: 0 0 14px;
+}
+
+.metro-small {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 8px 0 0;
 }
 
 .metro-item {
@@ -619,21 +586,36 @@ body {
 }
 
 .metro-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     border: 2px solid #fff;
+    background: none;
     color: #fff;
     text-decoration: none;
-    padding: 8px 20px;
+    padding: 9px 20px;
+    font-family: inherit;
     font-size: 15px;
     font-weight: 400;
-    margin-top: 6px;
+    margin: 0 10px 10px 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
 
-.metro-btn:active {
+.metro-btn:active, .metro-btn:hover {
     background: #fff;
     color: #000;
+}
+
+.metro-btn.primary {
+    border-color: var(--accent);
+    background: var(--accent);
+}
+
+.metro-btn.primary:active, .metro-btn.primary:hover {
+    background: var(--accent-lite);
+    border-color: var(--accent-lite);
+    color: #fff;
 }
 
 .social-hero {
@@ -649,16 +631,9 @@ body {
     margin: 0;
 }
 
-.big-date-sub {
-    font-size: 22px;
-    font-weight: 300;
-    color: var(--text-dim);
-    margin: 4px 0 18px;
-}
-
 .portfolio-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 8px;
 }
 
@@ -698,6 +673,16 @@ body {
 
 .retro-block .retro-text { font-size: 22px; margin: 0; }
 
+.booking-embed:empty { display: none; }
+
+.app-embed {
+    display: block;
+    width: 100%;
+    height: 70vh;
+    border: none;
+    background: #000;
+}
+
 /* ================================================================
    EDIT MODE (long-press: unpin / resize)
    ================================================================ */
@@ -726,7 +711,7 @@ body {
     height: 26px;
     background: #fff;
     color: #000;
-    border-radius: 50%;
+    border-radius: 50%;   /* authentic WP edit buttons are round */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -763,13 +748,6 @@ body {
 /* ================================================================
    MISC
    ================================================================ */
-@media (max-width: 400px) {
-    .retro-text { font-size: 22px; }
-    .tagline { font-size: 9px; }
-    .page-title { font-size: 42px; }
-    .cal-day { font-size: 48px !important; }
-}
-
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;

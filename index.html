@@ -3,201 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="OKKOKI — Fueling Small Business Growth. A Windows Phone Metro UI experience.">
-    <title>OKKOKI — Windows Phone</title>
+    <meta name="description" content="OKKOKI — Fueling Small Business Growth. Digital marketing, website building and paid media, delivered as a Windows Phone experience on the web.">
+    <title>OKKOKI — Fueling Small Business Growth</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="phone">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <i class="fa-solid fa-signal"></i>
-            <i class="fa-solid fa-wifi"></i>
-            <i class="fa-solid fa-battery-three-quarters"></i>
-            <span id="statusClock">12:00</span>
-        </div>
-
+    <div class="shell">
         <main class="viewport" id="viewport">
-            <!-- ============ START SCREEN (tiles) ============ -->
+            <!-- START SCREEN — tiles are generated from the app registry in script.js -->
             <section class="screen active" id="startScreen">
-                <div class="grid-container" id="tileGrid">
-                    <!-- Large brand tile (live) -->
-                    <div class="tile large live" data-app="mission">
-                        <div class="tile-flipper">
-                            <div class="tile-face front">
-                                <div class="tile-content">
-                                    <h1 class="retro-text">OKKOKI</h1>
-                                    <p class="tagline">Fueling Small Business Growth</p>
-                                </div>
-                            </div>
-                            <div class="tile-face back">
-                                <div class="tile-content">
-                                    <p class="back-line">web &bull; social &bull; branding</p>
-                                    <p class="back-sub">tap to see our mission</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tile" data-app="service">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-users-gear"></i>
-                            <span>Service</span>
-                        </div>
-                    </div>
-                    <div class="tile" data-app="portfolio">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-folder-open"></i>
-                            <span>Portfolio</span>
-                        </div>
-                    </div>
-                    <div class="tile live" data-app="blog">
-                        <div class="tile-flipper">
-                            <div class="tile-face front">
-                                <div class="tile-content">
-                                    <i class="fa-solid fa-blog"></i>
-                                    <span>Blog</span>
-                                </div>
-                            </div>
-                            <div class="tile-face back">
-                                <div class="tile-content back-note">
-                                    <p class="back-post">5 ways to grow your local business</p>
-                                    <span>Blog</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Calendar live tile shows real date -->
-                    <div class="tile medium live" data-app="calendar">
-                        <div class="tile-flipper">
-                            <div class="tile-face front">
-                                <div class="tile-content cal-front">
-                                    <div class="cal-wrap">
-                                        <span class="cal-day" id="calDay">1</span>
-                                        <div class="cal-meta">
-                                            <span id="calWeekday">Monday</span>
-                                            <span id="calMonth" class="cal-month">January</span>
-                                        </div>
-                                    </div>
-                                    <span>Calendar</span>
-                                </div>
-                            </div>
-                            <div class="tile-face back">
-                                <div class="tile-content back-note">
-                                    <p class="back-post">no more events today</p>
-                                    <span>Calendar</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tile live" data-app="people">
-                        <div class="tile-flipper">
-                            <div class="tile-face front">
-                                <div class="tile-content">
-                                    <i class="fa-solid fa-users"></i>
-                                    <span>People</span>
-                                </div>
-                            </div>
-                            <div class="tile-face back">
-                                <div class="tile-content back-note">
-                                    <div class="mini-avatars">
-                                        <span>AK</span><span>SR</span><span>MJ</span>
-                                    </div>
-                                    <span>People</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="small-grid">
-                        <div class="tile small" data-app="facebook">
-                            <div class="tile-content"><i class="fa-brands fa-facebook-f"></i></div>
-                        </div>
-                        <div class="tile small" data-app="instagram">
-                            <div class="tile-content"><i class="fa-brands fa-instagram"></i></div>
-                        </div>
-                        <div class="tile small" data-app="twitter">
-                            <div class="tile-content"><i class="fa-brands fa-twitter"></i></div>
-                        </div>
-                        <div class="tile small" data-app="youtube">
-                            <div class="tile-content"><i class="fa-brands fa-youtube"></i></div>
-                        </div>
-                    </div>
-                    <div class="tile" data-app="mission">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-bullseye"></i>
-                            <span>Mission</span>
-                        </div>
-                    </div>
-
-                    <div class="tile" data-app="note">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-note-sticky"></i>
-                            <span>Note</span>
-                        </div>
-                    </div>
-                    <div class="tile" data-app="recorder">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-microphone"></i>
-                            <span>Recorder</span>
-                        </div>
-                    </div>
-                    <div class="tile" data-app="camera">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-camera"></i>
-                            <span>Camera</span>
-                        </div>
-                    </div>
-
-                    <div class="small-grid">
-                        <div class="tile small" data-app="whatsapp">
-                            <div class="tile-content"><i class="fa-brands fa-whatsapp"></i></div>
-                        </div>
-                        <div class="tile small" data-app="phone">
-                            <div class="tile-content"><i class="fa-solid fa-phone"></i></div>
-                        </div>
-                        <div class="tile small" data-app="email">
-                            <div class="tile-content"><i class="fa-solid fa-envelope"></i></div>
-                        </div>
-                        <div class="tile small" data-app="maps">
-                            <div class="tile-content"><i class="fa-solid fa-location-dot"></i></div>
-                        </div>
-                    </div>
-
-                    <div class="tile live" data-app="music">
-                        <div class="tile-flipper">
-                            <div class="tile-face front">
-                                <div class="tile-content">
-                                    <i class="fa-solid fa-music"></i>
-                                    <span>Music</span>
-                                </div>
-                            </div>
-                            <div class="tile-face back">
-                                <div class="tile-content back-note">
-                                    <p class="back-post">now playing &mdash; metro beats</p>
-                                    <span>Music</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tile" data-app="screensaver">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-table-cells"></i>
-                            <span>Screensaver</span>
-                        </div>
-                    </div>
-                    <div class="tile" data-app="8bit">
-                        <div class="tile-content">
-                            <i class="fa-solid fa-heart"></i>
-                            <span>8-Bit</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- WP-style "all apps" arrow -->
+                <div class="grid-container" id="tileGrid"></div>
                 <div class="all-apps">
                     <button class="all-apps-btn" id="allAppsBtn" aria-label="All apps">
                         <i class="fa-solid fa-arrow-right"></i>
@@ -205,7 +22,7 @@
                 </div>
             </section>
 
-            <!-- ============ APP LIST SCREEN ============ -->
+            <!-- APP LIST SCREEN -->
             <section class="screen" id="appListScreen">
                 <div class="search-bar">
                     <button class="search-icon" id="searchToggle" aria-label="Search apps">
@@ -213,17 +30,19 @@
                     </button>
                     <input type="text" id="searchApps" placeholder="search apps" autocomplete="off">
                 </div>
-                <div class="app-list" id="appList"><!-- generated --></div>
+                <div class="app-list" id="appList"></div>
             </section>
 
-            <!-- ============ APP SCREEN (built per app) ============ -->
+            <!-- APP SCREEN — built per app -->
             <section class="screen" id="appScreen"></section>
 
             <!-- Alphabet jump grid overlay -->
-            <div class="jump-grid" id="jumpGrid"></div>
+            <div class="jump-grid" id="jumpGrid">
+                <div class="jump-inner" id="jumpInner"></div>
+            </div>
         </main>
 
-        <!-- Navigation Bar -->
+        <!-- Navigation bar -->
         <nav class="nav-bar">
             <button class="nav-btn" id="navBack" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
             <button class="nav-btn" id="navStart" aria-label="Start"><i class="fa-brands fa-windows"></i></button>
