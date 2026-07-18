@@ -40,7 +40,10 @@ html, body {
     flex-direction: column;
     background: var(--surface);
     touch-action: manipulation;
+    position: relative;
 }
+
+.shell > .viewport, .shell > .nav-bar { position: relative; z-index: 1; }
 
 .viewport {
     flex: 1;
@@ -1217,7 +1220,94 @@ body[data-tiles="solid"] .tile.transparent::after { background: none; }
    tile/overlay z-indexes keep working within the viewport context. */
 
 body[data-tiles="glass"] .wallpaper-layer { display: block; }
-body[data-tiles="glass"] #startScreen { background: transparent; }
+
+/* ---- Glass theme runs through the WHOLE app ---- */
+body[data-tiles="glass"] .screen { background: transparent; }
+
+/* Inner screens: frosted wallpaper behind a readable scrim */
+body[data-tiles="glass"] #appListScreen,
+body[data-tiles="glass"] #appScreen {
+    background: rgba(7, 10, 18, 0.58);
+    -webkit-backdrop-filter: blur(22px) saturate(1.2);
+    backdrop-filter: blur(22px) saturate(1.2);
+}
+
+body[data-tiles="glass"] .nav-bar {
+    background: rgba(8, 10, 16, 0.48);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Sticky search bar frosts the items passing beneath it */
+body[data-tiles="glass"] .search-bar {
+    background: rgba(9, 12, 20, 0.55);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+body[data-tiles="glass"] .search-bar input {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+body[data-tiles="glass"] .search-bar input::placeholder { color: rgba(255, 255, 255, 0.55); }
+
+/* Glass surface language for every control: translucent panes +
+   hairline rims; accent survives only for primary/active states */
+body[data-tiles="glass"] .app-icon,
+body[data-tiles="glass"] .metro-item-icon {
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+body[data-tiles="glass"] .letter-header {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #fff;
+}
+
+body[data-tiles="glass"] .jump-cell.off { background: rgba(255, 255, 255, 0.05); }
+
+body[data-tiles="glass"] .metro-btn {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+body[data-tiles="glass"] .metro-btn.primary {
+    background: var(--accent);
+    border-color: transparent;
+}
+
+body[data-tiles="glass"] .calc-btn { background: rgba(255, 255, 255, 0.09); }
+body[data-tiles="glass"] .calc-btn:active { background: rgba(255, 255, 255, 0.22); }
+body[data-tiles="glass"] .calc-btn.op { background: var(--accent); }
+
+body[data-tiles="glass"] .cal-cell { background: rgba(255, 255, 255, 0.07); }
+body[data-tiles="glass"] .cal-cell.dim { background: transparent; }
+body[data-tiles="glass"] .cal-cell.today { background: var(--accent); }
+body[data-tiles="glass"] .cal-nav { border-color: rgba(255, 255, 255, 0.4); }
+
+body[data-tiles="glass"] .note-card,
+body[data-tiles="glass"] .music-track,
+body[data-tiles="glass"] .weather-day { background: rgba(255, 255, 255, 0.08); }
+body[data-tiles="glass"] .note-card:active,
+body[data-tiles="glass"] .music-track:active { background: rgba(255, 255, 255, 0.18); }
+body[data-tiles="glass"] .music-track.active { background: var(--accent); }
+
+body[data-tiles="glass"] .note-editor {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body[data-tiles="glass"] .settings-group { border-color: rgba(255, 255, 255, 0.12); }
+body[data-tiles="glass"] .app-brand { color: rgba(255, 255, 255, 0.85); }
+body[data-tiles="glass"] .metro-p { color: rgba(255, 255, 255, 0.92); }
+body[data-tiles="glass"] .metro-item-sub,
+body[data-tiles="glass"] .metro-small,
+body[data-tiles="glass"] .blog-post-date { color: rgba(255, 255, 255, 0.62); }
 
 /* Liquid glass: a clear tinted pane; the .glass-fx child carries the
    backdrop refraction (SVG lens displacement) applied from JS. */
@@ -1488,9 +1578,71 @@ body[data-tiles="glass"] .is-scrolling .glass-fx {
 
 /* ---------------- Settings groups ---------------- */
 .settings-group {
-    margin-bottom: 26px;
-    padding-bottom: 4px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
     border-bottom: 1px solid #1c1c1c;
 }
 
+.settings-group .metro-small { margin: 16px 0 8px; }
+.settings-group .metro-small:first-of-type { margin-top: 4px; }
+.settings-group > div > .metro-btn { margin-bottom: 8px; }
+.swatch-grid, .wall-grid { margin-bottom: 4px; }
+
 .settings-group:last-child { border-bottom: none; }
+
+/* ================================================================
+   PHASE 2 — per-app alignment & rhythm pass
+   ================================================================ */
+
+/* Uniform vertical rhythm: every content block ends flush, blocks
+   are spaced by exactly one gap */
+.app-block { margin-bottom: 22px; }
+.app-block > :last-child { margin-bottom: 0; }
+.app-page header { margin-bottom: 2px; }
+.page-title { margin-bottom: 20px; }
+
+/* Button rows: wrapped buttons align on a clean flex grid */
+.app-block > div:has(> .metro-btn) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.app-block > div:has(> .metro-btn) .metro-btn { margin: 0; }
+.app-block > .metro-btn { margin: 0; }
+.metro-btn { justify-content: center; }
+
+/* Settings: segmented choices sized evenly */
+.settings-group .metro-btn { min-width: 112px; }
+
+/* Book/Contact: equal-width action buttons */
+#appScreen a.metro-btn { min-width: 128px; }
+
+/* Calculator: display right edge aligns with the keypad */
+.calc-display { max-width: 430px; }
+
+/* Music: one consistent 560px column */
+.music-hero, .music-progress, .music-controls, .music-track { max-width: 560px; }
+.music-progress { margin-bottom: 18px; }
+.music-controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+}
+
+/* Weather: match the standard column */
+.weather-days { max-width: 560px; }
+.weather-now { margin-bottom: 20px; }
+
+/* Photos grid matches portfolio gutter */
+.photo-grid { gap: 8px; }
+
+/* Blog: tighter title wrapping, even post spacing */
+.blog-post { margin-bottom: 24px; }
+.blog-post-title { line-height: 1.25; }
+
+/* Notes editor aligns with media column */
+.note-editor { max-width: 640px; }
+
+/* Metro list items: consistent sub-line rhythm */
+.metro-item-sub { line-height: 1.4; }
