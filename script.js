@@ -51,8 +51,33 @@
     const glassSupported = () =>
         (window.CSS && (CSS.supports("backdrop-filter", "blur(1px)") || CSS.supports("-webkit-backdrop-filter", "blur(1px)")));
 
+    const WALLPAPERS = [
+        { id: "aurora",   name: "Aurora",   file: "wallpapers/aurora.jpg" },
+        { id: "sunset",   name: "Sunset",   file: "wallpapers/sunset.jpg" },
+        { id: "emerald",  name: "Emerald",  file: "wallpapers/emerald.jpg" },
+        { id: "midnight", name: "Midnight", file: "wallpapers/midnight.jpg" },
+        { id: "windows",  name: "Windows",  file: "windows10-background.jpg" },
+    ];
+
     const getAccent = () => localStorage.getItem("okkoki_accent") || DEFAULT_ACCENT;
     const lockEnabled = () => localStorage.getItem("okkoki_lock") !== "off";
+
+    function currentWallpaper() {
+        const id = localStorage.getItem("okkoki_wallpaper");
+        return WALLPAPERS.find((w) => w.id === id) || WALLPAPERS[0];
+    }
+
+    function setWallpaper(id) {
+        localStorage.setItem("okkoki_wallpaper", id);
+        applyWallpaper();
+        requestWallpaper();
+    }
+
+    function applyWallpaper() {
+        const w = currentWallpaper();
+        document.documentElement.style.setProperty("--wallpaper", `url("${w.file}")`);
+        wallpaper.src = w.file; // reload for the classic per-tile sync ratio
+    }
 
     function tileStyle() {
         const s = localStorage.getItem("okkoki_tiles");
@@ -69,6 +94,7 @@
     function applySettings() {
         if (getAccent() !== DEFAULT_ACCENT) setAccent(getAccent());
         document.body.dataset.tiles = tileStyle();
+        applyWallpaper();
     }
 
     /* ---------------- Page block builders ---------------- */
@@ -400,7 +426,7 @@
             ? `<div class="tile-body"><div class="live-slot slot-a">${faces[0]}</div><div class="live-slot slot-b">${faces[1]}</div></div>`
             : `<div class="tile-body"><div class="face-static">${faces[0]}</div></div>`;
         const label = def.label === false ? "" : `<span class="tile-label">${app.name}</span>`;
-        return `<div class="${cls}" data-app="${app.id}" data-tid="${t.id}">${body}${label}</div>`;
+        return `<div class="${cls}" data-app="${app.id}" data-tid="${t.id}"><div class="glass-fx"></div>${body}${label}</div>`;
     }
 
     function renderStart(layout) {
@@ -441,19 +467,108 @@
     /* Columns/unit size so the WP math is exact at every width */
     function layoutGrid() {
         const w = viewport.clientWidth;
-        const gap = 6, pad = 16;
+        const gap = document.body.dataset.tiles === "glass" ? 8 : 6;
+        const pad = 16;
         let cols = Math.floor((w - pad + gap) / (88 + gap));
         cols -= cols % 2;
         cols = Math.max(4, Math.min(12, cols));
         const unit = Math.min((w - pad - (cols - 1) * gap) / cols, 110);
         tileGrid.style.setProperty("--cols", cols);
         tileGrid.style.setProperty("--unit", unit.toFixed(2) + "px");
+        tileGrid.style.setProperty("--gap", gap + "px");
         startScreen.style.setProperty("--grid-w", (cols * unit + (cols - 1) * gap).toFixed(2) + "px");
         const hero = $(".tile.hero", tileGrid);
         if (hero) {
             hero.classList.toggle("large", cols >= 6);
             hero.classList.toggle("wide", cols < 6);
         }
+        applyGlassFilters(unit, gap);
+    }
+
+    /* ================================================================
+       LIQUID GLASS — real refraction. For each tile size we build a
+       displacement map (a squircle lens: the backdrop bends inward at
+       the edges) and apply it via backdrop-filter: url(#...). Chromium
+       renders true refraction; other engines get a clean frosted
+       fallback. Technique: kube.io/blog/liquid-glass-css-svg.
+       ================================================================ */
+    const GLASS_RADIUS = 18;
+    const REFRACTION = !!window.chrome; // SVG backdrop displacement is Chromium-only
+    const lensCache = new Set();
+    let lensSvg = null;
+
+    function roundedRectSDF(x, y, hw, hh, r) {
+        const qx = Math.abs(x) - hw + r, qy = Math.abs(y) - hh + r;
+        return Math.min(Math.max(qx, qy), 0) + Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) - r;
+    }
+
+    const smoothstep = (a, b, t) => {
+        t = Math.min(1, Math.max(0, (t - a) / (b - a)));
+        return t * t * (3 - 2 * t);
+    };
+
+    function ensureLens(w, h) {
+        const key = `lg-${w}x${h}`;
+        if (lensCache.has(key)) return key;
+        if (!lensSvg) {
+            lensSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            lensSvg.setAttribute("style", "position:absolute;width:0;height:0");
+            lensSvg.setAttribute("aria-hidden", "true");
+            document.body.appendChild(lensSvg);
+        }
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        const ctx = c.getContext("2d");
+        const img = ctx.createImageData(w, h);
+        const d = img.data;
+        const cx = w / 2, cy = h / 2;
+        const band = Math.min(w, h) * 0.34;      // lens bezel width
+        const maxDisp = Math.min(w, h) * 0.16;   // max refraction in px
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                const ix = x - cx, iy = y - cy;
+                const sd = roundedRectSDF(ix, iy, cx, cy, GLASS_RADIUS);
+                let k = smoothstep(-band, 0, sd);
+                k = k * k; // squircle-ish falloff: flat center, strong edge
+                const len = Math.hypot(ix, iy) || 1;
+                const i = (y * w + x) * 4;
+                d[i]     = 128 - (ix / len) * k * 127;
+                d[i + 1] = 128 - (iy / len) * k * 127;
+                d[i + 2] = 128;
+                d[i + 3] = 255;
+            }
+        }
+        ctx.putImageData(img, 0, 0);
+        lensSvg.insertAdjacentHTML("beforeend",
+            `<filter id="${key}" x="0" y="0" width="${w}" height="${h}" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">` +
+            `<feImage href="${c.toDataURL()}" x="0" y="0" width="${w}" height="${h}" result="map" preserveAspectRatio="none"/>` +
+            `<feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="soft"/>` +
+            `<feDisplacementMap in="soft" in2="map" scale="${maxDisp.toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>` +
+            `</filter>`);
+        lensCache.add(key);
+        return key;
+    }
+
+    function applyGlassFilters(unit, gap) {
+        if (document.body.dataset.tiles !== "glass") return;
+        const px = (u) => Math.round(u);
+        const sizes = {
+            small:  [px(unit), px(unit)],
+            medium: [px(unit * 2 + gap), px(unit * 2 + gap)],
+            wide:   [px(unit * 4 + gap * 3), px(unit * 2 + gap)],
+            large:  [px(unit * 4 + gap * 3), px(unit * 4 + gap * 3)],
+        };
+        $$(".tile", tileGrid).forEach((t) => {
+            const fx = $(".glass-fx", t);
+            if (!fx) return;
+            const cls = ["small", "medium", "wide", "large"].find((s) => t.classList.contains(s)) || "medium";
+            const [w, h] = sizes[cls];
+            const bf = REFRACTION
+                ? `url(#${ensureLens(w, h)}) saturate(1.6) brightness(1.06)`
+                : "blur(12px) saturate(1.55) brightness(1.04)";
+            fx.style.backdropFilter = bf;
+            fx.style.webkitBackdropFilter = REFRACTION ? "blur(10px) saturate(1.55)" : bf;
+        });
     }
 
     /* ================================================================
@@ -464,13 +579,11 @@
     const wallpaper = new Image();
     let wpRatio = 16 / 9;
     wallpaper.onload = () => { wpRatio = wallpaper.naturalWidth / wallpaper.naturalHeight; requestWallpaper(); };
-    wallpaper.src = "windows10-background.jpg";
 
     function syncWallpaper() {
         const mode = document.body.dataset.tiles;
         if (mode === "glass") {
-            const drift = Math.min(startScreen.scrollTop * PARALLAX, 140);
-            wallpaperLayer.style.transform = `translateY(${(-drift).toFixed(1)}px)`;
+            wallpaperLayer.style.transform = "none"; // liquid glass wants a fixed backdrop
             return;
         }
         if (mode === "solid") return;
@@ -729,7 +842,13 @@
         if ((b = q("[data-set-tiles]"))) {
             localStorage.setItem("okkoki_tiles", b.dataset.setTiles);
             document.body.dataset.tiles = b.dataset.setTiles;
+            layoutGrid();
             requestWallpaper();
+            rerender("settingsApp", settingsBody);
+            return;
+        }
+        if ((b = q("[data-wallpaper]"))) {
+            setWallpaper(b.dataset.wallpaper);
             rerender("settingsApp", settingsBody);
             return;
         }
@@ -1178,6 +1297,10 @@
                 ${seg("set-tiles", "transparent", "image", "Classic", style === "transparent")}
                 ${seg("set-tiles", "solid", "square", "Solid", style === "solid")}
             </div>
+            ${small("Background")}
+            <div class="wall-grid">
+                ${WALLPAPERS.map((w) => `<button class="wall-thumb${w.id === currentWallpaper().id ? " active" : ""}" data-wallpaper="${w.id}" style="background-image:url(${w.file})" title="${w.name}" aria-label="${w.name}"></button>`).join("")}
+            </div>
             ${small("Accent color")}
             <div class="swatch-grid">
                 ${WP_COLORS.map(([n, h]) => `<button class="swatch${h === acc ? " active" : ""}" data-accent="${h}" style="background:${h}" title="${n}" aria-label="${n}"></button>`).join("")}
@@ -1289,7 +1412,7 @@
 
     function releaseTilt() {
         if (!tiltedTile) return;
-        tiltedTile.style.transition = "transform 0.18s ease";
+        tiltedTile.style.transition = "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
         tiltedTile.style.transform = "";
         tiltedTile = null;
     }
