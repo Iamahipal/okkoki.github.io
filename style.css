@@ -1589,3 +1589,60 @@ body[data-tiles="glass"] .is-scrolling .glass-fx {
 .swatch-grid, .wall-grid { margin-bottom: 4px; }
 
 .settings-group:last-child { border-bottom: none; }
+
+/* ================================================================
+   PHASE 2 — per-app alignment & rhythm pass
+   ================================================================ */
+
+/* Uniform vertical rhythm: every content block ends flush, blocks
+   are spaced by exactly one gap */
+.app-block { margin-bottom: 22px; }
+.app-block > :last-child { margin-bottom: 0; }
+.app-page header { margin-bottom: 2px; }
+.page-title { margin-bottom: 20px; }
+
+/* Button rows: wrapped buttons align on a clean flex grid */
+.app-block > div:has(> .metro-btn) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.app-block > div:has(> .metro-btn) .metro-btn { margin: 0; }
+.app-block > .metro-btn { margin: 0; }
+.metro-btn { justify-content: center; }
+
+/* Settings: segmented choices sized evenly */
+.settings-group .metro-btn { min-width: 112px; }
+
+/* Book/Contact: equal-width action buttons */
+#appScreen a.metro-btn { min-width: 128px; }
+
+/* Calculator: display right edge aligns with the keypad */
+.calc-display { max-width: 430px; }
+
+/* Music: one consistent 560px column */
+.music-hero, .music-progress, .music-controls, .music-track { max-width: 560px; }
+.music-progress { margin-bottom: 18px; }
+.music-controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+}
+
+/* Weather: match the standard column */
+.weather-days { max-width: 560px; }
+.weather-now { margin-bottom: 20px; }
+
+/* Photos grid matches portfolio gutter */
+.photo-grid { gap: 8px; }
+
+/* Blog: tighter title wrapping, even post spacing */
+.blog-post { margin-bottom: 24px; }
+.blog-post-title { line-height: 1.25; }
+
+/* Notes editor aligns with media column */
+.note-editor { max-width: 640px; }
+
+/* Metro list items: consistent sub-line rhythm */
+.metro-item-sub { line-height: 1.4; }
