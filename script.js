@@ -51,12 +51,15 @@
     const glassSupported = () =>
         (window.CSS && (CSS.supports("backdrop-filter", "blur(1px)") || CSS.supports("-webkit-backdrop-filter", "blur(1px)")));
 
+    /* Open-license photography (Wikimedia Commons):
+       aurora + nebula + milkyway are public domain (NASA / NASA-ESA-CSA-STScI /
+       Anthony Quintano PD), sunset is CC BY-SA 4.0 (Jakub Halun). */
     const WALLPAPERS = [
-        { id: "aurora",   name: "Aurora",   file: "wallpapers/aurora.jpg" },
-        { id: "sunset",   name: "Sunset",   file: "wallpapers/sunset.jpg" },
-        { id: "emerald",  name: "Emerald",  file: "wallpapers/emerald.jpg" },
-        { id: "midnight", name: "Midnight", file: "wallpapers/midnight.jpg" },
-        { id: "windows",  name: "Windows",  file: "windows10-background.jpg" },
+        { id: "aurora",   name: "Aurora from orbit", file: "wallpapers/aurora.jpg" },
+        { id: "nebula",   name: "Cosmic Cliffs",     file: "wallpapers/nebula.jpg" },
+        { id: "sunset",   name: "Bali sunset",       file: "wallpapers/sunset.jpg" },
+        { id: "milkyway", name: "Milky Way",         file: "wallpapers/milkyway.jpg" },
+        { id: "windows",  name: "Windows",           file: "windows10-background.jpg" },
     ];
 
     const getAccent = () => localStorage.getItem("okkoki_accent") || DEFAULT_ACCENT;
@@ -492,7 +495,7 @@
        renders true refraction; other engines get a clean frosted
        fallback. Technique: kube.io/blog/liquid-glass-css-svg.
        ================================================================ */
-    const GLASS_RADIUS = 18;
+    const GLASS_RADIUS = 2;   /* square tiles (hairline corner softening only) */
     const REFRACTION = !!window.chrome; // SVG backdrop displacement is Chromium-only
     const lensCache = new Set();
     let lensSvg = null;
@@ -516,22 +519,26 @@
             lensSvg.setAttribute("aria-hidden", "true");
             document.body.appendChild(lensSvg);
         }
+        // Half-resolution map (displacement fields are smooth, feImage
+        // upscales it) — 4x fewer pixels to generate and sample.
+        const mw = Math.max(2, w >> 1), mh = Math.max(2, h >> 1);
         const c = document.createElement("canvas");
-        c.width = w; c.height = h;
+        c.width = mw; c.height = mh;
         const ctx = c.getContext("2d");
-        const img = ctx.createImageData(w, h);
+        const img = ctx.createImageData(mw, mh);
         const d = img.data;
-        const cx = w / 2, cy = h / 2;
-        const band = Math.min(w, h) * 0.34;      // lens bezel width
+        const cx = mw / 2, cy = mh / 2;
+        const band = Math.min(mw, mh) * 0.34;    // lens bezel width
         const maxDisp = Math.min(w, h) * 0.16;   // max refraction in px
-        for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
+        const r2 = GLASS_RADIUS / 2;
+        for (let y = 0; y < mh; y++) {
+            for (let x = 0; x < mw; x++) {
                 const ix = x - cx, iy = y - cy;
-                const sd = roundedRectSDF(ix, iy, cx, cy, GLASS_RADIUS);
+                const sd = roundedRectSDF(ix, iy, cx, cy, r2);
                 let k = smoothstep(-band, 0, sd);
-                k = k * k; // squircle-ish falloff: flat center, strong edge
+                k = k * k; // flat center, strong edge
                 const len = Math.hypot(ix, iy) || 1;
-                const i = (y * w + x) * 4;
+                const i = (y * mw + x) * 4;
                 d[i]     = 128 - (ix / len) * k * 127;
                 d[i + 1] = 128 - (iy / len) * k * 127;
                 d[i + 2] = 128;
@@ -542,8 +549,7 @@
         lensSvg.insertAdjacentHTML("beforeend",
             `<filter id="${key}" x="0" y="0" width="${w}" height="${h}" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">` +
             `<feImage href="${c.toDataURL()}" x="0" y="0" width="${w}" height="${h}" result="map" preserveAspectRatio="none"/>` +
-            `<feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="soft"/>` +
-            `<feDisplacementMap in="soft" in2="map" scale="${maxDisp.toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>` +
+            `<feDisplacementMap in="SourceGraphic" in2="map" scale="${maxDisp.toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>` +
             `</filter>`);
         lensCache.add(key);
         return key;
@@ -564,10 +570,10 @@
             const cls = ["small", "medium", "wide", "large"].find((s) => t.classList.contains(s)) || "medium";
             const [w, h] = sizes[cls];
             const bf = REFRACTION
-                ? `url(#${ensureLens(w, h)}) saturate(1.6) brightness(1.06)`
-                : "blur(12px) saturate(1.55) brightness(1.04)";
+                ? `url(#${ensureLens(w, h)})`
+                : "blur(12px) saturate(1.5)";
             fx.style.backdropFilter = bf;
-            fx.style.webkitBackdropFilter = REFRACTION ? "blur(10px) saturate(1.55)" : bf;
+            fx.style.webkitBackdropFilter = REFRACTION ? "blur(10px) saturate(1.5)" : bf;
         });
     }
 
@@ -611,7 +617,15 @@
         requestAnimationFrame(() => { wpPending = false; syncWallpaper(); });
     }
 
-    startScreen.addEventListener("scroll", requestWallpaper, { passive: true });
+    let scrollIdle = null;
+    startScreen.addEventListener("scroll", () => {
+        requestWallpaper();
+        if (document.body.dataset.tiles === "glass") {
+            viewport.classList.add("is-scrolling");
+            clearTimeout(scrollIdle);
+            scrollIdle = setTimeout(() => viewport.classList.remove("is-scrolling"), 160);
+        }
+    }, { passive: true });
     window.addEventListener("resize", () => { layoutGrid(); requestWallpaper(); });
 
     /* ================================================================
@@ -720,8 +734,20 @@
         showOnly(appScreen);
         appScreen.scrollTop = 0;
         current = "app";
+        runDots();
         await turnstile(appEls(), "in", 55);
         busy = false;
+    }
+
+    /* The iconic WP loading dots, briefly, on every app launch */
+    function runDots() {
+        const dots = $("#wpDots");
+        if (!dots) return;
+        dots.classList.remove("run");
+        void dots.offsetWidth;
+        dots.classList.add("run");
+        clearTimeout(runDots.t);
+        runDots.t = setTimeout(() => dots.classList.remove("run"), 1900);
     }
 
     function leaveApp() {
@@ -1320,8 +1346,8 @@
         </div>
         <div class="settings-group">
             <div class="settings-label">About</div>
-            ${p("OKKOKI OS 4.0 — Windows Phone, reimagined for 2026.")}
-            ${small("Icons: Fluent UI System Icons (Microsoft, MIT) &amp; Simple Icons. Weather: Open-Meteo.")}
+            ${p("OKKOKI OS 5.0 — Windows Phone, reimagined for 2026.")}
+            ${small("Icons: Fluent UI System Icons (Microsoft, MIT) &amp; Simple Icons. Weather: Open-Meteo. Wallpapers via Wikimedia Commons: NASA (aurora, public domain), NASA/ESA/CSA/STScI (Cosmic Cliffs, public domain), Anthony Quintano (Milky Way, public domain), Jakub Hałun (Bali sunset, CC BY-SA 4.0).")}
         </div>`;
     }
 

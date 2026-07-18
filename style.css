@@ -1223,11 +1223,11 @@ body[data-tiles="glass"] #startScreen { background: transparent; }
    backdrop refraction (SVG lens displacement) applied from JS. */
 body[data-tiles="glass"] .tile.transparent {
     background-image: none;
-    background-color: rgba(18, 26, 44, 0.18);
+    background-color: rgba(18, 26, 44, 0.20);
     border: none;
-    border-radius: 18px;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.30);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.30);
 }
 
 .glass-fx { display: none; }
@@ -1270,10 +1270,20 @@ body[data-tiles="glass"] .jump-grid {
 
 body[data-tiles="glass"] .all-apps-btn,
 body[data-tiles="glass"] .search-bar .search-icon {
-    border-radius: 50%;
     background: rgba(14, 24, 40, 0.35);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* Saturation applied once to the wallpaper instead of per tile */
+body[data-tiles="glass"] .wallpaper-layer {
+    filter: saturate(1.3) brightness(1.02);
+}
+
+/* While flinging, swap refraction for the plain pane — huge scroll win */
+body[data-tiles="glass"] .is-scrolling .glass-fx {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -1403,6 +1413,51 @@ body[data-tiles="glass"] .search-bar .search-icon {
     max-height: 62vh;
     object-fit: contain;
 }
+
+/* ---------------- WP loading dots ---------------- */
+.wp-dots {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    z-index: 300;
+    pointer-events: none;
+    display: none;
+}
+
+.wp-dots.run { display: block; }
+
+.wp-dots i {
+    position: absolute;
+    top: 0;
+    left: -6%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-lite);
+    opacity: 0;
+}
+
+.wp-dots.run i { animation: wpDot 1.8s cubic-bezier(0.4, 0.6, 0.6, 0.4) forwards; }
+.wp-dots.run i:nth-child(2) { animation-delay: 0.12s; }
+.wp-dots.run i:nth-child(3) { animation-delay: 0.24s; }
+.wp-dots.run i:nth-child(4) { animation-delay: 0.36s; }
+.wp-dots.run i:nth-child(5) { animation-delay: 0.48s; }
+
+@keyframes wpDot {
+    0%   { left: -6%;  opacity: 0; }
+    10%  { opacity: 1; }
+    45%  { left: 48%; }
+    55%  { left: 52%; }
+    90%  { opacity: 1; }
+    100% { left: 106%; opacity: 0; }
+}
+
+/* WP-style press tilt on list rows and buttons */
+.app-item:active { transform: perspective(600px) rotateX(6deg) scale(0.985); }
+.metro-item:active { transform: perspective(600px) rotateX(4deg) scale(0.99); }
+.app-item, .metro-item { transition: transform 0.1s ease; }
 
 /* ---------------- Wallpaper picker ---------------- */
 .wall-grid {
