@@ -290,6 +290,13 @@
     const face = (icon) => ic(icon, "icon tile-icon");
     const line = (t, sub) => `<p class="face-line">${t}</p>` + (sub ? `<p class="face-sub">${sub}</p>` : "");
     const fill = (color) => `<div style="position:absolute;inset:0;background:${color}"></div>`;
+    /* Intra-face animations (see animateFaceExtras): */
+    const typed = (t, sub) => `<p class="face-line"><span data-type="${t}"></span></p>` +
+        (sub ? `<p class="face-sub">${sub}</p>` : "");
+    const marquee = (t) => `<div class="face-marquee"><span class="mq">${t} &bull;&nbsp;</span><span class="mq">${t} &bull;&nbsp;</span></div>`;
+    const countup = (pre, n, post, sub) =>
+        `<p class="face-num">${pre}<span data-countup="${n}">0</span>${post}</p><p class="face-sub">${sub}</p>`;
+    const quote = (q, who) => `<p class="face-quote">&ldquo;${q}&rdquo;</p><p class="face-sub">&mdash; ${who}</p>`;
 
     function calFace() {
         const d = new Date();
@@ -309,23 +316,35 @@
     const TILE_DEFS = {
         hero: { app: "about", label: false, live: { template: "peek" }, faces: [
             `<h1 class="retro-text">OKKOKI</h1><p class="tagline">Fueling Small Business Growth</p>`,
-            line("Web &bull; Paid media &bull; SEO &bull; Social", "Digital marketing for small business"),
-            line("Book a free 30-min growth call", "Tap to meet the human behind OKKOKI"),
+            typed("Websites that win customers.", "Digital marketing for small business"),
+            line("Web &bull; Paid media &bull; SEO &bull; Social", "Everything your business needs online"),
+            typed("Book a free 30-min growth call", "Tap to meet the human behind OKKOKI"),
         ]},
         services: { app: "services", live: { template: "peek" }, faces: [
-            face("rocket"), line("Website building"), line("Paid media"), line("SEO &amp; social"),
+            face("rocket"),
+            marquee("Web design &bull; Paid media &bull; SEO &bull; Social &bull; Branding"),
+            line("Website building"), line("Paid media"), line("SEO &amp; social"),
         ]},
         book: { app: "book", live: { template: "peek" }, faces: [
             face("book"), line("Free 30-min growth call"),
         ]},
+        /* TODO: countup stats below are placeholders — swap in real numbers */
         portfolio: { app: "portfolio", live: { template: "flip" }, faces: [
-            face("briefcase"), line("Cafe kiosk", "Web + branding"),
+            face("briefcase"),
+            countup("", 37, "", "projects shipped"),
+            line("Cafe kiosk", "Web + branding"),
+            countup("+", 240, "%", "avg. traffic growth"),
             line("Glow salon", "Paid media"), line("Daily fit", "SEO + social"),
         ]},
         blog: { app: "blog", live: { template: "flip" }, faces: [
             face("news"), line("5 ways to grow your local business"), line("Paid ads that actually pay"),
         ]},
-        about: { app: "about" },
+        /* TODO: testimonial quotes below are placeholders — swap in real client words */
+        about: { app: "about", live: { template: "flip" }, faces: [
+            face("person"),
+            quote("They doubled our walk-ins in a season.", "Cafe kiosk"),
+            quote("Bookings up 3&times; in two months.", "Glow salon"),
+        ]},
         contact: { app: "contact" },
         facebook:  { app: "facebook" },
         instagram: { app: "instagram" },
@@ -477,6 +496,7 @@
             }
         }
         tileGrid.innerHTML = html;
+        animateFaceExtras(tileGrid);
         if (typeof refreshBadges === "function") refreshBadges();
 
         // Wire live tiles to their face queues
@@ -664,12 +684,45 @@
        ================================================================ */
     const liveTiles = [];
 
+    /* Faces can carry text animations: [data-type] types itself out with a
+       caret, [data-countup] counts 0 -> target. Marquees are pure CSS. */
+    function animateFaceExtras(root) {
+        $$("[data-type]", root).forEach((el) => {
+            if (el.dataset.done) return;
+            el.dataset.done = "1";
+            const text = el.dataset.type;
+            el.textContent = "";
+            el.classList.add("typing");
+            let i = 0;
+            const t = setInterval(() => {
+                el.textContent = text.slice(0, ++i);
+                if (i >= text.length || !el.isConnected) {
+                    clearInterval(t);
+                    el.classList.remove("typing");
+                }
+            }, 52);
+        });
+        $$("[data-countup]", root).forEach((el) => {
+            if (el.dataset.done) return;
+            el.dataset.done = "1";
+            const target = parseInt(el.dataset.countup, 10);
+            const t0 = performance.now();
+            const step = (now) => {
+                const p = Math.min((now - t0) / 1100, 1);
+                el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+                if (p < 1 && el.isConnected) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        });
+    }
+
     function advanceLive(t) {
         const next = (t.idx + 1) % t.faces.length;
         t.animating = true;
         if (t.template === "flip") {
             const hidden = $(t.showingA ? ".slot-b" : ".slot-a", t.body);
             hidden.innerHTML = t.faces[next];
+            animateFaceExtras(hidden);
             t.body.classList.toggle("flipped");
             setTimeout(() => { t.idx = next; t.showingA = !t.showingA; t.animating = false; }, 720);
         } else { // peek
@@ -678,6 +731,9 @@
             setTimeout(() => {
                 t.body.classList.add("no-anim");
                 $(".slot-a", t.body).innerHTML = t.faces[next];
+                // Typing/count-up starts once the peek has settled, so the
+                // slot swap can never snap a half-finished animation.
+                animateFaceExtras($(".slot-a", t.body));
                 t.body.classList.remove("peeked");
                 void t.body.offsetWidth;
                 t.body.classList.remove("no-anim");
@@ -1684,6 +1740,10 @@
        NOTIFICATIONS — store, toasts, tile badges, Action Center
        ================================================================ */
     const NOTIF_KEY = "okkoki_notifs";
+    /* Master switch: notifications are OFF until the curated strategy
+       (which events, what copy, what timing) is decided. The whole
+       pipeline below stays intact — flip to true to bring it back. */
+    const NOTIFS_ON = false;
 
     function loadNotifs() {
         try { return JSON.parse(localStorage.getItem(NOTIF_KEY)) || []; }
@@ -1698,6 +1758,7 @@
     }
 
     function notify(appId, title, body) {
+        if (!NOTIFS_ON) return;
         const n = { id: Date.now() + Math.random(), app: appId, title, body, at: Date.now(), read: false };
         const all = loadNotifs();
         all.unshift(n);
@@ -1867,6 +1928,7 @@
 
     /* ---- Ambient notification events (tasteful, deduped) ---- */
     function scheduleAmbientNotifs() {
+        if (!NOTIFS_ON) return;
         const today = new Date().toDateString();
         if (localStorage.getItem("okkoki_lastvisit") !== today) {
             const first = !localStorage.getItem("okkoki_lastvisit");
@@ -2064,8 +2126,13 @@
        ================================================================ */
     tileGrid.addEventListener("click", (e) => {
         if (suppressClick) { suppressClick = false; return; }
-        if (editMode) return;
         const tile = e.target.closest(".tile[data-app]");
+        if (editMode) {
+            if (e.target.closest(".tile-action-btn")) return;
+            if (tile && tile !== selectedTile) { Sound.tick(); selectTile(tile); }
+            else if (!tile) exitEditMode(); // tapped a gap inside the grid
+            return;
+        }
         if (tile) { Sound.tick(); markRead(tile.dataset.app); openApp(tile.dataset.app, tile); }
     });
 
@@ -2131,20 +2198,43 @@
 
     /* ================================================================
        Edit mode: unpin / resize / drag-to-reorder
+       No overlay — like real WP, the Start keeps scrolling in edit mode.
+       Exit by tapping empty space, Back, or Start.
        ================================================================ */
-    const overlay = document.createElement("div");
-    overlay.className = "selection-overlay";
-    viewport.appendChild(overlay);
     let selectedTile = null;
 
-    function enterEditMode(tile) {
-        if (editMode) return;
-        editMode = true;
+    /* FLIP: snapshot every tile, run the mutation, then animate each
+       tile from its old spot to its new one. This is what makes
+       resize / unpin / drag reshuffles glide instead of teleport. */
+    function flipGrid(mutate, dur = 260) {
+        const tiles = $$(".tile", tileGrid);
+        const before = new Map(tiles.map((el) => [el, el.getBoundingClientRect()]));
+        mutate();
+        tiles.forEach((el) => {
+            if (!el.isConnected) return;
+            const a = before.get(el);
+            const b = el.getBoundingClientRect();
+            const dx = a.left - b.left, dy = a.top - b.top;
+            if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+            const scale = el.classList.contains("selected") ? " scale(1.05)" : "";
+            el.animate(
+                [{ transform: `translate(${dx}px, ${dy}px)${scale}` },
+                 { transform: `translate(0, 0)${scale}` }],
+                { duration: dur, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" }
+            );
+        });
+    }
+
+    function selectTile(tile) {
+        if (selectedTile === tile) return;
+        if (selectedTile) {
+            selectedTile.classList.remove("selected");
+            selectedTile.classList.add("floating");
+            $$(".tile-action-btn", selectedTile).forEach((b) => b.remove());
+        }
         selectedTile = tile;
-        if (navigator.vibrate) navigator.vibrate(40);
+        tile.classList.remove("floating");
         tile.classList.add("selected");
-        $$(".tile", tileGrid).forEach((t) => { if (t !== tile) t.classList.add("floating"); });
-        overlay.classList.add("active");
 
         const unpin = document.createElement("div");
         unpin.className = "tile-action-btn unpin-btn";
@@ -2159,6 +2249,14 @@
         tile.append(unpin, resize);
     }
 
+    function enterEditMode(tile) {
+        if (editMode) { selectTile(tile); return; }
+        editMode = true;
+        if (navigator.vibrate) navigator.vibrate(40);
+        $$(".tile", tileGrid).forEach((t) => t.classList.add("floating"));
+        selectTile(tile);
+    }
+
     function exitEditMode() {
         if (!editMode) return;
         editMode = false;
@@ -2167,19 +2265,26 @@
             $$(".tile-action-btn", selectedTile).forEach((b) => b.remove());
         }
         $$(".tile", tileGrid).forEach((t) => t.classList.remove("floating"));
-        overlay.classList.remove("active");
         selectedTile = null;
         requestWallpaper();
     }
 
-    overlay.addEventListener("click", exitEditMode);
+    /* Tap empty Start space (outside the grid) to leave edit mode */
+    startScreen.addEventListener("click", (e) => {
+        if (!editMode) return;
+        if (suppressClick) { suppressClick = false; return; }
+        if (e.target.closest(".tile") || e.target.closest(".tile-action-btn")) return;
+        exitEditMode();
+    });
 
     function unpinTile(tile) {
         tile.classList.add("removing");
         setTimeout(() => {
-            const parent = tile.parentElement;
-            tile.remove();
-            if (parent.classList.contains("tile-group") && !parent.children.length) parent.remove();
+            flipGrid(() => {
+                const parent = tile.parentElement;
+                tile.remove();
+                if (parent.classList.contains("tile-group") && !parent.children.length) parent.remove();
+            });
             exitEditMode();
             saveLayout();
             requestWallpaper();
@@ -2191,24 +2296,28 @@
     function resizeTile(tile) {
         const cur = SIZE_CYCLE.find((s) => tile.classList.contains(s)) || "medium";
         const next = SIZE_CYCLE[(SIZE_CYCLE.indexOf(cur) + 1) % SIZE_CYCLE.length];
-        tile.classList.remove("hero", ...SIZE_CYCLE);
-        tile.classList.add(next);
+        flipGrid(() => {
+            tile.classList.remove("hero", ...SIZE_CYCLE);
+            tile.classList.add(next);
 
-        const group = tile.parentElement.classList.contains("tile-group") ? tile.parentElement : null;
-        if (next !== "small" && group) {
-            group.after(tile);
-            if (!group.children.length) group.remove();
-        } else if (next === "small" && !group) {
-            let g = $$(".tile-group", tileGrid).find((el) => el.children.length < 4);
-            if (!g) {
-                g = document.createElement("div");
-                g.className = "tile-group";
-                tileGrid.appendChild(g);
+            const group = tile.parentElement.classList.contains("tile-group") ? tile.parentElement : null;
+            if (next !== "small" && group) {
+                group.after(tile);
+                if (!group.children.length) group.remove();
+            } else if (next === "small" && !group) {
+                let g = $$(".tile-group", tileGrid).find((el) => el.children.length < 4);
+                if (!g) {
+                    g = document.createElement("div");
+                    g.className = "tile-group";
+                    tileGrid.appendChild(g);
+                }
+                g.appendChild(tile);
             }
-            g.appendChild(tile);
-        }
+        });
         saveLayout();
         requestWallpaper();
+        // Never let the resized tile land below the fold
+        setTimeout(() => tile.scrollIntoView({ block: "nearest", behavior: "smooth" }), 60);
     }
 
     /* ---- Drag-to-reorder (drag the selected tile in edit mode) ---- */
@@ -2217,7 +2326,7 @@
     tileGrid.addEventListener("pointerdown", (e) => {
         if (!editMode || busy) return;
         const tile = e.target.closest(".tile");
-        if (!tile || tile !== selectedTile || e.target.closest(".tile-action-btn")) return;
+        if (!tile || e.target.closest(".tile-action-btn")) return;
         const r = tile.getBoundingClientRect();
         drag = {
             tile, active: false,
@@ -2231,6 +2340,7 @@
     function startDrag() {
         drag.active = true;
         suppressClick = true;
+        if (drag.tile !== selectedTile) selectTile(drag.tile);
         const g = drag.tile.cloneNode(true);
         $$(".tile-action-btn", g).forEach((b) => b.remove());
         g.classList.remove("selected", "floating");
@@ -2240,7 +2350,6 @@
         document.body.appendChild(g);
         drag.ghost = g;
         drag.tile.classList.add("drag-src");
-        overlay.style.pointerEvents = "none";
     }
 
     function gridChildOf(el) {
@@ -2277,8 +2386,10 @@
             if (targetGroup && targetGroup !== drag.tile.parentElement && targetGroup.children.length < 4) {
                 if (drag.lastTarget !== targetGroup) {
                     const src = drag.tile.parentElement;
-                    targetGroup.appendChild(drag.tile);
-                    cleanupGroup(src);
+                    flipGrid(() => {
+                        targetGroup.appendChild(drag.tile);
+                        cleanupGroup(src);
+                    }, 150);
                     drag.lastTarget = targetGroup; drag.lastAfter = null;
                 }
                 return;
@@ -2289,11 +2400,13 @@
                 const after = e.clientY > r.top + r.height / 2 || (e.clientX > r.left + r.width / 2 && e.clientY > r.top);
                 if (drag.lastTarget !== child || drag.lastAfter !== after) {
                     const src = drag.tile.parentElement;
-                    const g = document.createElement("div");
-                    g.className = "tile-group";
-                    child[after ? "after" : "before"](g);
-                    g.appendChild(drag.tile);
-                    cleanupGroup(src);
+                    flipGrid(() => {
+                        const g = document.createElement("div");
+                        g.className = "tile-group";
+                        child[after ? "after" : "before"](g);
+                        g.appendChild(drag.tile);
+                        cleanupGroup(src);
+                    }, 150);
                     drag.lastTarget = child; drag.lastAfter = after;
                 }
             }
@@ -2306,7 +2419,7 @@
         const r = child.getBoundingClientRect();
         const after = e.clientX > r.left + r.width / 2 || e.clientY > r.top + r.height / 2;
         if (drag.lastTarget === child && drag.lastAfter === after) return;
-        child[after ? "after" : "before"](drag.tile);
+        flipGrid(() => child[after ? "after" : "before"](drag.tile), 150);
         drag.lastTarget = child; drag.lastAfter = after;
     }
 
@@ -2317,8 +2430,10 @@
     function placeTile(refTile, after, grp) {
         if (drag.lastTarget === refTile && drag.lastAfter === after) return;
         const src = drag.tile.parentElement;
-        refTile[after ? "after" : "before"](drag.tile);
-        if (src !== grp) cleanupGroup(src);
+        flipGrid(() => {
+            refTile[after ? "after" : "before"](drag.tile);
+            if (src !== grp) cleanupGroup(src);
+        }, 150);
         drag.lastTarget = refTile; drag.lastAfter = after;
     }
 
@@ -2326,7 +2441,6 @@
         if (drag.active) {
             drag.ghost.remove();
             drag.tile.classList.remove("drag-src");
-            overlay.style.pointerEvents = "";
             saveLayout();
             layoutGrid();
             requestWallpaper();
@@ -2337,7 +2451,7 @@
     document.addEventListener("pointermove", (e) => {
         if (!drag) return;
         if (!drag.active) {
-            if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 8) return;
+            if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 14) return;
             startDrag();
         }
         e.preventDefault();
@@ -2492,6 +2606,7 @@
         localStorage.setItem("okkoki_since",
             new Date().toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }));
     }
+    if (!NOTIFS_ON) saveNotifs([]); // clear anything stored before the switch-off
     renderStart();
     startScreen.scrollTop = 0;
     renderAppList();
