@@ -1646,3 +1646,407 @@ body[data-tiles="glass"] .is-scrolling .glass-fx {
 
 /* Metro list items: consistent sub-line rhythm */
 .metro-item-sub { line-height: 1.4; }
+
+/* ================================================================
+   V6 — THE SOUL UPDATE
+   Action Center, toasts, badges, Panorama hub, Glance, Light theme
+   ================================================================ */
+
+/* ---------------- Tile notification badge ---------------- */
+.tile-badge {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 12px;
+}
+
+/* ---------------- Toast (WP banner) ---------------- */
+.toast {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    z-index: 320;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--accent);
+    padding: 12px 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    transform: translateY(-130%);
+    transition: transform 0.3s var(--ease-wp);
+    pointer-events: none;
+}
+
+.toast.show { transform: translateY(0); pointer-events: auto; }
+
+.toast-icon .icon { width: 24px; height: 24px; }
+
+.toast-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.toast-text b { font-size: 14.5px; font-weight: 600; }
+.toast-text span {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------------- Action Center ---------------- */
+.ac-grabber {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    z-index: 310;
+    cursor: pointer;
+}
+
+.ac-grabber::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.action-center {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-height: 78%;
+    z-index: 340;
+    display: flex;
+    flex-direction: column;
+    background: rgba(10, 10, 12, 0.97);
+    transform: translateY(-102%);
+    transition: transform 0.32s var(--ease-wp);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+}
+
+.action-center.open { transform: translateY(0); }
+
+body[data-tiles="glass"] .action-center {
+    background: rgba(8, 11, 19, 0.72);
+    -webkit-backdrop-filter: blur(26px) saturate(1.3);
+    backdrop-filter: blur(26px) saturate(1.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ac-quick {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+    padding: 14px 12px 10px;
+}
+
+.ac-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 4px 10px;
+    background: rgba(255, 255, 255, 0.09);
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 11px;
+    text-transform: lowercase;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ac-btn:active { background: var(--accent); }
+.ac-btn .icon { width: 20px; height: 20px; }
+
+.ac-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px 2px;
+}
+
+.ac-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.ac-clear {
+    background: none;
+    border: none;
+    color: var(--accent-lite);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 6px 0;
+}
+
+.ac-list {
+    overflow-y: auto;
+    padding: 4px 12px 8px;
+    scrollbar-width: none;
+}
+
+.ac-list::-webkit-scrollbar { display: none; }
+
+.ac-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 8px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ac-item:active { background: rgba(255, 255, 255, 0.08); }
+.ac-item.read { opacity: 0.55; }
+
+.ac-item-icon .icon { width: 20px; height: 20px; color: var(--accent-lite); }
+.ac-item-text { min-width: 0; flex: 1; }
+.ac-item-title { font-size: 14.5px; font-weight: 600; }
+.ac-item-body {
+    font-size: 13px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ac-when { font-size: 11px; color: var(--text-dim); flex: none; }
+
+.ac-empty {
+    padding: 18px 8px 14px;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-dim);
+}
+
+.ac-handle {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 10px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ac-handle .icon { width: 16px; height: 16px; }
+
+/* ---------------- Lock / glance notification chips ---------------- */
+.lock-icons, .glance-icons {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.notif-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.notif-chip .icon { width: 18px; height: 18px; }
+.notif-chip b { font-weight: 500; }
+
+/* ---------------- Glance screen ---------------- */
+.glance {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background: #000;
+    display: none;
+    cursor: pointer;
+}
+
+.glance.on { display: block; }
+
+.glance-inner {
+    position: absolute;
+    top: 38%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.42);
+    transition: transform 3s ease;
+}
+
+.glance-time {
+    font-size: 84px;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.glance-date { font-size: 17px; font-weight: 400; margin-top: 8px; }
+
+.glance-icons {
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.38);
+}
+
+/* ---------------- Panorama hub ---------------- */
+.pano {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.pano-bg {
+    position: absolute;
+    inset: 0;
+    width: 180%;
+    background: var(--wallpaper) center / cover no-repeat;
+    opacity: 0.22;
+    will-change: transform;
+}
+
+body[data-tiles="glass"] .pano-bg { display: none; }
+
+.pano-title {
+    position: absolute;
+    top: 6px;
+    left: 18px;
+    font-size: clamp(64px, 17vw, 110px);
+    font-weight: 300;
+    letter-spacing: -3px;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.94);
+    pointer-events: none;
+    will-change: transform;
+    z-index: 2;
+}
+
+.pano-track {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-top: clamp(90px, 22vw, 140px);
+}
+
+.pano-track::-webkit-scrollbar { display: none; }
+
+.pano-sec {
+    flex: none;
+    width: min(84vw, 460px);
+    scroll-snap-align: start;
+    padding: 8px 22px 60px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.pano-sec::-webkit-scrollbar { display: none; }
+
+.pano-sec-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-lite);
+    margin-bottom: 14px;
+}
+
+.pano-grid { grid-template-columns: 1fr 1fr; margin-bottom: 16px; }
+
+/* ---------------- Light theme (Classic & Solid interiors) ---------------- */
+body.light:not([data-tiles="glass"]) .screen,
+body.light:not([data-tiles="glass"]) .search-bar { background: #fff; color: #111; }
+body.light:not([data-tiles="glass"]) #startScreen { background: #fff; }
+body.light:not([data-tiles="glass"]) .nav-bar { background: #f1f1f1; }
+body.light:not([data-tiles="glass"]) .nav-btn { color: #111; }
+body.light:not([data-tiles="glass"]) .app-name,
+body.light:not([data-tiles="glass"]) .page-title,
+body.light:not([data-tiles="glass"]) .metro-big,
+body.light:not([data-tiles="glass"]) .metro-item-title,
+body.light:not([data-tiles="glass"]) .cal-title,
+body.light:not([data-tiles="glass"]) .music-title,
+body.light:not([data-tiles="glass"]) .weather-temp,
+body.light:not([data-tiles="glass"]) .calc-display { color: #111; }
+body.light:not([data-tiles="glass"]) .metro-p { color: #333; }
+body.light:not([data-tiles="glass"]) .app-brand { color: #555; }
+body.light:not([data-tiles="glass"]) .metro-small,
+body.light:not([data-tiles="glass"]) .metro-item-sub,
+body.light:not([data-tiles="glass"]) .blog-post-date,
+body.light:not([data-tiles="glass"]) .ac-item-body { color: #666; }
+body.light:not([data-tiles="glass"]) .search-bar input {
+    background: #eee; border-color: #ccc; color: #111;
+}
+body.light:not([data-tiles="glass"]) .search-bar .search-icon,
+body.light:not([data-tiles="glass"]) .all-apps-btn,
+body.light:not([data-tiles="glass"]) .cal-nav,
+body.light:not([data-tiles="glass"]) .music-play {
+    border-color: #111; color: #111;
+}
+body.light:not([data-tiles="glass"]) .metro-btn:not(.primary) {
+    border-color: #111; color: #111; background: none;
+}
+body.light:not([data-tiles="glass"]) .metro-btn:not(.primary):active,
+body.light:not([data-tiles="glass"]) .metro-btn:not(.primary):hover { background: #111; color: #fff; }
+body.light:not([data-tiles="glass"]) .calc-btn:not(.op) { background: #e8e8e8; color: #111; }
+body.light:not([data-tiles="glass"]) .calc-btn:not(.op):active { background: #d0d0d0; }
+body.light:not([data-tiles="glass"]) .cal-cell { background: #f0f0f0; color: #111; }
+body.light:not([data-tiles="glass"]) .cal-cell.dim { background: transparent; }
+body.light:not([data-tiles="glass"]) .cal-cell.today { background: var(--accent); color: #fff; }
+body.light:not([data-tiles="glass"]) .note-card,
+body.light:not([data-tiles="glass"]) .music-track,
+body.light:not([data-tiles="glass"]) .weather-day { background: #f0f0f0; color: #111; }
+body.light:not([data-tiles="glass"]) .music-track.active { background: var(--accent); color: #fff; }
+body.light:not([data-tiles="glass"]) .music-track.active .metro-small { color: rgba(255,255,255,0.85); }
+body.light:not([data-tiles="glass"]) .note-editor { background: #f5f5f5; border-color: #ccc; color: #111; }
+body.light:not([data-tiles="glass"]) .note-text { color: #111; }
+body.light:not([data-tiles="glass"]) .settings-group { border-color: #ddd; }
+body.light:not([data-tiles="glass"]) .jump-grid { background: rgba(255, 255, 255, 0.96); }
+body.light:not([data-tiles="glass"]) .jump-cell.off { background: #eee; color: #bbb; }
+body.light:not([data-tiles="glass"]) .action-center { background: rgba(248, 248, 248, 0.98); color: #111; }
+body.light:not([data-tiles="glass"]) .ac-btn { background: #e8e8e8; color: #111; }
+body.light:not([data-tiles="glass"]) .ac-btn:active { background: var(--accent); color: #fff; }
+body.light:not([data-tiles="glass"]) .ac-item { border-color: #e2e2e2; }
+body.light:not([data-tiles="glass"]) .ac-item-title { color: #111; }
+body.light:not([data-tiles="glass"]) .ac-handle { color: #666; }
+body.light:not([data-tiles="glass"]) .ac-grabber::after { background: rgba(0, 0, 0, 0.25); }
+body.light:not([data-tiles="glass"]) .tagline { color: rgba(255,255,255,0.92); }
+
+/* Wallpaper add button */
+.wall-thumb.wall-add {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px dashed rgba(255, 255, 255, 0.4);
+    color: #fff;
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.wall-thumb.wall-add .icon { width: 18px; height: 18px; }
+
+body.light:not([data-tiles="glass"]) .wall-thumb.wall-add {
+    background: #eee; border-color: #999; color: #111;
+}

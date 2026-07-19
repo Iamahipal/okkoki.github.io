@@ -65,9 +65,16 @@
     const getAccent = () => localStorage.getItem("okkoki_accent") || DEFAULT_ACCENT;
     const lockEnabled = () => localStorage.getItem("okkoki_lock") !== "off";
 
+    function wallList() {
+        const custom = localStorage.getItem("okkoki_custom_wall");
+        return custom
+            ? [...WALLPAPERS, { id: "custom", name: "Your photo", file: custom }]
+            : WALLPAPERS;
+    }
+
     function currentWallpaper() {
         const id = localStorage.getItem("okkoki_wallpaper");
-        return WALLPAPERS.find((w) => w.id === id) || WALLPAPERS[0];
+        return wallList().find((w) => w.id === id) || WALLPAPERS[0];
     }
 
     function setWallpaper(id) {
@@ -94,11 +101,41 @@
         localStorage.setItem("okkoki_accent", hex);
     }
 
+    const lightBg   = () => localStorage.getItem("okkoki_bg") === "light";
+    const soundsOn  = () => localStorage.getItem("okkoki_sounds") !== "off";
+    const hapticsOn = () => localStorage.getItem("okkoki_haptics") !== "off";
+
     function applySettings() {
         if (getAccent() !== DEFAULT_ACCENT) setAccent(getAccent());
         document.body.dataset.tiles = tileStyle();
+        document.body.classList.toggle("light", lightBg());
         applyWallpaper();
     }
+
+    /* ---------------- UI sounds + haptics (WP ticks) ---------------- */
+    const Sound = {
+        ctx: null,
+        ping(freq, dur, vol, type = "square", when = 0) {
+            if (!soundsOn()) return;
+            try {
+                this.ctx = this.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                if (this.ctx.state === "suspended") this.ctx.resume();
+                const t = this.ctx.currentTime + when;
+                const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+                o.type = type;
+                o.frequency.value = freq;
+                g.gain.setValueAtTime(vol, t);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                o.connect(g).connect(this.ctx.destination);
+                o.start(t); o.stop(t + dur);
+            } catch { /* audio unavailable */ }
+        },
+        tick()    { this.ping(1250, 0.035, 0.028); this.buzz(); },
+        back()    { this.ping(820, 0.045, 0.025); this.buzz(); },
+        toast()   { this.ping(988, 0.09, 0.05, "sine"); this.ping(1319, 0.12, 0.05, "sine", 0.09); },
+        shutter() { this.ping(2200, 0.03, 0.06); this.ping(1100, 0.04, 0.06, "square", 0.05); this.buzz(20); },
+        buzz(ms = 8) { if (hapticsOn() && navigator.vibrate) navigator.vibrate(ms); },
+    };
 
     /* ---------------- Page block builders ---------------- */
     const p    = (t) => `<p class="metro-p">${t}</p>`;
@@ -210,6 +247,7 @@
             [`<div id="photosApp">${photosBody()}</div>`] },
         { id: "settings", name: "Settings", icon: "gear", page: () =>
             [`<div id="settingsApp">${settingsBody()}</div>`] },
+        { id: "hub", name: "OKKOKI Hub", icon: "sparkle", pano: true },
         { id: "facebook", name: "Facebook", icon: "brand-facebook",
           page: () => social("brand-facebook", "Daily tips, client wins and behind-the-scenes from OKKOKI.") },
         { id: "instagram", name: "Instagram", icon: "brand-instagram",
@@ -238,14 +276,10 @@
             `<div class="retro-block"><span class="retro-text">OKKOKI</span></div>`,
             p("Where it all started — a love for pixels, play and personality. We bring that same retro heart to every brand we build."),
         ]},
-        { id: "screensaver", name: "Screensaver", icon: "color", page: () => [
-            `<div class="portfolio-grid">
-                <div class="pf" style="background:#1ba1e2"></div>
-                <div class="pf" style="background:#0057b7"></div>
-                <div class="pf" style="background:#0050ef"></div>
-                <div class="pf" style="background:#1a7fe0"></div>
-            </div>`,
-            p("Fifty shades of Metro blue."),
+        { id: "screensaver", name: "Glance", icon: "color", page: () => [
+            big("The always-on display, reborn."),
+            p("Nokia's beloved Glance screen: a dim clock that quietly drifts around a black screen, with your unread notifications beneath it. Tap anywhere to wake."),
+            `<button class="metro-btn primary" data-glance>${ic("sun")} Turn on Glance</button>`,
         ]},
         /* Example of a future embedded tile app — see apps/README.md */
         { id: "demo", name: "Demo App", icon: "cube", embed: "apps/demo/index.html" },
@@ -322,6 +356,9 @@
         demo: { app: "demo", live: { template: "peek" }, faces: [
             face("cube"), line("Your future apps live here", "One folder, one registry line"),
         ]},
+        hub: { app: "hub", live: { template: "peek" }, faces: [
+            face("sparkle"), line("Story &bull; Work &bull; Contact", "One panorama, everything OKKOKI"),
+        ]},
         calculator: { app: "calculator" },
         notes:      { app: "notes" },
         videos:     { app: "videos" },
@@ -352,7 +389,7 @@
         { id: "email", size: "small" },
         { id: "phone", size: "small" },
         { id: "8bit", size: "small" },
-        { id: "demo", size: "medium" },
+        { id: "hub", size: "medium" },
         { id: "calculator", size: "small" },
         { id: "notes", size: "small" },
         { id: "videos", size: "small" },
@@ -447,6 +484,7 @@
             }
         }
         tileGrid.innerHTML = html;
+        if (typeof refreshBadges === "function") refreshBadges();
 
         // Wire live tiles to their face queues
         liveTiles.length = 0;
@@ -810,6 +848,9 @@
     }
 
     function goBack() {
+        Sound.back();
+        if (acIsOpen()) { acClose(); return; }
+        if (glanceEl.classList.contains("on")) { exitGlance(); return; }
         if (editMode) { exitEditMode(); return; }
         if (jumpGrid.classList.contains("active")) { jumpGrid.classList.remove("active"); return; }
         if (current === "app") closeApp();
@@ -819,8 +860,66 @@
     /* ================================================================
        App pages
        ================================================================ */
+    function buildPano(app) {
+        appScreen.innerHTML = `
+        <div class="pano">
+            <div class="pano-bg"></div>
+            <h1 class="pano-title">okkoki hub</h1>
+            <div class="pano-track" id="panoTrack">
+                <section class="pano-sec" data-anim>
+                    <div class="pano-sec-title">the story</div>
+                    ${big("Fueling small business growth.")}
+                    ${p("Years of digital marketing — websites, paid media, search and social — now working for small businesses that deserve to punch above their weight.")}
+                    ${openBtn("about", "person", "More about me")}
+                </section>
+                <section class="pano-sec" data-anim>
+                    <div class="pano-sec-title">what we do</div>
+                    ${item("briefcase", "Website building", "Sites that convert")}
+                    ${item("news", "Paid media", "Ads with real return")}
+                    ${item("search", "SEO &amp; growth", "Get found first")}
+                    ${item("contact", "Social media", "Stay top of mind")}
+                </section>
+                <section class="pano-sec" data-anim>
+                    <div class="pano-sec-title">the work</div>
+                    <div class="portfolio-grid pano-grid">
+                        <div class="pf" style="background:#e51400">Cafe kiosk</div>
+                        <div class="pf" style="background:#60a917">Daily fit</div>
+                        <div class="pf" style="background:#fa6800">Style studio</div>
+                        <div class="pf" style="background:#d80073">Glow salon</div>
+                    </div>
+                    ${openBtn("portfolio", "briefcase", "Full portfolio")}
+                </section>
+                <section class="pano-sec" data-anim>
+                    <div class="pano-sec-title">say hello</div>
+                    ${big("The first call is free.")}
+                    <div>${openBtn("book", "book", "Book a call", true)}
+                    ${openBtn("contact", "contact", "Contact")}</div>
+                </section>
+            </div>
+        </div>`;
+        const track = $("#panoTrack");
+        const title = $(".pano-title", appScreen);
+        const bg = $(".pano-bg", appScreen);
+        let pending = false;
+        track.addEventListener("scroll", () => {
+            if (pending) return;
+            pending = true;
+            requestAnimationFrame(() => {
+                pending = false;
+                const s = track.scrollLeft;
+                title.style.transform = `translateX(${(-s * 0.35).toFixed(1)}px)`;
+                bg.style.transform = `translateX(${(-s * 0.15).toFixed(1)}px)`;
+            });
+        }, { passive: true });
+    }
+
     function buildAppPage(app) {
         stopCamera();
+        if (app.pano) {
+            buildPano(app);
+            activeApp = app.id;
+            return;
+        }
         const blocks = app.embed
             ? [`<iframe class="app-embed" src="${app.embed}" loading="lazy" title="${app.name}"></iframe>`]
             : (app.page ? app.page() : [p("Coming soon.")]);
@@ -883,6 +982,25 @@
             rerender("settingsApp", settingsBody);
             return;
         }
+        if ((b = q("[data-bg]")))      {
+            localStorage.setItem("okkoki_bg", b.dataset.bg);
+            document.body.classList.toggle("light", b.dataset.bg === "light");
+            rerender("settingsApp", settingsBody);
+            return;
+        }
+        if ((b = q("[data-sounds]")))  {
+            localStorage.setItem("okkoki_sounds", b.dataset.sounds);
+            Sound.tick();
+            rerender("settingsApp", settingsBody);
+            return;
+        }
+        if ((b = q("[data-haptics]"))) {
+            localStorage.setItem("okkoki_haptics", b.dataset.haptics);
+            Sound.buzz(20);
+            rerender("settingsApp", settingsBody);
+            return;
+        }
+        if ((b = q("[data-glance]")))  { enterGlance(); return; }
         if ((b = q("[data-reset]")))   {
             if (confirm("Reset everything? Your layout, notes, photos and settings on this device will be erased.")) {
                 localStorage.clear();
@@ -896,6 +1014,31 @@
         const el = document.getElementById(id);
         if (el) el.innerHTML = bodyFn();
     }
+
+    appScreen.addEventListener("change", (e) => {
+        if (e.target.id !== "wallFile" || !e.target.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const scale = Math.min(1, 1920 / Math.max(img.width, img.height));
+                const c = document.createElement("canvas");
+                c.width = Math.round(img.width * scale);
+                c.height = Math.round(img.height * scale);
+                c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+                try {
+                    localStorage.setItem("okkoki_custom_wall", c.toDataURL("image/jpeg", 0.8));
+                    setWallpaper("custom");
+                    rerender("settingsApp", settingsBody);
+                    notify("settings", "Wallpaper updated", "Your photo is now the background.");
+                } catch {
+                    notify("settings", "Couldn't save wallpaper", "The photo is too large for browser storage.");
+                }
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    });
 
     /* ================================================================
        APP: Music — WebAudio chiptune player
@@ -1084,6 +1227,7 @@
                 if (noteEditing === -1) notes.unshift({ text, at: Date.now() });
                 else notes[noteEditing] = { text, at: Date.now() };
                 saveNotes(notes);
+                notify("notes", "Note saved", text.trim().slice(0, 60));
             }
             noteEditing = null;
         }
@@ -1267,6 +1411,8 @@
             photosDirty = true;
             const flash = $("#camFlash");
             if (flash) { flash.classList.remove("on"); void flash.offsetWidth; flash.classList.add("on"); }
+            Sound.shutter();
+            if (ok) notify("photos", "Photo saved", "Your shot is in the Photos app.");
             camMsg(ok ? small(`Saved — ${loadPhotos().length} photo${loadPhotos().length === 1 ? "" : "s"} in Photos.`)
                       : p("Storage is full — couldn't save the photo."));
         }
@@ -1280,6 +1426,7 @@
             <div class="photo-view"><img src="${ph.src}" alt="Photo"></div>
             <div class="metro-small" style="margin-bottom:12px">${new Date(ph.at).toLocaleString()}</div>
             <div>
+                <button class="metro-btn primary" data-pv="wall">${ic("photos")} Set as wallpaper</button>
                 <button class="metro-btn" data-pv="del">${ic("delete")} Delete</button>
                 <button class="metro-btn" data-pv="back">${ic("arrow-left")} All photos</button>
             </div>`;
@@ -1296,6 +1443,19 @@
     }
 
     function photoViewerAction(action) {
+        if (action === "wall" && photoView != null) {
+            const ph = loadPhotos()[photoView];
+            if (ph) {
+                try {
+                    localStorage.setItem("okkoki_custom_wall", ph.src);
+                    setWallpaper("custom");
+                    notify("settings", "Wallpaper updated", "Your photo is now the background.");
+                } catch {
+                    notify("settings", "Couldn't set wallpaper", "Browser storage is full.");
+                }
+            }
+            return;
+        }
         if (action === "del" && photoView != null) {
             const photos = loadPhotos();
             photos.splice(photoView, 1);
@@ -1306,6 +1466,249 @@
         if (action === "back") photoView = null;
         rerender("photosApp", photosBody);
     }
+
+    /* ================================================================
+       NOTIFICATIONS — store, toasts, tile badges, Action Center
+       ================================================================ */
+    const NOTIF_KEY = "okkoki_notifs";
+
+    function loadNotifs() {
+        try { return JSON.parse(localStorage.getItem(NOTIF_KEY)) || []; }
+        catch { return []; }
+    }
+    const saveNotifs = (n) => localStorage.setItem(NOTIF_KEY, JSON.stringify(n.slice(0, 30)));
+
+    function unreadByApp() {
+        const map = {};
+        loadNotifs().forEach((n) => { if (!n.read) map[n.app] = (map[n.app] || 0) + 1; });
+        return map;
+    }
+
+    function notify(appId, title, body) {
+        const n = { id: Date.now() + Math.random(), app: appId, title, body, at: Date.now(), read: false };
+        const all = loadNotifs();
+        all.unshift(n);
+        saveNotifs(all);
+        queueToast(n);
+        refreshBadges();
+        renderAC();
+        renderNotifIcons();
+    }
+
+    function markRead(appId) {
+        const all = loadNotifs();
+        let dirty = false;
+        all.forEach((n) => { if (n.app === appId && !n.read) { n.read = true; dirty = true; } });
+        if (dirty) { saveNotifs(all); refreshBadges(); renderAC(); renderNotifIcons(); }
+    }
+
+    function refreshBadges() {
+        const map = unreadByApp();
+        $$(".tile", tileGrid).forEach((t) => {
+            const b = $(".tile-badge", t);
+            const count = map[t.dataset.app];
+            if (count) {
+                if (b) b.textContent = count;
+                else t.insertAdjacentHTML("beforeend", `<span class="tile-badge">${count}</span>`);
+            } else if (b) b.remove();
+        });
+    }
+
+    function renderNotifIcons() {
+        const map = unreadByApp();
+        const html = Object.keys(map).slice(0, 5).map((id) => {
+            const app = appById(id);
+            return app ? `<span class="notif-chip">${ic(app.icon)}<b>${map[id]}</b></span>` : "";
+        }).join("");
+        const lock = $("#lockIcons");
+        if (lock) lock.innerHTML = html;
+        const gi = $("#glanceIcons");
+        if (gi) gi.innerHTML = html;
+    }
+
+    /* ---- Toasts (WP banner) ---- */
+    const toastEl = $("#toast");
+    const toastQueue = [];
+    let toastBusy = false;
+
+    function queueToast(n) {
+        toastQueue.push(n);
+        drainToasts();
+    }
+
+    function drainToasts() {
+        if (toastBusy || !toastQueue.length) return;
+        if (document.getElementById("lockScreen")) { setTimeout(drainToasts, 1500); return; }
+        toastBusy = true;
+        const n = toastQueue.shift();
+        const app = appById(n.app);
+        toastEl.innerHTML = `<div class="toast-icon">${ic(app ? app.icon : "cube")}</div>
+            <div class="toast-text"><b>${n.title}</b><span>${n.body}</span></div>`;
+        toastEl.dataset.app = n.app;
+        toastEl.classList.add("show");
+        Sound.toast();
+        clearTimeout(drainToasts.t);
+        drainToasts.t = setTimeout(hideToast, 4200);
+    }
+
+    function hideToast() {
+        toastEl.classList.remove("show");
+        setTimeout(() => { toastBusy = false; drainToasts(); }, 350);
+    }
+
+    toastEl.addEventListener("click", () => {
+        const app = toastEl.dataset.app;
+        hideToast();
+        markRead(app);
+        if (current !== "app" || activeApp !== app) {
+            if (current === "app") { showOnly(startScreen); current = "start"; }
+            openApp(app, null);
+        }
+    });
+
+    /* ---- Action Center ---- */
+    const actionCenter = $("#actionCenter");
+    const acGrabber = $("#acGrabber");
+
+    function acOpen()  { renderAC(); actionCenter.classList.add("open"); }
+    function acClose() { actionCenter.classList.remove("open"); }
+    const acIsOpen = () => actionCenter.classList.contains("open");
+
+    function renderAC() {
+        const style = tileStyle();
+        $("#acQuick").innerHTML = `
+            <button class="ac-btn" data-ac="style">${ic(style === "glass" ? "sparkle" : style === "solid" ? "square" : "image")}<span>${style === "transparent" ? "classic" : style}</span></button>
+            <button class="ac-btn" data-ac="accent">${ic("color")}<span>accent</span></button>
+            <button class="ac-btn" data-ac="wall">${ic("photos")}<span>wallpaper</span></button>
+            <button class="ac-btn" data-ac="lock">${ic(lockEnabled() ? "lock" : "unlock")}<span>lock ${lockEnabled() ? "on" : "off"}</span></button>`;
+        const list = loadNotifs();
+        $("#acList").innerHTML = list.length ? list.map((n) => {
+            const app = appById(n.app);
+            const when = new Date(n.at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+            return `<div class="ac-item${n.read ? " read" : ""}" data-acopen="${n.app}">
+                <div class="ac-item-icon">${ic(app ? app.icon : "cube")}</div>
+                <div class="ac-item-text"><div class="ac-item-title">${n.title}</div>
+                <div class="ac-item-body">${n.body}</div></div>
+                <span class="ac-when">${when}</span>
+            </div>`;
+        }).join("") : `<div class="ac-empty">No notifications — all caught up.</div>`;
+    }
+
+    acGrabber.addEventListener("click", () => { Sound.tick(); acIsOpen() ? acClose() : acOpen(); });
+    $(".ac-handle", actionCenter).addEventListener("click", () => { Sound.back(); acClose(); });
+    $("#acClear").addEventListener("click", () => {
+        Sound.tick();
+        saveNotifs([]);
+        refreshBadges(); renderAC(); renderNotifIcons();
+    });
+
+    actionCenter.addEventListener("click", (e) => {
+        const q = e.target.closest("[data-ac]");
+        if (q) {
+            Sound.tick();
+            const a = q.dataset.ac;
+            if (a === "style") {
+                const order = ["glass", "transparent", "solid"];
+                const next = order[(order.indexOf(tileStyle()) + 1) % 3];
+                localStorage.setItem("okkoki_tiles", next);
+                document.body.dataset.tiles = next;
+                layoutGrid(); requestWallpaper();
+            }
+            if (a === "accent") {
+                const others = WP_COLORS.filter(([, h]) => h !== getAccent());
+                setAccent(others[Math.floor(Math.random() * others.length)][1]);
+            }
+            if (a === "wall") {
+                const list = wallList();
+                const i = list.findIndex((w) => w.id === currentWallpaper().id);
+                setWallpaper(list[(i + 1) % list.length].id);
+            }
+            if (a === "lock") {
+                localStorage.setItem("okkoki_lock", lockEnabled() ? "off" : "on");
+            }
+            renderAC();
+            return;
+        }
+        const item = e.target.closest("[data-acopen]");
+        if (item) {
+            const app = item.dataset.acopen;
+            acClose();
+            markRead(app);
+            if (current === "app") { showOnly(startScreen); current = "start"; }
+            openApp(app, null);
+        }
+    });
+
+    /* Pull down from the top edge (touch) to open */
+    let acTouchY = null;
+    document.addEventListener("touchstart", (e) => {
+        const y = e.touches[0].clientY;
+        acTouchY = (y < 32 && !acIsOpen()) ? y : null;
+    }, { passive: true });
+    document.addEventListener("touchmove", (e) => {
+        if (acTouchY != null && e.touches[0].clientY - acTouchY > 46) {
+            acTouchY = null;
+            acOpen();
+        }
+    }, { passive: true });
+
+    /* ---- Ambient notification events (tasteful, deduped) ---- */
+    function scheduleAmbientNotifs() {
+        const today = new Date().toDateString();
+        if (localStorage.getItem("okkoki_lastvisit") !== today) {
+            const first = !localStorage.getItem("okkoki_lastvisit");
+            localStorage.setItem("okkoki_lastvisit", today);
+            setTimeout(() => notify("hub",
+                first ? "Welcome to OKKOKI OS" : "Welcome back",
+                first ? "Swipe around — every tile is an app." : "Good to see you again."), 8000);
+        }
+        if (localStorage.getItem("okkoki_blogseen") !== "v1") {
+            localStorage.setItem("okkoki_blogseen", "v1");
+            setTimeout(() => notify("blog", "New on the blog",
+                "5 ways to grow your local business"), 26000);
+        }
+        if (!sessionStorage.getItem("okkoki_nudged")) {
+            sessionStorage.setItem("okkoki_nudged", "1");
+            setTimeout(() => notify("book", "Free growth call",
+                "Your free 30-minute growth call is waiting."), 120000);
+        }
+    }
+
+    /* ================================================================
+       GLANCE — Nokia's always-on display
+       ================================================================ */
+    const glanceEl = $("#glance");
+    let glanceTimers = [];
+
+    function glanceTick() {
+        const d = new Date();
+        let h = d.getHours() % 12; if (h === 0) h = 12;
+        $("#glanceTime").textContent = `${h}:${String(d.getMinutes()).padStart(2, "0")}`;
+        $("#glanceDate").textContent = `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+    }
+
+    function glanceDrift() {
+        $("#glanceInner").style.transform =
+            `translate(${(Math.random() * 24 - 12).toFixed(0)}%, ${(Math.random() * 30 - 15).toFixed(0)}%)`;
+    }
+
+    function enterGlance() {
+        glanceTick();
+        renderNotifIcons();
+        glanceDrift();
+        glanceEl.classList.add("on");
+        glanceTimers = [setInterval(glanceTick, 15000), setInterval(glanceDrift, 45000)];
+    }
+
+    function exitGlance() {
+        if (!glanceEl.classList.contains("on")) return;
+        glanceEl.classList.remove("on");
+        glanceTimers.forEach(clearInterval);
+        glanceTimers = [];
+    }
+
+    glanceEl.addEventListener("click", exitGlance);
+    document.addEventListener("visibilitychange", () => { if (document.hidden) exitGlance(); });
 
     /* ================================================================
        APP: Settings — organized WP-style
@@ -1323,13 +1726,30 @@
                 ${seg("set-tiles", "transparent", "image", "Classic", style === "transparent")}
                 ${seg("set-tiles", "solid", "square", "Solid", style === "solid")}
             </div>
+            ${small("Interior (Classic &amp; Solid)")}
+            <div>
+                ${seg("bg", "dark", "square", "Dark", !lightBg())}
+                ${seg("bg", "light", "sun", "Light", lightBg())}
+            </div>
             ${small("Background")}
             <div class="wall-grid">
-                ${WALLPAPERS.map((w) => `<button class="wall-thumb${w.id === currentWallpaper().id ? " active" : ""}" data-wallpaper="${w.id}" style="background-image:url(${w.file})" title="${w.name}" aria-label="${w.name}"></button>`).join("")}
+                ${wallList().map((w) => `<button class="wall-thumb${w.id === currentWallpaper().id ? " active" : ""}" data-wallpaper="${w.id}" style="background-image:url(${w.file})" title="${w.name}" aria-label="${w.name}"></button>`).join("")}
+                <label class="wall-thumb wall-add" title="Use your own photo">${ic("add")}<span>your photo</span><input type="file" id="wallFile" accept="image/*" hidden></label>
             </div>
             ${small("Accent color")}
             <div class="swatch-grid">
                 ${WP_COLORS.map(([n, h]) => `<button class="swatch${h === acc ? " active" : ""}" data-accent="${h}" style="background:${h}" title="${n}" aria-label="${n}"></button>`).join("")}
+            </div>
+        </div>
+        <div class="settings-group">
+            <div class="settings-label">Sounds</div>
+            <div>
+                ${seg("sounds", "on", "speaker", "Sounds on", soundsOn())}
+                ${seg("sounds", "off", "square", "Off", !soundsOn())}
+            </div>
+            <div>
+                ${seg("haptics", "on", "call", "Vibration on", hapticsOn())}
+                ${seg("haptics", "off", "square", "Off", !hapticsOn())}
             </div>
         </div>
         <div class="settings-group">
@@ -1382,7 +1802,7 @@
     appListEl.addEventListener("click", (e) => {
         if (e.target.closest(".letter-header")) { jumpGrid.classList.add("active"); return; }
         const it = e.target.closest(".app-item");
-        if (it) openApp(it.dataset.app, null);
+        if (it) { Sound.tick(); markRead(it.dataset.app); openApp(it.dataset.app, null); }
     });
 
     jumpGrid.addEventListener("click", (e) => {
@@ -1418,7 +1838,7 @@
         if (suppressClick) { suppressClick = false; return; }
         if (editMode) return;
         const tile = e.target.closest(".tile[data-app]");
-        if (tile) openApp(tile.dataset.app, tile);
+        if (tile) { Sound.tick(); markRead(tile.dataset.app); openApp(tile.dataset.app, tile); }
     });
 
     tileGrid.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -1784,6 +2204,10 @@
     renderStart();
     startScreen.scrollTop = 0;
     renderAppList();
+    refreshBadges();
+    renderNotifIcons();
+    renderAC();
     syncWallpaper();
     initLockScreen();
+    scheduleAmbientNotifs();
 })();
