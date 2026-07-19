@@ -1669,12 +1669,21 @@ body[data-tiles="glass"] .is-scrolling .glass-fx {
     padding: 12px 14px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     cursor: pointer;
-    transform: translateY(-130%);
-    transition: transform 0.3s var(--ease-wp);
+    /* -130% wasn't enough when the toast is empty (24px tall) — a 1px
+       accent sliver peeked at the viewport top. Push it well clear and
+       hide it outright once the slide-out transition finishes. */
+    transform: translateY(-200%);
+    visibility: hidden;
+    transition: transform 0.3s var(--ease-wp), visibility 0s 0.3s;
     pointer-events: none;
 }
 
-.toast.show { transform: translateY(0); pointer-events: auto; }
+.toast.show {
+    transform: translateY(0);
+    visibility: visible;
+    transition: transform 0.3s var(--ease-wp);
+    pointer-events: auto;
+}
 
 .toast-icon .icon { width: 24px; height: 24px; }
 
