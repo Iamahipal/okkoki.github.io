@@ -735,23 +735,23 @@ html, body {
    EDIT MODE (long-press: unpin / resize)
    ================================================================ */
 .tile.selected {
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85), 0 12px 32px rgba(0, 0, 0, 0.45);
+    transform: scale(1.05);
+    transition: transform 0.18s ease;
     z-index: 40;
     touch-action: none;   /* so drag-reorder gets pointer moves, not scroll */
 }
 
-.tile.floating { animation: floatEffect 3s infinite ease-in-out; }
+/* The WP wobble: unselected tiles sway on rotation, out of phase */
+.tile.floating { animation: wpWobble 2.4s infinite ease-in-out; }
 
-.tile.floating:nth-child(3n+1) { animation-delay: 0.2s; }
-.tile.floating:nth-child(3n+2) { animation-delay: 0.5s; }
-.tile.floating:nth-child(3n+3) { animation-delay: 0.8s; }
+.tile.floating:nth-child(3n+1) { animation-delay: -0.5s; }
+.tile.floating:nth-child(3n+2) { animation-delay: -1.2s; }
+.tile.floating:nth-child(3n+3) { animation-delay: -1.8s; }
 
-@keyframes floatEffect {
-    0%   { transform: translate(0, 0); }
-    25%  { transform: translate(-3px, 2px); }
-    50%  { transform: translate(2px, -2px); }
-    75%  { transform: translate(1px, 3px); }
-    100% { transform: translate(0, 0); }
+@keyframes wpWobble {
+    0%, 100% { transform: rotate(-0.7deg); }
+    50%      { transform: rotate(0.7deg); }
 }
 
 .tile-action-btn {
@@ -795,16 +795,6 @@ html, body {
 }
 
 .tile.removing { animation: removeTile 0.3s ease-out forwards; }
-
-.selection-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    z-index: 30;
-    display: none;
-}
-
-.selection-overlay.active { display: block; }
 
 /* ================================================================
    MISC
@@ -2383,3 +2373,75 @@ body.light:not([data-tiles="glass"]) .app-bar { background: #e9e9e9; }
 .resuming-dots i:nth-child(3) { animation-delay: 0.24s; }
 .resuming-dots i:nth-child(4) { animation-delay: 0.36s; }
 .resuming-dots i:nth-child(5) { animation-delay: 0.48s; }
+
+/* ================================================================
+   V8 — theme-true lock, WP edit-mode feel, tile text animations
+   ================================================================ */
+
+/* Solid mode never shows a photo — the lock screen goes accent too */
+body[data-tiles="solid"] .lock-screen {
+    background: linear-gradient(160deg, var(--accent), #001226 130%);
+}
+
+body[data-tiles="solid"] .lock-screen::before {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.45), transparent 55%);
+}
+
+/* ---------------- Tile face text animations ---------------- */
+
+/* Typewriter caret while [data-type] is typing */
+.typing::after {
+    content: "";
+    display: inline-block;
+    width: 2px;
+    height: 0.95em;
+    margin-left: 3px;
+    vertical-align: -0.12em;
+    background: currentColor;
+    animation: caretBlink 0.85s steps(1) infinite;
+}
+
+@keyframes caretBlink {
+    50% { opacity: 0; }
+}
+
+/* Sliding marquee text (classic WP live-tile trick) */
+.face-marquee {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.face-marquee .mq {
+    display: inline-block;
+    animation: mqSlide 11s linear infinite;
+}
+
+@keyframes mqSlide {
+    to { transform: translateX(-100%); }
+}
+
+/* Big animated number faces (count-up stats) */
+.face-num {
+    font-size: 38px;
+    font-weight: 300;
+    line-height: 1.05;
+    margin: 0 0 4px;
+    letter-spacing: -1px;
+}
+
+.tile.small .face-num { font-size: 24px; }
+
+/* Rotating testimonial faces */
+.face-quote {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 0 0 5px;
+}
