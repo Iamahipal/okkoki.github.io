@@ -1715,17 +1715,8 @@ body[data-tiles="glass"] .is-scrolling .glass-fx {
     cursor: pointer;
 }
 
-.ac-grabber::after {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 44px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255, 255, 255, 0.28);
-}
+/* Grabber is invisible — the Action Center is an Easter egg
+   (swipe down from the top edge, or tap this hidden strip). */
 
 .action-center {
     position: absolute;
@@ -2027,7 +2018,6 @@ body.light:not([data-tiles="glass"]) .ac-btn:active { background: var(--accent);
 body.light:not([data-tiles="glass"]) .ac-item { border-color: #e2e2e2; }
 body.light:not([data-tiles="glass"]) .ac-item-title { color: #111; }
 body.light:not([data-tiles="glass"]) .ac-handle { color: #666; }
-body.light:not([data-tiles="glass"]) .ac-grabber::after { background: rgba(0, 0, 0, 0.25); }
 body.light:not([data-tiles="glass"]) .tagline { color: rgba(255,255,255,0.92); }
 
 /* Wallpaper add button */
@@ -2050,3 +2040,346 @@ body.light:not([data-tiles="glass"]) .tagline { color: rgba(255,255,255,0.92); }
 body.light:not([data-tiles="glass"]) .wall-thumb.wall-add {
     background: #eee; border-color: #999; color: #111;
 }
+
+/* ================================================================
+   V7 — Real Camera, Photos pivot, App Bar, App Switcher
+   ================================================================ */
+
+/* ---------------- Camera 2.0: full-screen viewfinder ---------------- */
+.cam-full {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    overflow: hidden;
+}
+
+.cam-full video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.25s ease;
+}
+
+.cam-full video.mirror { transform: scaleX(-1); }
+
+.cam-grid-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    pointer-events: none;
+    background:
+        linear-gradient(to right, transparent calc(33.3% - 1px), rgba(255,255,255,.35) 33.3%, transparent calc(33.3% + 1px)),
+        linear-gradient(to right, transparent calc(66.6% - 1px), rgba(255,255,255,.35) 66.6%, transparent calc(66.6% + 1px)),
+        linear-gradient(to bottom, transparent calc(33.3% - 1px), rgba(255,255,255,.35) 33.3%, transparent calc(33.3% + 1px)),
+        linear-gradient(to bottom, transparent calc(66.6% - 1px), rgba(255,255,255,.35) 66.6%, transparent calc(66.6% + 1px));
+}
+
+.cam-grid-overlay.on { display: block; }
+
+.cam-full .cam-flash {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.cam-full .cam-flash.on { animation: camFlash 0.28s ease-out; }
+.cam-full .cam-flash.bright.on { animation: camFlashBright 0.5s ease-out; }
+
+@keyframes camFlashBright {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.cam-count {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    font-weight: 200;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 4;
+}
+
+.cam-top {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    z-index: 6;
+    flex-wrap: wrap;
+}
+
+.cam-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-family: inherit;
+    font-size: 11.5px;
+    padding: 7px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cam-chip .icon { width: 14px; height: 14px; }
+.cam-chip.active { background: var(--accent); border-color: transparent; }
+
+.cam-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+    z-index: 6;
+}
+
+.cam-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    background: rgba(0, 0, 0, 0.4) center / cover no-repeat;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cam-thumb .icon { width: 20px; height: 20px; }
+.cam-thumb[style*="background-image"] .icon { display: none; }
+
+.cam-full .cam-shutter {
+    width: 78px;
+    height: 78px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+}
+
+.cam-msg {
+    position: absolute;
+    bottom: 118px;
+    left: 16px;
+    right: 16px;
+    text-align: center;
+    z-index: 6;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ---------------- Photos pivot ---------------- */
+.pivot-head {
+    display: flex;
+    gap: 22px;
+    margin-bottom: 16px;
+}
+
+.pivot-tab {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 30px;
+    font-weight: 300;
+    letter-spacing: -0.5px;
+    color: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+}
+
+.pivot-tab.active { color: #fff; }
+
+body.light:not([data-tiles="glass"]) .pivot-tab { color: rgba(0, 0, 0, 0.3); }
+body.light:not([data-tiles="glass"]) .pivot-tab.active { color: #111; }
+
+.photo-cell { position: relative; }
+
+.photo-fav {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    color: #fff;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.7));
+}
+
+.photo-fav .icon { width: 14px; height: 14px; }
+
+/* ---------------- WP App Bar ---------------- */
+.app-page.has-bar { padding-bottom: 92px; }
+
+.app-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    background: #141414;
+    margin: 0 -20px;
+    transition: none;
+}
+
+body[data-tiles="glass"] .app-bar {
+    background: rgba(10, 13, 22, 0.7);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.light:not([data-tiles="glass"]) .app-bar { background: #e9e9e9; }
+
+.app-bar-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 12px 12px;
+}
+
+.app-bar-btns {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 26px;
+}
+
+.app-bar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: 10.5px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.app-bar-btn .icon {
+    width: 40px;
+    height: 40px;
+    padding: 9px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+}
+
+.app-bar-btn span {
+    display: none;
+    text-transform: lowercase;
+}
+
+.app-bar.expanded .app-bar-btn span { display: block; }
+
+.app-bar-dots {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 22px;
+    line-height: 1;
+    padding: 4px 6px 12px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------- App switcher + Resuming ---------------- */
+.switcher {
+    position: absolute;
+    inset: 0;
+    z-index: 350;
+    background: rgba(0, 0, 0, 0.82);
+    display: none;
+    align-items: center;
+}
+
+.switcher.open { display: flex; }
+
+.switcher-track {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 0 24px;
+    width: 100%;
+    scrollbar-width: none;
+}
+
+.switcher-track::-webkit-scrollbar { display: none; }
+
+.switch-card {
+    flex: none;
+    width: 62%;
+    max-width: 300px;
+    aspect-ratio: 9 / 14;
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    animation: jumpZoom 0.25s var(--ease-wp) backwards;
+}
+
+.switch-card-head {
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--accent);
+}
+
+.switch-card-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 70%;
+}
+
+.switch-card-body .icon { width: 62px; height: 62px; color: rgba(255, 255, 255, 0.6); }
+
+.resuming {
+    position: absolute;
+    inset: 0;
+    z-index: 360;
+    background: #000;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-left: 26px;
+    gap: 20px;
+}
+
+.resuming.on { display: flex; }
+
+.resuming span {
+    font-size: 30px;
+    font-weight: 300;
+}
+
+.resuming-dots { position: relative; width: 100%; height: 6px; }
+
+.resuming-dots i {
+    position: absolute;
+    left: -6%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-lite);
+    animation: wpDot 1.5s cubic-bezier(0.4, 0.6, 0.6, 0.4) infinite;
+}
+
+.resuming-dots i:nth-child(2) { animation-delay: 0.12s; }
+.resuming-dots i:nth-child(3) { animation-delay: 0.24s; }
+.resuming-dots i:nth-child(4) { animation-delay: 0.36s; }
+.resuming-dots i:nth-child(5) { animation-delay: 0.48s; }

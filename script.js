@@ -91,8 +91,9 @@
 
     function tileStyle() {
         const s = localStorage.getItem("okkoki_tiles");
-        if (s === "glass" || s === "transparent" || s === "solid") return s;
-        return glassSupported() ? "glass" : "transparent";
+        if (s === "glass") return glassSupported() ? "glass" : "transparent";
+        if (s === "transparent" || s === "solid") return s;
+        return "solid"; // classic WP first impression; Glass/Classic live in Settings
     }
 
     function setAccent(hex) {
@@ -102,6 +103,8 @@
     }
 
     const lightBg   = () => localStorage.getItem("okkoki_bg") === "light";
+    const liveTempo = () => localStorage.getItem("okkoki_tempo") || "normal";
+    const liveOn    = () => localStorage.getItem("okkoki_live") !== "off";
     const soundsOn  = () => localStorage.getItem("okkoki_sounds") !== "off";
     const hapticsOn = () => localStorage.getItem("okkoki_haptics") !== "off";
 
@@ -232,17 +235,7 @@
         }},
         { id: "weather", name: "Weather", icon: "weather", page: () =>
             [`<div id="weatherApp"><p class="metro-p">Getting your weather…</p></div>`] },
-        { id: "camera", name: "Camera", icon: "camera", page: () => [
-            `<div id="cameraApp">
-                <div class="cam-stage"><video id="camVideo" playsinline muted></video><div class="cam-flash" id="camFlash"></div></div>
-                <div class="cam-controls">
-                    <button class="cam-btn" data-cam="switch" aria-label="Switch camera">${ic("camera-switch")}</button>
-                    <button class="cam-shutter" data-cam="shot" aria-label="Take photo">${ic("camera")}</button>
-                    <button class="cam-btn" data-open="photos" aria-label="Open photos">${ic("photos")}</button>
-                </div>
-                <div id="camMsg"></div>
-            </div>`,
-        ]},
+        { id: "camera", name: "Camera", icon: "camera", fullscreen: true },
         { id: "photos", name: "Photos", icon: "photos", page: () =>
             [`<div id="photosApp">${photosBody()}</div>`] },
         { id: "settings", name: "Settings", icon: "gear", page: () =>
@@ -695,12 +688,13 @@
     }
 
     setInterval(() => {
-        if (document.hidden || busy || editMode || current !== "start") return;
+        if (document.hidden || busy || editMode || current !== "start" || !liveOn()) return;
+        const tempo = liveTempo() === "calm" ? 1.8 : liveTempo() === "lively" ? 0.55 : 1;
         const now = Date.now();
         for (const t of liveTiles) {
             if (!t.animating && now >= t.due && tileGrid.contains(t.el)) {
                 advanceLive(t);
-                t.due = now + 3500 + Math.random() * 4500;
+                t.due = now + (3500 + Math.random() * 4500) * tempo;
                 break;
             }
         }
@@ -759,6 +753,7 @@
         if (!app || busy || editMode) return;
         busy = true;
         openedFrom = current;
+        trackRecent(app.id);
         buildAppPage(app);
 
         if (current === "start") {
@@ -849,6 +844,7 @@
 
     function goBack() {
         Sound.back();
+        if (switcher.classList.contains("open")) { closeSwitcher(); return; }
         if (acIsOpen()) { acClose(); return; }
         if (glanceEl.classList.contains("on")) { exitGlance(); return; }
         if (editMode) { exitEditMode(); return; }
@@ -913,6 +909,37 @@
         }, { passive: true });
     }
 
+    function buildCamera() {
+        camTimer = false; camGrid = false; camZoom = 1; camFlashOn = false;
+        appScreen.innerHTML = `
+        <div class="cam-full" id="cameraApp">
+            <video id="camVideo" playsinline muted></video>
+            <div class="cam-grid-overlay" id="camGridOverlay"></div>
+            <div class="cam-flash" id="camFlash"></div>
+            <div class="cam-count" id="camCount"></div>
+            <div class="cam-top">
+                <button class="cam-chip" data-cam="flash" id="camFlashBtn">${ic("sun")}<span>flash off</span></button>
+                <button class="cam-chip" data-cam="timer" id="camTimerBtn">${ic("calendar")}<span>timer off</span></button>
+                <button class="cam-chip" data-cam="grid" id="camGridBtn">${ic("photos")}<span>grid</span></button>
+                <button class="cam-chip" data-cam="zoom" id="camZoomBtn">${ic("search")}<span>1x</span></button>
+            </div>
+            <div class="cam-bottom">
+                <button class="cam-thumb" data-open="photos" id="camThumb" aria-label="Open photos">${ic("photos")}</button>
+                <button class="cam-shutter" data-cam="shot" id="camShutter" aria-label="Take photo">${ic("camera")}</button>
+                <button class="cam-btn" data-cam="switch" aria-label="Switch camera">${ic("camera-switch")}</button>
+            </div>
+            <div class="cam-msg" id="camMsg"></div>
+        </div>`;
+        startCamera();
+        updateCamThumb();
+    }
+
+    function updateCamThumb() {
+        const t = $("#camThumb");
+        const last = loadPhotos()[0];
+        if (t && last) t.style.backgroundImage = `url(${last.src})`;
+    }
+
     function buildAppPage(app) {
         stopCamera();
         if (app.pano) {
@@ -920,20 +947,78 @@
             activeApp = app.id;
             return;
         }
+        if (app.fullscreen && app.id === "camera") {
+            activeApp = "camera";
+            buildCamera();
+            return;
+        }
         const blocks = app.embed
             ? [`<iframe class="app-embed" src="${app.embed}" loading="lazy" title="${app.name}"></iframe>`]
             : (app.page ? app.page() : [p("Coming soon.")]);
         appScreen.innerHTML =
-            `<div class="app-page">
+            `<div class="app-page${APP_BARS[app.id] ? " has-bar" : ""}">
                 <header data-anim>
                     <div class="app-brand">okkoki</div>
                     <h1 class="page-title">${app.name}</h1>
                 </header>
                 ${blocks.map((b) => `<div class="app-block" data-anim>${b}</div>`).join("")}
-            </div>`;
+            </div>${appBarHTML(app.id)}`;
         activeApp = app.id;
         if (app.id === "weather") loadWeather();
         if (app.id === "camera") startCamera();
+    }
+
+    /* ---- WP bottom App Bar ("...") ---- */
+    const APP_BARS = {
+        photos:   { buttons: [
+            { icon: "camera", label: "camera", act: "open:camera" },
+            { icon: "heart", label: "favorites", act: "pivot:favs" },
+            { icon: "photos", label: "camera roll", act: "pivot:roll" },
+        ]},
+        notes:    { buttons: [{ icon: "add", label: "new", act: "note:new" }] },
+        calendar: { buttons: [{ icon: "calendar", label: "today", act: "cal:today" }] },
+        music:    { buttons: [{ icon: "play", label: "play/pause", act: "music:toggle" }] },
+        settings: { buttons: [{ icon: "delete", label: "reset", act: "settings:reset" }] },
+        blog:     { buttons: [{ icon: "book", label: "book a call", act: "open:book" }] },
+    };
+
+    function appBarHTML(appId) {
+        const bar = APP_BARS[appId];
+        if (!bar) return "";
+        return `<div class="app-bar" id="appBar">
+            <div class="app-bar-row">
+                <div class="app-bar-btns">
+                    ${bar.buttons.map((b) => `<button class="app-bar-btn" data-abar="${b.act}">${ic(b.icon)}<span>${b.label}</span></button>`).join("")}
+                </div>
+                <button class="app-bar-dots" data-abar="expand" aria-label="More">&#8943;</button>
+            </div>
+        </div>`;
+    }
+
+    appScreen.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-abar]");
+        if (!b) return;
+        Sound.tick();
+        const act = b.dataset.abar;
+        if (act === "expand") { $("#appBar").classList.toggle("expanded"); return; }
+        const [kind, arg] = act.split(":");
+        if (kind === "open")     { $(`[data-open]`) /* reuse flow */; openFromBar(arg); }
+        if (kind === "pivot")    { photoPivot = arg; rerender("photosApp", photosBody); }
+        if (kind === "note")     { noteAction("new"); }
+        if (kind === "cal")      { const d = new Date(); calY = d.getFullYear(); calM = d.getMonth(); rerender("calApp", calendarBody); }
+        if (kind === "music")    { Music.playing ? Music.stop() : Music.play(); }
+        if (kind === "settings") { if (confirm("Reset everything? Your layout, notes, photos and settings on this device will be erased.")) { indexedDB.deleteDatabase("okkoki"); localStorage.clear(); sessionStorage.clear(); location.reload(); } }
+    });
+
+    async function openFromBar(id) {
+        const app = appById(id);
+        if (!app || busy) return;
+        busy = true;
+        await turnstile(appEls(), "out", 25);
+        buildAppPage(app);
+        appScreen.scrollTop = 0;
+        await turnstile(appEls(), "in", 55);
+        busy = false;
     }
 
     /* Buttons inside app pages that open another app (e.g. Book) */
@@ -962,6 +1047,7 @@
         if ((b = q("[data-weather]"))) { loadWeather(); return; }
         if ((b = q("[data-cam]")))     { cameraAction(b.dataset.cam); return; }
         if ((b = q("[data-photo]")))   { photoView = +b.dataset.photo; rerender("photosApp", photosBody); return; }
+        if ((b = q("[data-pivot]")))   { photoPivot = b.dataset.pivot; Sound.tick(); rerender("photosApp", photosBody); return; }
         if ((b = q("[data-pv]")))      { photoViewerAction(b.dataset.pv); return; }
         if ((b = q("[data-accent]")))  { setAccent(b.dataset.accent); rerender("settingsApp", settingsBody); return; }
         if ((b = q("[data-set-tiles]"))) {
@@ -974,6 +1060,16 @@
         }
         if ((b = q("[data-wallpaper]"))) {
             setWallpaper(b.dataset.wallpaper);
+            rerender("settingsApp", settingsBody);
+            return;
+        }
+        if ((b = q("[data-tempo]")))   {
+            localStorage.setItem("okkoki_tempo", b.dataset.tempo);
+            rerender("settingsApp", settingsBody);
+            return;
+        }
+        if ((b = q("[data-live]")))    {
+            localStorage.setItem("okkoki_live", b.dataset.live);
             rerender("settingsApp", settingsBody);
             return;
         }
@@ -1003,6 +1099,7 @@
         if ((b = q("[data-glance]")))  { enterGlance(); return; }
         if ((b = q("[data-reset]")))   {
             if (confirm("Reset everything? Your layout, notes, photos and settings on this device will be erased.")) {
+                indexedDB.deleteDatabase("okkoki");
                 localStorage.clear();
                 sessionStorage.clear();
                 location.reload();
@@ -1334,28 +1431,77 @@
     /* ================================================================
        APP: Camera + Photos (stored in the browser)
        ================================================================ */
-    const PHOTOS_KEY = "okkoki_photos";
-    const PHOTOS_MAX = 24;
+    const PHOTOS_MAX = 48;
     let camStream = null;
     let camFacing = "user";
+    let camTimer = false, camGrid = false, camZoom = 1, camFlashOn = false, camCounting = false;
     let photoView = null;
+    let photosCache = [];   // in-memory mirror of the IndexedDB store
+    let photoPivot = "roll"; // 'roll' | 'favs'
 
-    function loadPhotos() {
-        try { return JSON.parse(localStorage.getItem(PHOTOS_KEY)) || []; }
-        catch { return []; }
+    /* IndexedDB keeps photos safe (localStorage quota silently ate them) */
+    let dbPromise = null;
+    function photoDB() {
+        dbPromise = dbPromise || new Promise((resolve, reject) => {
+            const req = indexedDB.open("okkoki", 1);
+            req.onupgradeneeded = () => req.result.createObjectStore("photos", { keyPath: "id" });
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+        return dbPromise;
     }
 
-    function savePhotos(photos) {
-        while (true) {
-            try {
-                localStorage.setItem(PHOTOS_KEY, JSON.stringify(photos));
-                return true;
-            } catch {
-                if (!photos.length) return false;
-                photos.pop(); // storage full -> drop the oldest and retry
-            }
+    function photoTx(mode, fn) {
+        return photoDB().then((db) => new Promise((resolve, reject) => {
+            const tx = db.transaction("photos", mode);
+            const out = fn(tx.objectStore("photos"));
+            tx.oncomplete = () => resolve(out && out.result !== undefined ? out.result : undefined);
+            tx.onerror = () => reject(tx.error);
+        })).catch(() => undefined);
+    }
+
+    async function refreshPhotosCache() {
+        const rows = await photoTx("readonly", (s) => s.getAll());
+        photosCache = (rows || []).sort((a, b) => b.at - a.at);
+    }
+
+    async function addPhoto(src) {
+        await photoTx("readwrite", (s) => s.put({ id: Date.now() + Math.random(), src, at: Date.now(), fav: false }));
+        await refreshPhotosCache();
+        while (photosCache.length > PHOTOS_MAX) {
+            const oldest = photosCache[photosCache.length - 1];
+            await photoTx("readwrite", (s) => s.delete(oldest.id));
+            photosCache.pop();
         }
+        localStorage.setItem("okkoki_stat_photos", String(1 + (+localStorage.getItem("okkoki_stat_photos") || 0)));
     }
+
+    async function deletePhoto(id) {
+        await photoTx("readwrite", (s) => s.delete(id));
+        await refreshPhotosCache();
+    }
+
+    async function toggleFavPhoto(id) {
+        const ph = photosCache.find((p) => p.id === id);
+        if (!ph) return;
+        ph.fav = !ph.fav;
+        await photoTx("readwrite", (s) => s.put(ph));
+    }
+
+    async function migratePhotos() {
+        try {
+            const old = JSON.parse(localStorage.getItem("okkoki_photos") || "null");
+            if (Array.isArray(old) && old.length) {
+                for (const p of old) {
+                    await photoTx("readwrite", (s) => s.put({ id: (p.at || Date.now()) + Math.random(), src: p.src, at: p.at || Date.now(), fav: false }));
+                }
+            }
+            localStorage.removeItem("okkoki_photos");
+        } catch { /* nothing to migrate */ }
+        await refreshPhotosCache();
+    }
+
+    const loadPhotos = () => photosCache;
 
     function camMsg(html) {
         const el = $("#camMsg");
@@ -1371,12 +1517,13 @@
         }
         try {
             camStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: camFacing, width: { ideal: 1280 } }, audio: false,
+                video: { facingMode: camFacing, width: { ideal: 1920 } }, audio: false,
             });
             v.srcObject = camStream;
             v.classList.toggle("mirror", camFacing === "user");
+            v.style.transform = `${camFacing === "user" ? "scaleX(-1) " : ""}scale(${camZoom})`;
             await v.play();
-            camMsg(small("Photos are saved only in this browser — clear site data and they're gone."));
+            camMsg("");
         } catch {
             camMsg(p("Couldn't access the camera — allow camera access and try again.") +
                    `<button class="metro-btn primary" data-cam="retry">${ic("retry")} Try again</button>`);
@@ -1390,76 +1537,142 @@
         }
     }
 
+    async function capturePhoto() {
+        const v = $("#camVideo");
+        if (!v || !camStream || !v.videoWidth) return;
+        const scale = Math.min(1, 1440 / Math.max(v.videoWidth, v.videoHeight));
+        const c = document.createElement("canvas");
+        c.width = Math.round(v.videoWidth * scale);
+        c.height = Math.round(v.videoHeight * scale);
+        const ctx = c.getContext("2d");
+        if (camZoom > 1) {
+            const zw = v.videoWidth / camZoom, zh = v.videoHeight / camZoom;
+            ctx.drawImage(v, (v.videoWidth - zw) / 2, (v.videoHeight - zh) / 2, zw, zh, 0, 0, c.width, c.height);
+        } else {
+            ctx.drawImage(v, 0, 0, c.width, c.height);
+        }
+        const flash = $("#camFlash");
+        if (flash) {
+            flash.classList.toggle("bright", camFlashOn);
+            flash.classList.remove("on"); void flash.offsetWidth; flash.classList.add("on");
+        }
+        Sound.shutter();
+        await addPhoto(c.toDataURL("image/jpeg", 0.75));
+        photosDirty = true;
+        updateCamThumb();
+        notify("photos", "Photo saved", `${loadPhotos().length} photo${loadPhotos().length === 1 ? "" : "s"} in your camera roll.`);
+    }
+
     function cameraAction(action) {
         if (action === "switch") {
             camFacing = camFacing === "user" ? "environment" : "user";
             startCamera();
         }
         if (action === "retry") startCamera();
-        if (action === "shot") {
+        if (action === "flash") {
+            camFlashOn = !camFlashOn;
+            const b = $("#camFlashBtn span");
+            if (b) b.textContent = camFlashOn ? "flash on" : "flash off";
+            $("#camFlashBtn").classList.toggle("active", camFlashOn);
+        }
+        if (action === "timer") {
+            camTimer = !camTimer;
+            const b = $("#camTimerBtn span");
+            if (b) b.textContent = camTimer ? "timer 3s" : "timer off";
+            $("#camTimerBtn").classList.toggle("active", camTimer);
+        }
+        if (action === "grid") {
+            camGrid = !camGrid;
+            $("#camGridOverlay").classList.toggle("on", camGrid);
+            $("#camGridBtn").classList.toggle("active", camGrid);
+        }
+        if (action === "zoom") {
+            camZoom = camZoom === 1 ? 2 : 1;
             const v = $("#camVideo");
-            if (!v || !camStream || !v.videoWidth) return;
-            const scale = Math.min(1, 1080 / Math.max(v.videoWidth, v.videoHeight));
-            const c = document.createElement("canvas");
-            c.width = Math.round(v.videoWidth * scale);
-            c.height = Math.round(v.videoHeight * scale);
-            c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
-            const photos = loadPhotos();
-            photos.unshift({ src: c.toDataURL("image/jpeg", 0.72), at: Date.now() });
-            while (photos.length > PHOTOS_MAX) photos.pop();
-            const ok = savePhotos(photos);
-            photosDirty = true;
-            const flash = $("#camFlash");
-            if (flash) { flash.classList.remove("on"); void flash.offsetWidth; flash.classList.add("on"); }
-            Sound.shutter();
-            if (ok) notify("photos", "Photo saved", "Your shot is in the Photos app.");
-            camMsg(ok ? small(`Saved — ${loadPhotos().length} photo${loadPhotos().length === 1 ? "" : "s"} in Photos.`)
-                      : p("Storage is full — couldn't save the photo."));
+            if (v) v.style.transform = `${v.classList.contains("mirror") ? "scaleX(-1) " : ""}scale(${camZoom})`;
+            const b = $("#camZoomBtn span");
+            if (b) b.textContent = camZoom + "x";
+            $("#camZoomBtn").classList.toggle("active", camZoom > 1);
+        }
+        if (action === "shot") {
+            if (camCounting) return;
+            if (camTimer) {
+                camCounting = true;
+                let n = 3;
+                const el = $("#camCount");
+                const step = () => {
+                    if (!$("#camCount")) { camCounting = false; return; }
+                    if (n === 0) {
+                        el.textContent = "";
+                        camCounting = false;
+                        capturePhoto();
+                        return;
+                    }
+                    el.textContent = n;
+                    Sound.tick();
+                    n--;
+                    setTimeout(step, 1000);
+                };
+                step();
+            } else {
+                capturePhoto();
+            }
         }
     }
 
+    const photoById = (id) => photosCache.find((p) => p.id === +id || p.id === id);
+
     function photosBody() {
-        const photos = loadPhotos();
-        if (photoView != null && photos[photoView]) {
-            const ph = photos[photoView];
+        const ph = photoView != null ? photoById(photoView) : null;
+        if (ph) {
             return `
             <div class="photo-view"><img src="${ph.src}" alt="Photo"></div>
-            <div class="metro-small" style="margin-bottom:12px">${new Date(ph.at).toLocaleString()}</div>
+            <div class="metro-small" style="margin-bottom:12px">${new Date(ph.at).toLocaleString()}${ph.fav ? " &bull; ♥ favorite" : ""}</div>
             <div>
-                <button class="metro-btn primary" data-pv="wall">${ic("photos")} Set as wallpaper</button>
+                <button class="metro-btn primary" data-pv="fav">${ic("heart")} ${ph.fav ? "Unfavorite" : "Favorite"}</button>
+                <button class="metro-btn" data-pv="wall">${ic("photos")} Set as wallpaper</button>
                 <button class="metro-btn" data-pv="del">${ic("delete")} Delete</button>
                 <button class="metro-btn" data-pv="back">${ic("arrow-left")} All photos</button>
             </div>`;
         }
         photoView = null;
-        if (!photos.length) {
+        const all = loadPhotos();
+        if (!all.length) {
             return `${p("No photos yet — everything you shoot stays in this browser only.")}` +
                    openBtn("camera", "camera", "Open camera", true);
         }
-        return `<div class="photo-grid">
-            ${photos.map((ph, i) => `<div class="photo-cell" data-photo="${i}" style="background-image:url(${ph.src})"></div>`).join("")}
+        const shown = photoPivot === "favs" ? all.filter((x) => x.fav) : all;
+        const grid = shown.length
+            ? `<div class="photo-grid">
+                ${shown.map((x) => `<div class="photo-cell" data-photo="${x.id}" style="background-image:url(${x.src})">${x.fav ? `<span class="photo-fav">${ic("heart")}</span>` : ""}</div>`).join("")}
+              </div>`
+            : p("No favorites yet — open a photo and tap the heart.");
+        return `
+        <div class="pivot-head">
+            <button class="pivot-tab${photoPivot === "roll" ? " active" : ""}" data-pivot="roll">camera roll</button>
+            <button class="pivot-tab${photoPivot === "favs" ? " active" : ""}" data-pivot="favs">favorites</button>
         </div>
-        ${small(`${photos.length} photo${photos.length === 1 ? "" : "s"} — saved in this browser only.`)}`;
+        ${grid}
+        ${small(`${all.length} photo${all.length === 1 ? "" : "s"} — saved in this browser only.`)}`;
     }
 
-    function photoViewerAction(action) {
-        if (action === "wall" && photoView != null) {
-            const ph = loadPhotos()[photoView];
-            if (ph) {
-                try {
-                    localStorage.setItem("okkoki_custom_wall", ph.src);
-                    setWallpaper("custom");
-                    notify("settings", "Wallpaper updated", "Your photo is now the background.");
-                } catch {
-                    notify("settings", "Couldn't set wallpaper", "Browser storage is full.");
-                }
+    async function photoViewerAction(action) {
+        const ph = photoView != null ? photoById(photoView) : null;
+        if (action === "wall" && ph) {
+            try {
+                localStorage.setItem("okkoki_custom_wall", ph.src);
+                setWallpaper("custom");
+                notify("settings", "Wallpaper updated", "Your photo is now the background.");
+            } catch {
+                notify("settings", "Couldn't set wallpaper", "Browser storage is full.");
             }
             return;
         }
-        if (action === "del" && photoView != null) {
-            const photos = loadPhotos();
-            photos.splice(photoView, 1);
-            savePhotos(photos);
+        if (action === "fav" && ph) {
+            await toggleFavPhoto(ph.id);
+        }
+        if (action === "del" && ph) {
+            await deletePhoto(ph.id);
             photosDirty = true;
             photoView = null;
         }
@@ -1753,6 +1966,19 @@
             </div>
         </div>
         <div class="settings-group">
+            <div class="settings-label">Live tiles</div>
+            <div>
+                ${seg("live", "on", "sparkle", "On", liveOn())}
+                ${seg("live", "off", "square", "Off", !liveOn())}
+            </div>
+            ${small("Tempo")}
+            <div>
+                ${seg("tempo", "calm", "cloud", "Calm", liveTempo() === "calm")}
+                ${seg("tempo", "normal", "image", "Normal", liveTempo() === "normal")}
+                ${seg("tempo", "lively", "rocket", "Lively", liveTempo() === "lively")}
+            </div>
+        </div>
+        <div class="settings-group">
             <div class="settings-label">Lock screen</div>
             <div>
                 ${seg("lock", "on", "lock", "On", lock)}
@@ -1761,12 +1987,14 @@
         </div>
         <div class="settings-group">
             <div class="settings-label">Storage</div>
-            ${p(`${loadPhotos().length} photos &bull; ${loadNotes().length} notes &bull; layout ${localStorage.getItem(LAYOUT_KEY) ? "customized" : "default"} — all saved in this browser only.`)}
+            ${p(`${loadPhotos().length} photos &bull; ${loadNotes().length} notes &bull; ${loadNotifs().length} notifications &bull; layout ${localStorage.getItem(LAYOUT_KEY) ? "customized" : "default"} — all saved in this browser only.`)}
             <button class="metro-btn" data-reset>${ic("delete")} Reset everything</button>
         </div>
         <div class="settings-group">
             <div class="settings-label">About</div>
-            ${p("OKKOKI OS 5.0 — Windows Phone, reimagined for 2026.")}
+            ${p("OKKOKI OS 6.0 — Windows Phone, reimagined for 2026.")}
+            ${p(`${+localStorage.getItem("okkoki_stat_photos") || 0} photos ever taken here &bull; visitor since ${localStorage.getItem("okkoki_since") || "today"}.`)}
+            ${small("Psst — swipe down from the very top of the screen. There's more.")}
             ${small("Icons: Fluent UI System Icons (Microsoft, MIT) &amp; Simple Icons. Weather: Open-Meteo. Wallpapers via Wikimedia Commons: NASA (aurora, public domain), NASA/ESA/CSA/STScI (Cosmic Cliffs, public domain), Anthony Quintano (Milky Way, public domain), Jakub Hałun (Bali sunset, CC BY-SA 4.0).")}
         </div>`;
     }
@@ -2123,7 +2351,66 @@
     /* ================================================================
        Nav bar + all-apps arrow + swipe + keyboard
        ================================================================ */
-    $("#navBack").addEventListener("click", goBack);
+    /* ---- App switcher (hold Back) + Resuming... ---- */
+    const recentApps = [];
+    function trackRecent(id) {
+        const i = recentApps.indexOf(id);
+        if (i >= 0) recentApps.splice(i, 1);
+        recentApps.unshift(id);
+        if (recentApps.length > 8) recentApps.pop();
+    }
+
+    const switcher = document.createElement("div");
+    switcher.className = "switcher";
+    switcher.innerHTML = `<div class="switcher-track" id="switcherTrack"></div>`;
+    viewport.appendChild(switcher);
+
+    const resuming = document.createElement("div");
+    resuming.className = "resuming";
+    resuming.innerHTML = `<span>Resuming&#8230;</span><div class="resuming-dots"><i></i><i></i><i></i><i></i><i></i></div>`;
+    viewport.appendChild(resuming);
+
+    function openSwitcher() {
+        if (!recentApps.length) return;
+        Sound.buzz(15);
+        $("#switcherTrack").innerHTML = recentApps.map((id) => {
+            const app = appById(id);
+            return app ? `<div class="switch-card" data-switch="${id}">
+                <div class="switch-card-head">${app.name}</div>
+                <div class="switch-card-body">${ic(app.icon)}</div>
+            </div>` : "";
+        }).join("");
+        switcher.classList.add("open");
+    }
+
+    const closeSwitcher = () => switcher.classList.remove("open");
+
+    switcher.addEventListener("click", async (e) => {
+        const card = e.target.closest("[data-switch]");
+        closeSwitcher();
+        if (!card) return;
+        const id = card.dataset.switch;
+        resuming.classList.add("on");
+        setTimeout(() => {
+            resuming.classList.remove("on");
+            if (current === "app") { showOnly(startScreen); current = "start"; }
+            openApp(id, null);
+        }, 950);
+    });
+
+    let backHold = null, backHeld = false;
+    const navBackBtn = $("#navBack");
+    navBackBtn.addEventListener("pointerdown", () => {
+        backHeld = false;
+        backHold = setTimeout(() => { backHeld = true; openSwitcher(); }, 600);
+    });
+    ["pointerup", "pointerleave", "pointercancel"].forEach((ev) =>
+        navBackBtn.addEventListener(ev, () => clearTimeout(backHold)));
+    navBackBtn.addEventListener("click", () => {
+        if (backHeld) { backHeld = false; return; }
+        if (switcher.classList.contains("open")) { closeSwitcher(); return; }
+        goBack();
+    });
     $("#navStart").addEventListener("click", () => { exitEditMode(); goStart(); });
     $("#navSearch").addEventListener("click", () => { exitEditMode(); goList(true); });
     $("#allAppsBtn").addEventListener("click", () => goList());
@@ -2201,6 +2488,10 @@
        ================================================================ */
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     applySettings();
+    if (!localStorage.getItem("okkoki_since")) {
+        localStorage.setItem("okkoki_since",
+            new Date().toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }));
+    }
     renderStart();
     startScreen.scrollTop = 0;
     renderAppList();
@@ -2210,4 +2501,8 @@
     syncWallpaper();
     initLockScreen();
     scheduleAmbientNotifs();
+    migratePhotos().then(() => {
+        photosDirty = true;
+        if (current === "start" && !busy) refreshPhotosTileIfNeeded();
+    });
 })();
