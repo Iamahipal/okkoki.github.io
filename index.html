@@ -19,6 +19,7 @@
         <div class="lock-content">
             <div class="lock-time" id="lockTime">12:00</div>
             <div class="lock-date" id="lockDate">Monday, January 1</div>
+            <div class="lock-icons" id="lockIcons"></div>
             <div class="lock-hint"><svg class="icon"><use href="#i-chevron-up"/></svg> swipe up to unlock</div>
         </div>
     </div>
@@ -60,6 +61,30 @@
                 <div class="jump-inner" id="jumpInner"></div>
             </div>
         </main>
+
+        <!-- Toast notifications (WP banner) -->
+        <div class="toast" id="toast"></div>
+
+        <!-- Action Center (swipe down from the top / tap the grabber) -->
+        <div class="ac-grabber" id="acGrabber" aria-label="Open action center"></div>
+        <div class="action-center" id="actionCenter">
+            <div class="ac-quick" id="acQuick"></div>
+            <div class="ac-head">
+                <span class="ac-title">notifications</span>
+                <button class="ac-clear" id="acClear">clear all</button>
+            </div>
+            <div class="ac-list" id="acList"></div>
+            <div class="ac-handle"><svg class="icon"><use href="#i-chevron-up"/></svg></div>
+        </div>
+
+        <!-- Glance screen overlay -->
+        <div class="glance" id="glance">
+            <div class="glance-inner" id="glanceInner">
+                <div class="glance-time" id="glanceTime">12:00</div>
+                <div class="glance-date" id="glanceDate"></div>
+                <div class="glance-icons" id="glanceIcons"></div>
+            </div>
+        </div>
 
         <!-- Navigation bar -->
         <nav class="nav-bar">
