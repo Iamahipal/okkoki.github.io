@@ -2454,3 +2454,133 @@ body[data-tiles="solid"] .lock-screen::before {
     line-height: 1.35;
     margin: 0 0 5px;
 }
+
+/* ================================================================
+   V9 — Koki, the assistant (a love letter to Cortana)
+   ================================================================ */
+.koki {
+    padding: 4px 16px 14px;
+    flex: none;
+}
+
+.koki-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* The orb: a calm breathing ring, like Cortana at rest */
+.koki-orb {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    flex: none;
+    border-radius: 50%;
+    border: 2px solid var(--accent-lite);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    animation: kokiBreathe 3.4s ease-in-out infinite;
+}
+
+.koki-orb i {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-lite);
+    animation: kokiPulse 3.4s ease-in-out infinite;
+}
+
+@keyframes kokiBreathe {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(26, 127, 224, 0.35); }
+    50%      { box-shadow: 0 0 0 7px rgba(26, 127, 224, 0); }
+}
+
+@keyframes kokiPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50%      { transform: scale(0.72); opacity: 1; }
+}
+
+/* Thinking: the ring spins into an arc, the dot shrinks away */
+.koki-orb.thinking {
+    animation: none;
+    border-color: rgba(255, 255, 255, 0.18);
+    border-top-color: var(--accent-lite);
+    animation: kokiSpin 0.62s linear infinite;
+}
+
+.koki-orb.thinking i {
+    animation: none;
+    transform: scale(0.4);
+    opacity: 0.5;
+}
+
+@keyframes kokiSpin {
+    to { transform: rotate(360deg); }
+}
+
+.koki-hello {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.88);
+    line-height: 1.3;
+}
+
+.koki-answer {
+    display: none;
+    margin-top: 12px;
+    padding: 13px 15px;
+    background: rgba(255, 255, 255, 0.07);
+    border-left: 3px solid var(--accent);
+}
+
+.koki-answer.show { display: block; }
+
+.koki-text {
+    font-size: 15px;
+    line-height: 1.45;
+    margin: 0;
+    min-height: 1.45em;
+}
+
+.koki-answer .koki-do { margin: 12px 0 0; }
+
+.koki-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px;
+}
+
+.koki-chip {
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-family: inherit;
+    font-size: 12.5px;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.koki-chip:active { background: var(--accent); border-color: var(--accent); }
+
+/* Theme parity: frosted in glass, readable in light */
+body[data-tiles="glass"] .koki-answer {
+    background: rgba(12, 20, 34, 0.42);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+}
+
+body[data-tiles="glass"] .koki-chip {
+    background: rgba(14, 24, 40, 0.42);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+body.light:not([data-tiles="glass"]) .koki-hello { color: #111; }
+body.light:not([data-tiles="glass"]) .koki-answer { background: #f2f2f2; color: #111; }
+body.light:not([data-tiles="glass"]) .koki-chip { background: #ececec; border-color: #d5d5d5; color: #111; }
+body.light:not([data-tiles="glass"]) .koki-chip:active { background: var(--accent); color: #fff; }
