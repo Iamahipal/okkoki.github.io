@@ -6,6 +6,22 @@
     <meta name="description" content="OKKOKI — Fueling Small Business Growth. Digital marketing, website building and paid media, delivered as a Windows Phone experience on the web.">
     <meta name="theme-color" content="#000000">
     <title>OKKOKI — Fueling Small Business Growth</title>
+    <!-- Link preview card for WhatsApp, LinkedIn, X, iMessage, Slack.
+         Crawlers don't resolve relative paths, so these are absolute. -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="OKKOKI">
+    <meta property="og:url" content="https://iamahipal.github.io/okkoki.github.io/">
+    <meta property="og:title" content="OKKOKI — Fueling Small Business Growth">
+    <meta property="og:description" content="Websites, paid media, SEO and social for small business — delivered as a Windows Phone you can hold in your browser.">
+    <meta property="og:image" content="https://iamahipal.github.io/okkoki.github.io/share-card.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="OKKOKI — Fueling Small Business Growth, shown as Metro tiles">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OKKOKI — Fueling Small Business Growth">
+    <meta name="twitter:description" content="Websites, paid media, SEO and social for small business — delivered as a Windows Phone you can hold in your browser.">
+    <meta name="twitter:image" content="https://iamahipal.github.io/okkoki.github.io/share-card.png">
+
     <!-- Installable: add to home screen and OKKOKI OS runs as a real app -->
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -24,6 +40,7 @@
     <!-- WP lock screen: swipe/click up to unlock (once per session) -->
     <div class="lock-screen" id="lockScreen">
         <div class="lock-content">
+            <div class="lock-greet" id="lockGreet"></div>
             <div class="lock-time" id="lockTime">12:00</div>
             <div class="lock-date" id="lockDate">Monday, January 1</div>
             <div class="lock-icons" id="lockIcons"></div>

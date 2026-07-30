@@ -2,7 +2,7 @@
    Strategy: precache the shell on install, then stale-while-revalidate
    for same-origin GETs so updates land on the next visit without the
    user ever staring at a blank screen. Bump CACHE on each release. */
-const CACHE = "okkoki-v9";
+const CACHE = "okkoki-v10";
 
 /* Relative paths — the site lives under /okkoki.github.io/ on Pages */
 const SHELL = [
@@ -16,6 +16,7 @@ const SHELL = [
     "icons/icon-maskable-192.png",
     "icons/icon-maskable-512.png",
     "icons/apple-touch-icon.png",
+    "share-card.png",
     "wallpapers/aurora.jpg",
     "wallpapers/nebula.jpg",
     "wallpapers/sunset.jpg",
