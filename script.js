@@ -64,6 +64,15 @@
 
     const getAccent = () => localStorage.getItem("okkoki_accent") || DEFAULT_ACCENT;
     const lockEnabled = () => localStorage.getItem("okkoki_lock") !== "off";
+    /* Names land inside HTML attributes (tile faces), so only letters,
+       marks, spaces and the punctuation real names use ever get stored. */
+    const cleanName = (s) =>
+        (s || "").replace(/[^\p{L}\p{M}\s.-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 18);
+    const userName = () => cleanName(localStorage.getItem("okkoki_name"));
+    const timeGreeting = () => {
+        const h = new Date().getHours();
+        return h < 5 ? "Still up" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+    };
 
     function wallList() {
         const custom = localStorage.getItem("okkoki_custom_wall");
@@ -139,6 +148,13 @@
         shutter() { this.ping(2200, 0.03, 0.06); this.ping(1100, 0.04, 0.06, "square", 0.05); this.buzz(20); },
         buzz(ms = 8) { if (hapticsOn() && navigator.vibrate) navigator.vibrate(ms); },
     };
+
+    /* The little three-note rise when the phone wakes up */
+    function bootChime() {
+        Sound.ping(523, 0.16, 0.045, "sine");
+        Sound.ping(784, 0.16, 0.045, "sine", 0.1);
+        Sound.ping(1047, 0.30, 0.05, "sine", 0.2);
+    }
 
     /* ---------------- Page block builders ---------------- */
     const p    = (t) => `<p class="metro-p">${t}</p>`;
@@ -236,6 +252,7 @@
         { id: "weather", name: "Weather", icon: "weather", page: () =>
             [`<div id="weatherApp"><p class="metro-p">Getting your weather…</p></div>`] },
         { id: "camera", name: "Camera", icon: "camera", fullscreen: true },
+        { id: "game", name: "Flappy Tile", icon: "heart", fullscreen: true },
         { id: "photos", name: "Photos", icon: "photos", page: () =>
             [`<div id="photosApp">${photosBody()}</div>`] },
         { id: "settings", name: "Settings", icon: "gear", page: () =>
@@ -314,12 +331,16 @@
     }
 
     const TILE_DEFS = {
-        hero: { app: "about", label: false, live: { template: "peek" }, faces: [
-            `<h1 class="retro-text">OKKOKI</h1><p class="tagline">Fueling Small Business Growth</p>`,
-            typed("Websites that win customers.", "Digital marketing for small business"),
-            line("Web &bull; Paid media &bull; SEO &bull; Social", "Everything your business needs online"),
-            typed("Book a free 30-min growth call", "Tap to meet the human behind OKKOKI"),
-        ]},
+        hero: { app: "about", label: false, live: { template: "peek" }, facesFn: () => {
+            const name = cleanName(localStorage.getItem("okkoki_name"));
+            return [
+                `<h1 class="retro-text">OKKOKI</h1><p class="tagline">Fueling Small Business Growth</p>`,
+                ...(name ? [typed(`${timeGreeting()}, ${name}.`, "Welcome back to OKKOKI")] : []),
+                typed("Websites that win customers.", "Digital marketing for small business"),
+                line("Web &bull; Paid media &bull; SEO &bull; Social", "Everything your business needs online"),
+                typed("Book a free 30-min growth call", "Tap to meet the human behind OKKOKI"),
+            ];
+        }},
         services: { app: "services", live: { template: "peek" }, faces: [
             face("rocket"),
             marquee("Web design &bull; Paid media &bull; SEO &bull; Social &bull; Branding"),
@@ -354,6 +375,16 @@
             face("color"), fill("#1ba1e2"), fill("#aa00ff"), fill("#60a917"), fill("#fa6800"),
         ]},
         camera: { app: "camera" },
+        game: { app: "game", live: { template: "flip" }, facesFn: () => {
+            const best = +localStorage.getItem("okkoki_flappy_best") || 0;
+            return [
+                face("heart"),
+                best
+                    ? countup("Best ", best, "", "Think you can beat it?")
+                    : line("Flappy Tile", "One thumb. Two pillars. Go."),
+                line("Tap to flap", "A 90s break, on the house"),
+            ];
+        }},
         photos: { app: "photos", live: { template: "flip" }, facesFn: photoFaces },
         music: { app: "music", live: { template: "peek" }, faces: [
             face("music"), line("Metro beats", "Built-in chiptune radio"),
@@ -401,6 +432,7 @@
         { id: "email", size: "small" },
         { id: "phone", size: "small" },
         { id: "8bit", size: "small" },
+        { id: "game", size: "wide" },
         { id: "hub", size: "medium" },
         { id: "calculator", size: "small" },
         { id: "notes", size: "small" },
@@ -798,6 +830,7 @@
         [startScreen, listScreen, appScreen].forEach((s) => s.classList.toggle("active", s === screen));
     }
 
+    /* Rebuilds Start when a live tile's data changed (new photo, new high score) */
     function refreshPhotosTileIfNeeded() {
         if (!photosDirty) return;
         photosDirty = false;
@@ -844,6 +877,7 @@
 
     function leaveApp() {
         stopCamera();
+        stopGame();
         activeApp = null;
     }
 
@@ -1012,6 +1046,11 @@
             buildCamera();
             return;
         }
+        if (app.fullscreen && app.id === "game") {
+            activeApp = "game";
+            buildGame();
+            return;
+        }
         const blocks = app.embed
             ? [`<iframe class="app-embed" src="${app.embed}" loading="lazy" title="${app.name}"></iframe>`]
             : (app.page ? app.page() : [p("Coming soon.")]);
@@ -1158,6 +1197,14 @@
         }
         if ((b = q("[data-glance]")))  { enterGlance(); return; }
         if ((b = q("[data-install]"))) { promptInstall(); return; }
+        if ((b = q("[data-name]")))    {
+            const input = $("#nameInput");
+            localStorage.setItem("okkoki_name", cleanName(input ? input.value : ""));
+            Sound.tick();
+            photosDirty = true;                   // hero tile picks up the greeting
+            rerender("settingsApp", settingsBody);
+            return;
+        }
         if ((b = q("[data-reset]")))   {
             if (confirm("Reset everything? Your layout, notes, photos and settings on this device will be erased.")) {
                 indexedDB.deleteDatabase("okkoki");
@@ -1488,6 +1535,261 @@
             weatherFail("Couldn't get your location — allow location access and try again.");
         }, { timeout: 9000, maximumAge: 600000 });
     }
+
+    /* ================================================================
+       GAME: Flappy Tile — a Metro square, two pillars, one thumb
+       ================================================================ */
+    const BEST_KEY = "okkoki_flappy_best";
+    const bestScore = () => +localStorage.getItem(BEST_KEY) || 0;
+
+    let game = null;   // live game state; null whenever nothing is running
+
+    function buildGame() {
+        appScreen.innerHTML = `
+            <div class="game-full">
+                <canvas id="gameCanvas"></canvas>
+                <div class="game-hud">
+                    <div class="game-score" id="gameScore">0</div>
+                </div>
+                <div class="game-card" id="gameCard">
+                    <div class="game-card-in">
+                        <div class="game-title" id="gameTitle">Flappy Tile</div>
+                        <div class="game-sub" id="gameSub">Tap to flap. Mind the pillars.</div>
+                        <div class="game-best" id="gameBest">Best ${bestScore()}</div>
+                        <button class="metro-btn primary" id="gameStart">${ic("play")} Play</button>
+                        <button class="metro-btn" data-gameback>${ic("arrow-left")} Back</button>
+                    </div>
+                </div>
+            </div>`;
+        startGame();
+    }
+
+    function startGame() {
+        const canvas = $("#gameCanvas");
+        if (!canvas) return;
+        stopGame();
+
+        const ctx = canvas.getContext("2d");
+        const accent = getAccent();
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+
+        game = {
+            canvas, ctx, dpr, accent,
+            raf: 0, last: 0, acc: 0, frames: 0,
+            w: 0, h: 0,
+            state: "ready",           // ready | playing | over
+            y: 0, vy: 0, rot: 0,
+            pillars: [], score: 0, spawn: 0, spawned: 0, scroll: 0,
+        };
+
+        sizeGame();
+        resetRound();
+        game.raf = requestAnimationFrame(gameLoop);
+    }
+
+    function sizeGame() {
+        if (!game) return;
+        const r = game.canvas.getBoundingClientRect();
+        game.w = r.width || viewport.clientWidth;
+        game.h = r.height || viewport.clientHeight;
+        game.canvas.width = Math.round(game.w * game.dpr);
+        game.canvas.height = Math.round(game.h * game.dpr);
+        game.ctx.setTransform(game.dpr, 0, 0, game.dpr, 0, 0);
+    }
+
+    function resetRound() {
+        if (!game) return;
+        game.y = game.h * 0.42;
+        game.vy = 0;
+        game.rot = 0;
+        game.pillars = [];
+        game.score = 0;
+        game.spawn = 0.9;      // a beat to settle before the first pillar
+        game.spawned = 0;
+        game.state = "ready";
+        const s = $("#gameScore");
+        if (s) s.textContent = "0";
+    }
+
+    /* Physics in units per second so it plays the same on any refresh rate */
+    const G = { grav: 2100, flap: -620, speed: 210, gap: 0.30, pillarW: 62, size: 34, every: 1.45 };
+
+    function flap() {
+        if (!game) return;
+        if (game.state === "over") return;
+        if (game.state === "ready") {
+            game.state = "playing";
+            hideGameCard();
+        }
+        game.vy = G.flap;
+        Sound.ping(760, 0.05, 0.03, "square");
+        Sound.buzz(6);
+    }
+
+    function gameOver() {
+        if (!game || game.state === "over") return;
+        game.state = "over";
+        Sound.ping(300, 0.12, 0.05, "square");
+        Sound.ping(180, 0.22, 0.05, "square", 0.1);
+        Sound.buzz(28);
+
+        const best = bestScore();
+        const isBest = game.score > best;
+        if (isBest) {
+            localStorage.setItem(BEST_KEY, String(game.score));
+            photosDirty = true;   // rebuild Start so the tile shows the new best
+        }
+        localStorage.setItem("okkoki_flappy_plays", String((+localStorage.getItem("okkoki_flappy_plays") || 0) + 1));
+
+        const card = $("#gameCard"), title = $("#gameTitle"), sub = $("#gameSub"),
+              bestEl = $("#gameBest"), start = $("#gameStart");
+        if (!card) return;
+        title.textContent = isBest ? "New best!" : "Game over";
+        sub.textContent = `You scored ${game.score}`;
+        bestEl.textContent = `Best ${Math.max(best, game.score)}`;
+        start.innerHTML = `${ic("retry")} Play again`;
+        card.classList.remove("hidden");
+    }
+
+    function hideGameCard() {
+        const card = $("#gameCard");
+        if (card) card.classList.add("hidden");
+    }
+
+    function stepGame(dt) {
+        const g = game;
+        if (g.state !== "playing") {
+            // Idle bob on the start screen so the tile looks alive
+            g.rot = Math.sin(performance.now() / 260) * 0.12;
+            return;
+        }
+
+        g.vy += G.grav * dt;
+        g.y += g.vy * dt;
+        g.rot = Math.max(-0.5, Math.min(1.1, g.vy / 900));
+        g.scroll += G.speed * dt;
+
+        g.spawn -= dt;
+        if (g.spawn <= 0) {
+            g.spawn = G.every;
+            const gapH = g.h * G.gap;
+            const margin = g.h * 0.12;
+            // The first pillar is always centred and reachable — nobody
+            // should lose before they've understood the game.
+            const top = g.spawned === 0
+                ? (g.h - gapH) / 2
+                : margin + Math.random() * (g.h - gapH - margin * 2);
+            g.spawned++;
+            g.pillars.push({ x: g.w + G.pillarW, top, gap: gapH, passed: false });
+        }
+
+        const half = G.size / 2;
+        for (const p of g.pillars) {
+            p.x -= G.speed * dt;
+            if (!p.passed && p.x + G.pillarW < g.w * 0.28 - half) {
+                p.passed = true;
+                g.score++;
+                $("#gameScore").textContent = g.score;
+                Sound.ping(1180, 0.05, 0.03);
+            }
+            // Collision: the tile sits at a fixed x, pillars come to it
+            const bx = g.w * 0.28;
+            if (bx + half > p.x && bx - half < p.x + G.pillarW &&
+                (g.y - half < p.top || g.y + half > p.top + p.gap)) {
+                gameOver();
+            }
+        }
+        g.pillars = g.pillars.filter((p) => p.x + G.pillarW > -10);
+
+        if (g.y + half >= g.h || g.y - half <= 0) {
+            g.y = Math.max(half, Math.min(g.h - half, g.y));
+            gameOver();
+        }
+    }
+
+    function drawGame() {
+        const g = game, x = g.ctx;
+        x.clearRect(0, 0, g.w, g.h);
+
+        // Backdrop: black with a slow Metro grid drifting past
+        x.fillStyle = "#000";
+        x.fillRect(0, 0, g.w, g.h);
+        x.strokeStyle = "rgba(255,255,255,0.05)";
+        x.lineWidth = 1;
+        const step = 44, off = -(g.scroll * 0.35) % step;
+        for (let i = off; i < g.w; i += step) {
+            x.beginPath(); x.moveTo(i, 0); x.lineTo(i, g.h); x.stroke();
+        }
+
+        // Pillars — squared off, no rounding, pure Metro
+        for (const p of g.pillars) {
+            x.fillStyle = g.accent;
+            x.fillRect(p.x, 0, G.pillarW, p.top);
+            x.fillRect(p.x, p.top + p.gap, G.pillarW, g.h - p.top - p.gap);
+            x.fillStyle = "rgba(255,255,255,0.16)";
+            x.fillRect(p.x, p.top - 5, G.pillarW, 5);
+            x.fillRect(p.x, p.top + p.gap, G.pillarW, 5);
+        }
+
+        // The tile itself
+        const half = G.size / 2;
+        x.save();
+        x.translate(g.w * 0.28, g.y);
+        x.rotate(g.rot);
+        x.fillStyle = "#fff";
+        x.fillRect(-half, -half, G.size, G.size);
+        x.fillStyle = g.accent;
+        x.fillRect(-half + 6, -half + 6, G.size - 12, G.size - 12);
+        x.restore();
+    }
+
+    function gameLoop(ts) {
+        if (!game) return;
+        const g = game;
+        if (!g.last) g.last = ts;
+        let dt = (ts - g.last) / 1000;
+        g.last = ts;
+        dt = Math.min(dt, 0.05);          // a backgrounded tab must not teleport the tile
+
+        g.acc += dt;
+        const fixed = 1 / 120;
+        while (g.acc >= fixed) { stepGame(fixed); g.acc -= fixed; }
+
+        drawGame();
+        g.frames++;
+        g.raf = requestAnimationFrame(gameLoop);
+    }
+
+    function stopGame() {
+        if (!game) return;
+        cancelAnimationFrame(game.raf);
+        game = null;
+    }
+
+    /* Controls: tap the stage, or Space/Enter on a keyboard */
+    appScreen.addEventListener("pointerdown", (e) => {
+        if (!game) return;
+        if (e.target.closest(".metro-btn") || e.target.closest("[data-gameback]")) return;
+        if (game.state === "over") return;
+        flap();
+    });
+
+    appScreen.addEventListener("click", (e) => {
+        if (e.target.closest("[data-gameback]")) { goBack(); return; }
+        if (e.target.closest("#gameStart")) {
+            Sound.tick();
+            resetRound();
+            hideGameCard();
+            game.state = "playing";
+            game.vy = G.flap;
+            return;
+        }
+    });
+
+    window.addEventListener("resize", () => { if (game) { sizeGame(); } });
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && game && game.state === "playing") gameOver();
+    });
 
     /* ================================================================
        APP: Camera + Photos (stored in the browser)
@@ -2000,6 +2302,16 @@
         return `
         ${installGroup()}
         <div class="settings-group">
+            <div class="settings-label">Make it personal</div>
+            ${p("Tell the phone your name and it'll say hello. Stored on this device only — never sent anywhere.")}
+            <div class="name-row">
+                <input type="text" id="nameInput" class="name-input" maxlength="18"
+                       placeholder="your first name" value="${esc(userName())}" autocomplete="given-name">
+                <button class="metro-btn primary" data-name="save">${ic("check")} Save</button>
+            </div>
+            ${userName() ? small(`Right now it would greet you with “${timeGreeting()}, ${esc(userName())}”.`) : ""}
+        </div>
+        <div class="settings-group">
             <div class="settings-label">Start + theme</div>
             ${small("Tile style")}
             <div>
@@ -2151,9 +2463,82 @@
 
     appListEl.addEventListener("click", (e) => {
         if (e.target.closest(".letter-header")) { jumpGrid.classList.add("active"); return; }
+        const pin = e.target.closest("[data-pinapp]");
+        if (pin) { e.stopPropagation(); pinAppToStart(pin.dataset.pinapp, pin); return; }
+        // The click that ends the long-press must not also open the app
+        if (pinJustOpened) { pinJustOpened = false; return; }
+        if (listPinOpen) { closePinSheet(); return; }
         const it = e.target.closest(".app-item");
         if (it) { Sound.tick(); markRead(it.dataset.app); openApp(it.dataset.app, null); }
     });
+
+    /* ---- Pin to start (long-press an app, like real WP) ----
+       Unpinning used to be a one-way door: loadLayout respects
+       KNOWN_KEY, so an unpinned tile never came back on its own. */
+    let listPinOpen = null;
+    let listPressTimer = null;
+    let pinJustOpened = false;
+
+    const tileIdForApp = (appId) =>
+        (TILE_DEFS[appId] && TILE_DEFS[appId].app === appId)
+            ? appId
+            : Object.keys(TILE_DEFS).find((k) => TILE_DEFS[k].app === appId);
+
+    const isPinned = (tileId) =>
+        !!$(`.tile[data-tid="${tileId}"]`, tileGrid);
+
+    function closePinSheet() {
+        if (!listPinOpen) return;
+        $$(".pin-sheet", appListEl).forEach((s) => s.remove());
+        listPinOpen = null;
+    }
+
+    function openPinSheet(item) {
+        closePinSheet();
+        const appId = item.dataset.app;
+        const tileId = tileIdForApp(appId);
+        if (!tileId) return;                      // no tile definition -> nothing to pin
+        Sound.tick();
+        Sound.buzz(30);
+        const pinned = isPinned(tileId);
+        const sheet = document.createElement("div");
+        sheet.className = "pin-sheet";
+        sheet.innerHTML = pinned
+            ? `<span class="pin-note">${ic("check")} on start</span>`
+            : `<button class="pin-btn" data-pinapp="${appId}">${ic("pin")} pin to start</button>`;
+        item.appendChild(sheet);
+        listPinOpen = item;
+    }
+
+    function pinAppToStart(appId, btn) {
+        const tileId = tileIdForApp(appId);
+        if (!tileId || isPinned(tileId)) return;
+        Sound.tick();
+        // Append to the live grid, then persist via the existing serializer
+        const html = tileHTML({ id: tileId, size: "medium" });
+        tileGrid.insertAdjacentHTML("beforeend", html);
+        saveLayout();
+        renderStart();                            // rewires live tiles + grid math
+        requestWallpaper();
+        if (btn) {
+            btn.outerHTML = `<span class="pin-note">${ic("check")} pinned</span>`;
+        }
+        setTimeout(closePinSheet, 1100);
+    }
+
+    appListEl.addEventListener("pointerdown", (e) => {
+        const it = e.target.closest(".app-item");
+        if (!it || e.target.closest(".pin-sheet")) return;
+        clearTimeout(listPressTimer);
+        listPressTimer = setTimeout(() => {
+            pinJustOpened = true;
+            openPinSheet(it);
+        }, 650);
+    });
+
+    ["pointerup", "pointercancel", "pointerleave", "pointermove"].forEach((ev) =>
+        appListEl.addEventListener(ev, () => clearTimeout(listPressTimer))
+    );
 
     /* ================================================================
        KOKI — the assistant (a love letter to Cortana)
@@ -2208,6 +2593,9 @@
         { m: ["contact", "email", "phone", "whatsapp", "reach", "call you", "talk", "get in touch", "book"],
           a: "Easiest is the free 30-minute growth call — no pressure, no jargon. WhatsApp, email and phone are all in Contact.",
           open: "book", openLabel: "Book a call" },
+        { m: ["game", "play", "bored", "fun", "flappy", "flap"],
+          a: "There's a Flappy Tile hiding on this phone — one thumb, two pillars, and a high score that judges you. Go on, take a break.",
+          open: "game", openLabel: "Play Flappy Tile" },
         { m: ["hello", "hi ", "hey", "yo ", "namaste", "good morning", "good evening"],
           a: "Hello! I'm Koki. Ask me what OKKOKI does, what it costs, or how fast we can get you live.",
           open: null },
@@ -2773,6 +3161,8 @@
             let h = d.getHours() % 12; if (h === 0) h = 12;
             $("#lockTime").textContent = `${h}:${String(d.getMinutes()).padStart(2, "0")}`;
             $("#lockDate").textContent = `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+            const greet = $("#lockGreet");
+            if (greet) greet.textContent = userName() ? `${timeGreeting()}, ${userName()}` : "";
         };
         tick();
         const clock = setInterval(tick, 15000);
@@ -2783,6 +3173,7 @@
             unlocked = true;
             clearInterval(clock);
             sessionStorage.setItem("okkoki_unlocked", "1");
+            bootChime();
             lockScreen.classList.add("unlocking");
             setTimeout(() => lockScreen.remove(), 600);
             bootStart();
