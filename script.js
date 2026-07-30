@@ -694,13 +694,16 @@
             el.textContent = "";
             el.classList.add("typing");
             let i = 0;
+            // Tiles type at a leisurely pace; longer copy (Koki's answers)
+            // sets its own speed so nobody waits to finish reading.
+            const speed = +el.dataset.typeSpeed || 52;
             const t = setInterval(() => {
                 el.textContent = text.slice(0, ++i);
                 if (i >= text.length || !el.isConnected) {
                     clearInterval(t);
                     el.classList.remove("typing");
                 }
-            }, 52);
+            }, speed);
         });
         $$("[data-countup]", root).forEach((el) => {
             if (el.dataset.done) return;
@@ -875,6 +878,7 @@
         showOnly(startScreen);
         startScreen.scrollTop = 0;
         current = "start";
+        resetKoki();
         await turnstile(gridEls(), "in", 16);
         requestWallpaper();
         busy = false;
@@ -1153,6 +1157,7 @@
             return;
         }
         if ((b = q("[data-glance]")))  { enterGlance(); return; }
+        if ((b = q("[data-install]"))) { promptInstall(); return; }
         if ((b = q("[data-reset]")))   {
             if (confirm("Reset everything? Your layout, notes, photos and settings on this device will be erased.")) {
                 indexedDB.deleteDatabase("okkoki");
@@ -1993,6 +1998,7 @@
         const seg = (attr, val, icon, label, active) =>
             `<button class="metro-btn${active ? " primary" : ""}" data-${attr}="${val}">${ic(icon)} ${label}</button>`;
         return `
+        ${installGroup()}
         <div class="settings-group">
             <div class="settings-label">Start + theme</div>
             ${small("Tile style")}
@@ -2062,6 +2068,60 @@
     }
 
     /* ================================================================
+       INSTALL — put the phone on their phone (PWA)
+       ================================================================ */
+    let installEvent = null;
+    const isStandalone = () =>
+        matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    /* iOS never fires beforeinstallprompt — it needs the Share sheet */
+    const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        installEvent = e;
+        if (activeApp === "settings") rerender("settingsApp", settingsBody);
+    });
+
+    window.addEventListener("appinstalled", () => {
+        installEvent = null;
+        if (activeApp === "settings") rerender("settingsApp", settingsBody);
+    });
+
+    function installGroup() {
+        if (isStandalone()) {
+            return `<div class="settings-group">
+                <div class="settings-label">Install</div>
+                ${p("You're running OKKOKI OS as an app. No address bar, no browser — just the phone.")}
+            </div>`;
+        }
+        const how = installEvent
+            ? `<button class="metro-btn primary" data-install>${ic("add")} Install OKKOKI OS</button>`
+            : isIOS()
+                ? small("On iPhone: tap the Share button in Safari, then <b>Add to Home Screen</b>.")
+                : small("In your browser menu, choose <b>Install app</b> or <b>Add to Home screen</b>.");
+        return `<div class="settings-group">
+            <div class="settings-label">Install</div>
+            ${p("Pin this phone to your phone — it opens fullscreen with no address bar, and works offline.")}
+            ${how}
+        </div>`;
+    }
+
+    async function promptInstall() {
+        if (!installEvent) return;
+        Sound.tick();
+        installEvent.prompt();
+        await installEvent.userChoice.catch(() => null);
+        installEvent = null; // a prompt can only be used once
+        rerender("settingsApp", settingsBody);
+    }
+
+    function registerSW() {
+        if (!("serviceWorker" in navigator)) return;
+        // Relative path keeps the scope correct under /okkoki.github.io/
+        navigator.serviceWorker.register("sw.js").catch(() => { /* offline mode unavailable */ });
+    }
+
+    /* ================================================================
        App list + alphabet jump grid + search
        ================================================================ */
     const LETTERS = ["#", ..."abcdefghijklmnopqrstuvwxyz"];
@@ -2095,6 +2155,149 @@
         if (it) { Sound.tick(); markRead(it.dataset.app); openApp(it.dataset.app, null); }
     });
 
+    /* ================================================================
+       KOKI — the assistant (a love letter to Cortana)
+       Lives above the app list on the search screen. Ask it anything
+       about OKKOKI; every road leads to a free growth call.
+       ================================================================ */
+    const KOKI_CHIPS = [
+        "What do you do?",
+        "How much does it cost?",
+        "Show me results",
+        "Why Windows Phone?!",
+    ];
+
+    /* TODO: keep these answers in the owner's own voice — edit freely. */
+    const KOKI_QA = [
+        { m: ["what do you do", "services", "service", "offer", "help with", "what can you"],
+          a: "Four things, done properly: websites that convert, paid media on Google and Meta, SEO that gets you found, and social that keeps you top of mind.",
+          open: "services", openLabel: "See services" },
+        { m: ["price", "cost", "how much", "budget", "charge", "rate", "quote", "expensive"],
+          a: "Every project is scoped to the business — a one-page site and a national ad campaign shouldn't cost the same. The free 30-minute call is where we work out what yours needs.",
+          open: "book", openLabel: "Book the free call" },
+        { m: ["result", "proof", "portfolio", "case study", "work", "clients", "examples", "show me"],
+          a: "Small businesses that now look big: a cafe kiosk, a salon, a fitness brand and more. Open the portfolio and each square becomes their story.",
+          open: "portfolio", openLabel: "See the work" },
+        { m: ["windows phone", "why windows", "metro", "wp", "nokia", "lumia"],
+          a: "Because it was the most beautiful phone OS ever made and the world moved on too fast. This site is that design language, alive again — and proof of what I can build for you.",
+          open: "about", openLabel: "About OKKOKI" },
+        { m: ["cortana"],
+          a: "I'm Koki — Cortana's small cousin, running entirely in your browser. No cloud, no account, no data leaves this phone.",
+          open: "book", openLabel: "Talk to a human" },
+        { m: ["process", "how do you work", "how does it work", "steps", "what happens"],
+          a: "We talk, I look at where you are, then you get a plan with a price before anything starts. No surprise invoices, no jargon.",
+          open: "book", openLabel: "Start with a call" },
+        { m: ["how long", "timeline", "how fast", "when can", "turnaround", "deadline"],
+          a: "A focused small-business site is usually live in two to four weeks. Ads can be running within days. The call is where we set real dates.",
+          open: "book", openLabel: "Get your timeline" },
+        { m: ["website", "web design", "site", "build me", "landing page", "web development"],
+          a: "Sites built to sell, not just to sit there — fast, mobile-first, and written around what your customer actually wants to know.",
+          open: "services", openLabel: "Website building" },
+        { m: ["seo", "google rank", "ranking", "search engine", "get found", "found on google"],
+          a: "SEO is getting found by people already searching for what you sell. That's technical fixes, the right pages, and content that answers real questions.",
+          open: "services", openLabel: "SEO &amp; growth" },
+        { m: ["ads", "paid", "ppc", "meta", "facebook ad", "google ad", "advertis", "campaign"],
+          a: "Paid media managed for return, not vanity clicks — tight targeting, honest reporting, and budget that goes where it converts.",
+          open: "services", openLabel: "Paid media" },
+        { m: ["social", "instagram", "content", "posting", "reels"],
+          a: "Content and community that keep your brand in mind between purchases — planned, not posted in a panic on a Sunday night.",
+          open: "services", openLabel: "Social media" },
+        { m: ["who are you", "about", "your name", "who is", "behind", "experience", "yourself"],
+          a: "OKKOKI is one person with years of digital marketing behind them — websites, paid media, search and social — now working for small businesses that deserve to punch above their weight.",
+          open: "about", openLabel: "More about me" },
+        { m: ["contact", "email", "phone", "whatsapp", "reach", "call you", "talk", "get in touch", "book"],
+          a: "Easiest is the free 30-minute growth call — no pressure, no jargon. WhatsApp, email and phone are all in Contact.",
+          open: "book", openLabel: "Book a call" },
+        { m: ["hello", "hi ", "hey", "yo ", "namaste", "good morning", "good evening"],
+          a: "Hello! I'm Koki. Ask me what OKKOKI does, what it costs, or how fast we can get you live.",
+          open: null },
+        { m: ["thank", "thanks", "nice", "cool", "awesome", "love it", "amazing", "wow"],
+          a: "That's kind of you. If you want this level of care on your own site, the first call is free.",
+          open: "book", openLabel: "Book the free call" },
+    ];
+
+    const KOKI_FALLBACK = {
+        a: "That one deserves a human answer. Bring it to the free 30-minute call and you'll get a straight one.",
+        open: "book", openLabel: "Book a free call",
+    };
+
+    function kokiAnswer(query) {
+        const q = " " + query.toLowerCase().trim() + " ";
+        let best = null, bestLen = 0;
+        for (const entry of KOKI_QA) {
+            for (const key of entry.m) {
+                // Longest matching keyword wins, so "google ad" beats "ads"
+                if (q.includes(key) && key.length > bestLen) { best = entry; bestLen = key.length; }
+            }
+        }
+        return best || KOKI_FALLBACK;
+    }
+
+    const kokiEl = document.createElement("div");
+    kokiEl.className = "koki";
+    kokiEl.innerHTML = `
+        <div class="koki-row">
+            <div class="koki-orb" id="kokiOrb"><i></i></div>
+            <div class="koki-hello" id="kokiHello">Ask me anything about OKKOKI</div>
+        </div>
+        <div class="koki-answer" id="kokiAnswer"></div>
+        <div class="koki-chips" id="kokiChips">
+            ${KOKI_CHIPS.map((c) => `<button class="koki-chip" data-koki-ask="${c}">${c}</button>`).join("")}
+        </div>`;
+    listScreen.insertBefore(kokiEl, appListEl);
+
+    const kokiOrb = $("#kokiOrb", kokiEl);
+    const kokiAnswerEl = $("#kokiAnswer", kokiEl);
+    const kokiHello = $("#kokiHello", kokiEl);
+    let kokiThinking = null;
+
+    function kokiAsk(query) {
+        if (!query.trim()) return;
+        Sound.tick();
+        clearTimeout(kokiThinking);
+        kokiOrb.classList.add("thinking");
+        kokiHello.textContent = `“${query}”`;
+        kokiAnswerEl.classList.remove("show");
+        kokiAnswerEl.innerHTML = "";
+
+        kokiThinking = setTimeout(() => {
+            kokiOrb.classList.remove("thinking");
+            const r = kokiAnswer(query);
+            const action = r.open
+                ? `<button class="metro-btn primary koki-do" data-koki-open="${r.open}">${ic("arrow-right")} ${r.openLabel}</button>`
+                : "";
+            // The typewriter comes free from the live-tile engine
+            kokiAnswerEl.innerHTML = `<p class="koki-text"><span data-type="${r.a}" data-type-speed="17"></span></p>${action}`;
+            kokiAnswerEl.classList.add("show");
+            animateFaceExtras(kokiAnswerEl);
+        }, 620);
+    }
+
+    kokiEl.addEventListener("click", (e) => {
+        const chip = e.target.closest("[data-koki-ask]");
+        if (chip) { kokiAsk(chip.dataset.kokiAsk); return; }
+        const go = e.target.closest("[data-koki-open]");
+        if (go) { Sound.tick(); openApp(go.dataset.kokiOpen, null); return; }
+        if (e.target.closest(".koki-orb")) {
+            kokiAsk(searchInput.value.trim() || "hello");
+        }
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && searchInput.value.trim()) {
+            e.preventDefault();
+            kokiAsk(searchInput.value.trim());
+        }
+    });
+
+    function resetKoki() {
+        clearTimeout(kokiThinking);
+        kokiOrb.classList.remove("thinking");
+        kokiHello.textContent = "Ask me anything about OKKOKI";
+        kokiAnswerEl.classList.remove("show");
+        kokiAnswerEl.innerHTML = "";
+    }
+
     jumpGrid.addEventListener("click", (e) => {
         const cell = e.target.closest(".jump-cell.on");
         jumpGrid.classList.remove("active");
@@ -2119,6 +2322,7 @@
         searchInput.value = "";
         searchInput.dispatchEvent(new Event("input"));
         searchInput.focus();
+        resetKoki();
     });
 
     /* ================================================================
@@ -2616,6 +2820,7 @@
     syncWallpaper();
     initLockScreen();
     scheduleAmbientNotifs();
+    registerSW();
     migratePhotos().then(() => {
         photosDirty = true;
         if (current === "start" && !busy) refreshPhotosTileIfNeeded();
